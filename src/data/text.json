@@ -1,0 +1,67 @@
+{
+  "_about": "Every word on the base screen. Rule: max 12 words per sentence, max 2 sentences. {n}, {max} and similar are filled in by the game.",
+
+  "stats": {
+    "power": { "name": "Power", "explain": "Power runs every machine. The Sun makes it." },
+    "air": { "name": "Air", "explain": "Air means oxygen. The crew breathes it all day." },
+    "food": { "name": "Food", "explain": "Food comes from the greenhouse. The crew eats every sol." },
+    "time": { "name": "Time", "explain": "You get {n} time points each sol. Walking uses 1." },
+    "shield": { "name": "Shield", "explain": "The shield blocks radiation. Radiation is invisible energy that can hurt bodies." },
+    "dust": { "name": "Dust", "explain": "Dust on the panels blocks sunlight. Less sunlight means less power." },
+    "science": { "name": "Science stars", "explain": "Stars show the science you did. They raise your score." }
+  },
+
+  "rooms": {
+    "power": { "name": "Power Room", "about": "Solar panels and the battery live here." },
+    "air": { "name": "Air Room", "about": "This machine makes oxygen for the crew to breathe." },
+    "greenhouse": { "name": "Greenhouse", "about": "Plants grow our food here." },
+    "shelter": { "name": "Shield Shelter", "about": "Thick walls keep the crew safe from radiation." }
+  },
+
+  "actions": {
+    "cleanPanels": { "name": "Clean the panels", "about": "Less dust means more power tomorrow." },
+    "makeOxygen": { "name": "Make oxygen", "about": "The machine turns power into air." },
+    "growLights": { "name": "Turn on grow lights", "about": "Plants make food over the next 2 sols." },
+    "raiseShield": { "name": "Raise the shield", "about": "Blocks radiation from the Sun." },
+    "science": { "name": "Do science", "about": "Study Mars and earn a star." }
+  },
+
+  "hud": {
+    "sol": "Sol {n} of {total}",
+    "solExplain": "A sol is one day on Mars. It is about 40 minutes longer than Earth's day.",
+    "todo": "To-do",
+    "time": "Time",
+    "timeLeft": "{n} of {max} time left",
+    "gameSized": "GAME-SIZED",
+    "gameSizedExplain": "These numbers are made small for the game. Real bases use bigger numbers.",
+    "low": "Low!",
+    "shield": "Shield {n} of {max}",
+    "menu": "New game"
+  },
+
+  "panel": {
+    "tapRoom": "Tap a room to walk there.",
+    "walkCost": "Walk",
+    "walking": "Walking to the {room}…",
+    "youAreHere": "You are here",
+    "costs": "Costs",
+    "gives": "Gives",
+    "tomorrow": "tomorrow",
+    "inDays": "in {n} sols",
+    "overDays": "over {n} sols",
+    "noActions": "Nothing to do here yet.",
+    "usesToday": "{n}/{max} today"
+  },
+
+  "reasons": {
+    "noTime": "Not enough time. You need {n}, you have {have}.",
+    "notEnough": "Not enough {stat}. You need {n}, you have {have}.",
+    "full": "{stat} is already full.",
+    "limit": "Done for today. Try again next sol.",
+    "notHere": "Walk to the {room} first.",
+    "noDust": "The panels are already clean.",
+    "walking": "Wait, you are still walking."
+  },
+
+  "confirmNewGame": "Start a new game? Your base will reset."
+}

@@ -1,0 +1,65 @@
+{
+  "_about": "Every NASA dataset the game plans to use. Shown on the Science Sources screen (Step 8) and in README.md. endpoint_status: 'not checked' until Step 5 reads the official docs. Never add an endpoint that is not in official NASA docs.",
+  "sources": [
+    {
+      "id": "donki",
+      "name": "DONKI (Space Weather Database Of Notifications, Knowledge, Information)",
+      "what": "Real solar flares (FLR) and CMEs from the past.",
+      "why": "Gives each run a real flare date and size.",
+      "game_moment": "Solar flare day, Real Mission mode, end screen.",
+      "docs_url": "https://api.nasa.gov/",
+      "endpoint_status": "not checked",
+      "cache_file": "src/data/nasa-cache/donki-flares.json"
+    },
+    {
+      "id": "apod",
+      "name": "APOD (Astronomy Picture of the Day)",
+      "what": "A real space photo with its title and credit.",
+      "why": "A real night sky for the opening scene.",
+      "game_moment": "Grass scene (optional sky).",
+      "docs_url": "https://api.nasa.gov/",
+      "endpoint_status": "not checked",
+      "cache_file": "src/data/nasa-cache/apod.json"
+    },
+    {
+      "id": "osdr",
+      "name": "NASA Open Science Data Repository (OSDR)",
+      "what": "Real research on astronauts and plants in space.",
+      "why": "Science findings for the debrief cards.",
+      "game_moment": "Debrief cards on plant and crew days.",
+      "docs_url": "https://osdr.nasa.gov/",
+      "endpoint_status": "not checked",
+      "cache_file": "src/data/nasa-cache/osdr.json"
+    },
+    {
+      "id": "mars-environment",
+      "name": "Mars environment values (sol length, temperature, dust)",
+      "what": "Real measured values from NASA Mars missions.",
+      "why": "Sets the sol length, cold nights and dust in the game.",
+      "game_moment": "Base sky, dust days, Day Report.",
+      "docs_url": "https://science.nasa.gov/mars/facts/",
+      "endpoint_status": "saved values only: no live public Mars weather API is known to be running",
+      "cache_file": "src/data/nasa-cache/mars-environment.json"
+    },
+    {
+      "id": "signal-delay",
+      "name": "Earth-Mars distance and signal delay",
+      "what": "How far Mars is today and how long a radio message takes.",
+      "why": "Sets the Ask Earth wait and the late-message day.",
+      "game_moment": "Ask Earth button, late-message day.",
+      "docs_url": "https://ssd.jpl.nasa.gov/",
+      "endpoint_status": "not checked",
+      "cache_file": "src/data/nasa-cache/signal-delay.json"
+    },
+    {
+      "id": "nasa-images",
+      "name": "NASA Image and Video Library",
+      "what": "Real Mars and rover photos.",
+      "why": "Pictures for fact cards and the ending.",
+      "game_moment": "Mars Notebook cards, end screen.",
+      "docs_url": "https://images.nasa.gov/",
+      "endpoint_status": "not checked",
+      "cache_file": "src/data/nasa-cache/images.json"
+    }
+  ]
+}

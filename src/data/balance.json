@@ -1,0 +1,73 @@
+{
+  "_about": "Every cost and gain in the game. All numbers here are GAME-SIZED: small, round numbers a kid can count. Edit them here only. Step 3 adds `npm run balance` to check that no day has one best answer and no day is impossible.",
+
+  "resources": {
+    "power": { "max": 20 },
+    "air": { "max": 20 },
+    "food": { "max": 20 }
+  },
+
+  "start": {
+    "_about": "Starting values on Mars. Step 6: the trip choices will change these.",
+    "power": 8,
+    "air": 10,
+    "food": 10,
+    "shield": 0,
+    "dust": 1,
+    "room": "shelter"
+  },
+
+  "day": {
+    "_about": "solarPowerPerDay is made each morning, minus dustPowerLossPerLevel for every level of dust on the panels. crew*/nightHeatPower are used up each night.",
+    "timePoints": 6,
+    "solarPowerPerDay": 10,
+    "dustPowerLossPerLevel": 2,
+    "crewAirPerDay": 3,
+    "crewFoodPerDay": 2,
+    "nightHeatPower": 2
+  },
+
+  "walk": { "time": 1 },
+
+  "shield": { "max": 3, "dropPerDay": 1 },
+
+  "dust": { "max": 4 },
+
+  "actions": {
+    "cleanPanels": {
+      "room": "power",
+      "maxPerDay": 1,
+      "needsDust": true,
+      "cost": { "time": 2 },
+      "gain": { "dust": -1 }
+    },
+    "makeOxygen": {
+      "room": "air",
+      "maxPerDay": 2,
+      "cost": { "power": 3 },
+      "gain": { "air": 3 }
+    },
+    "growLights": {
+      "room": "greenhouse",
+      "maxPerDay": 1,
+      "cost": { "power": 3 },
+      "gain": {},
+      "later": [
+        { "inDays": 1, "gain": { "food": 1 } },
+        { "inDays": 2, "gain": { "food": 1 } }
+      ]
+    },
+    "raiseShield": {
+      "room": "shelter",
+      "maxPerDay": 3,
+      "cost": { "power": 3, "time": 1 },
+      "gain": { "shield": 1 }
+    },
+    "science": {
+      "room": "shelter",
+      "maxPerDay": 2,
+      "cost": { "power": 2, "air": 1 },
+      "gain": { "science": 1 }
+    }
+  }
+}

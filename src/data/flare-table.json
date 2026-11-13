@@ -1,0 +1,10 @@
+{
+  "_about": "Maps a real DONKI flare class (the letter in classType, e.g. 'M2.3') to game radiation. The letter is a REAL NASA VALUE; strength is GAME-SIZED. A shield level equal to or above strength blocks all of it.",
+  "classes": {
+    "A": { "word": "tiny", "strength": 0 },
+    "B": { "word": "tiny", "strength": 0 },
+    "C": { "word": "low", "strength": 1 },
+    "M": { "word": "medium", "strength": 2 },
+    "X": { "word": "high", "strength": 3 }
+  }
+}

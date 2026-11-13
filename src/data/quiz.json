@@ -1,0 +1,35 @@
+{
+  "_about": "The same 3 picture questions before and after play (Step 8). The score change is the learning proof.",
+  "questions": [
+    {
+      "id": "radiation",
+      "question": "What keeps a crew safe from Sun radiation on Mars?",
+      "options": [
+        { "id": "shield", "pic": "shield", "text": "A thick shield" },
+        { "id": "air", "pic": "air", "text": "Mars air" },
+        { "id": "lights", "pic": "lights", "text": "Bright lights" }
+      ],
+      "answer": "shield"
+    },
+    {
+      "id": "power-food",
+      "question": "Grow lights make food. What do they use up?",
+      "options": [
+        { "id": "power", "pic": "power", "text": "Power" },
+        { "id": "nothing", "pic": "nothing", "text": "Nothing" },
+        { "id": "water", "pic": "dust", "text": "Dust" }
+      ],
+      "answer": "power"
+    },
+    {
+      "id": "delay",
+      "question": "You send a message to Mars. When does it arrive?",
+      "options": [
+        { "id": "minutes", "pic": "clock-minutes", "text": "After some minutes" },
+        { "id": "instant", "pic": "clock-now", "text": "Right away" },
+        { "id": "year", "pic": "calendar", "text": "Next year" }
+      ],
+      "answer": "minutes"
+    }
+  ]
+}

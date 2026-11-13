@@ -1,13 +1,25 @@
 import { useState } from "react";
 import Prologue from "./prologue/Prologue";
+import BaseScreen from "./base/BaseScreen";
 
-type Scene = "title" | "prologue" | "launch";
+type Scene = "title" | "prologue" | "base";
+
+// Dev only: http://localhost:5173/?scene=base opens the base directly.
+function firstScene(): Scene {
+  if (!import.meta.env.DEV) return "title";
+  return new URLSearchParams(window.location.search).get("scene") === "base" ? "base" : "title";
+}
 
 export default function App() {
-  const [scene, setScene] = useState<Scene>("title");
+  const [scene, setScene] = useState<Scene>(firstScene);
 
   if (scene === "prologue") {
-    return <Prologue onDone={() => setScene("launch")} />;
+    // Steps 6 adds the trip tutorial and the landing between these two.
+    return <Prologue onDone={() => setScene("base")} />;
+  }
+
+  if (scene === "base") {
+    return <BaseScreen />;
   }
 
   return (
@@ -22,17 +34,10 @@ export default function App() {
         textAlign: "center",
       }}
     >
-      {scene === "title" ? (
-        <div>
-          <h1>Mission ARES</h1>
-          <button onClick={() => setScene("prologue")}>▶ Play</button>
-        </div>
-      ) : (
-        <div>
-          <p id="step1">Step 1 goes here: launch and discovery.</p>
-          <button onClick={() => setScene("prologue")}>Replay prologue</button>
-        </div>
-      )}
+      <div>
+        <h1>Mission ARES</h1>
+        <button onClick={() => setScene("prologue")}>▶ Play</button>
+      </div>
     </main>
   );
 }

@@ -1,0 +1,96 @@
+{
+  "_about": "Mars Notebook fact cards. Every card needs source_url, source_date (when the source was published) and checked. checked=false means nobody has opened the source yet: the game marks it UNCHECKED in dev, and it is listed in TODO.md. Step 5 opens each source and sets checked=true or fixes the card.",
+
+  "facts": [
+    {
+      "id": "sol-length",
+      "title": "A sol is a Mars day",
+      "text": "One Mars day is 24 hours and 39 minutes long. Scientists call it a sol.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA Science: Mars Facts",
+      "source_url": "https://science.nasa.gov/mars/facts/",
+      "source_date": "",
+      "checked": false
+    },
+    {
+      "id": "trip-length",
+      "title": "The long trip",
+      "text": "A trip to Mars takes about 6 to 9 months. In space, no thick air blocks radiation.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA (page to be confirmed)",
+      "source_url": "",
+      "source_date": "",
+      "checked": false
+    },
+    {
+      "id": "insight-dust",
+      "title": "Dust stopped a lander",
+      "text": "NASA's InSight lander ran on solar power. Dust slowly covered its panels until it stopped.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA JPL news (page to be confirmed)",
+      "source_url": "",
+      "source_date": "2022-12",
+      "checked": false
+    },
+    {
+      "id": "flare-classes",
+      "title": "Flare sizes",
+      "text": "Flares have letter sizes: C, M and X. Each letter is 10 times stronger.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA (page to be confirmed)",
+      "source_url": "",
+      "source_date": "",
+      "checked": false
+    },
+    {
+      "id": "donki-flare",
+      "title": "A real flare",
+      "text": "On {date}, a real class {class} flare burst from the Sun.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA DONKI space weather database",
+      "source_url": "https://api.nasa.gov/",
+      "source_date": "filled in from the DONKI record",
+      "checked": false
+    },
+    {
+      "id": "veggie-lettuce",
+      "title": "Space salad",
+      "text": "Astronauts grew lettuce on the space station. In 2015 they ate some!",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA (page to be confirmed)",
+      "source_url": "",
+      "source_date": "2015-08",
+      "checked": false
+    },
+    {
+      "id": "moxie-oxygen",
+      "title": "Oxygen from Mars air",
+      "text": "The MOXIE machine on the Perseverance rover made oxygen from Mars air.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA JPL (page to be confirmed)",
+      "source_url": "",
+      "source_date": "",
+      "checked": false
+    },
+    {
+      "id": "signal-delay",
+      "title": "Slow messages",
+      "text": "A radio message takes about 3 to 22 minutes between Earth and Mars.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA (page to be confirmed)",
+      "source_url": "",
+      "source_date": "",
+      "checked": false
+    },
+    {
+      "id": "opportunity-storm",
+      "title": "The rover and the storm",
+      "text": "In 2018, a giant dust storm covered Mars. The Opportunity rover lost power and went silent.",
+      "label": "REAL NASA VALUE",
+      "source_name": "NASA JPL (page to be confirmed)",
+      "source_url": "",
+      "source_date": "2019-02",
+      "checked": false
+    }
+  ]
+}
