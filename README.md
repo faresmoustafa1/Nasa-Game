@@ -82,3 +82,53 @@ Dev shortcuts (only in `npm run dev`):
 - http://localhost:5173/?scene=base opens the base directly (resumes the save)
 - http://localhost:5173/?scene=base&sol=3 starts a fresh game on Sol 3
 - "New game" (top right) resets the save
+
+## Step 3: the sol loop and the balance checker
+
+A sol goes: **morning** (dust event, food from grow lights, the Sun makes
+power) → **day** (walk + act) → **End Sol** → **night** → **Day Report**.
+
+- Tonight's needs are always on screen before you end the sol:
+  the crew breathes 3 Air, eats 2 Food, heaters use 2 Power
+  (plus extra on event days). A red warning shows when you can't pay.
+- Rule: if the base can't pay tonight's needs, or radiation dose reaches 3,
+  it is a **Mission Pause**: a friendly reason, a tip, and **Retry Sol N**
+  (back to that morning). If no plan can save the sol from that morning,
+  the card says so and offers **Back to Sol N−1**: earlier choices matter.
+- Flares: each flare point the shield doesn't block adds 1 dose.
+  The shield fades by 1 each night.
+
+### Balance checker
+
+    npm run balance                    # every sol, flare classes C, M, X
+    npm run balance -- --all-orders    # also all 120 orders of Sols 2-6 (slow)
+
+It plays every combination of walks and actions with the real rules and
+numbers and reports, per sol: UNWINNABLE (no choice survives from any start),
+DOMINANT (one choice beats all others on every bar), no-brainer actions and
+useless actions. Current result: no unwinnable or one-answer sols, and all
+120 day orders can be finished with C, M and X flares.
+
+The checker found one real problem: cleaning the panels only cost time, so it
+was always right. Cleaning now also costs 1 Air (it's a spacesuit walk), and
+became a real trade-off.
+
+## Step 4: the learning loop (every sol)
+
+1. **Briefing**: Commander Rivera says the problem in one sentence and
+   explains new science words (from glossary.json).
+2. **To-do** with an icon, top left. Flare days show the flare class and points.
+3. **Ask Earth**: one hint per sol, costs 1 Power, arrives after a delay
+   (10 s here; real messages take minutes).
+4. **Predict**: End Sol first asks "What do you think will happen?" with
+   2-3 picture choices.
+5. **Act** in the rooms.
+6. **Consequence**: night falls, bars drop, flare streaks hit the base,
+   the shield dome flashes (blocked) or the base flashes orange (hit).
+7. **Debrief**: right or wrong (celebrated either way), why it happened,
+   the NASA fact card with its label and source.
+8. The fact goes into the **Mars Notebook** (counter in the top bar).
+
+Sol 1 has first-run tips with arrows (bars → rooms → buttons → End Sol).
+The flare is a labelled GAME EXAMPLE (class M) until Step 5 connects real
+DONKI data; the "real flare on <date>" card stays hidden until then.

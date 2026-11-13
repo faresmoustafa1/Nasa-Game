@@ -1,6 +1,5 @@
 {
   "_about": "The 7 Mars days. slot 'first' is always Sol 1, 'last' is always Sol 7, and the 'shuffle' days are mixed each run (Step 8). Each day teaches ONE real idea. event, predict, debrief and goal are used by the day loop (Steps 3-4). DRAFT text: check reading level before shipping.",
-
   "days": [
     {
       "id": "settle",
@@ -9,22 +8,48 @@
       "title": "Settling in",
       "todo": "Use power to make air or food.",
       "briefing": "Welcome to Mars! Power makes our air and our food.",
+      "hint": "Making air or food costs 3 power. Save 2 power for the heaters tonight.",
       "teaches": "Every machine uses power. Power is limited.",
       "showRadiation": false,
       "event": {},
-      "goal": { "type": "anyAction", "actions": ["makeOxygen", "growLights"] },
+      "goal": {
+        "type": "anyAction",
+        "actions": [
+          "makeOxygen",
+          "growLights"
+        ]
+      },
       "predict": {
         "question": "What happens to power when you make air?",
         "options": [
-          { "id": "down", "pic": "power-down", "text": "Power goes down" },
-          { "id": "up", "pic": "power-up", "text": "Power goes up" },
-          { "id": "same", "pic": "power-same", "text": "Nothing changes" }
+          {
+            "id": "down",
+            "pic": "power-down",
+            "text": "Power goes down"
+          },
+          {
+            "id": "up",
+            "pic": "power-up",
+            "text": "Power goes up"
+          },
+          {
+            "id": "same",
+            "pic": "power-same",
+            "text": "Nothing changes"
+          }
         ],
         "answer": "down"
       },
-      "debrief": { "why": "Every machine uses power. Power is like the base's money." },
-      "factIds": ["sol-length"],
-      "glossary": ["sol", "oxygen"],
+      "debrief": {
+        "why": "Every machine uses power. Power is like the base's money."
+      },
+      "factIds": [
+        "sol-length"
+      ],
+      "glossary": [
+        "sol",
+        "oxygen"
+      ],
       "discussion": "What uses electricity in your home? What would you turn off first?"
     },
     {
@@ -34,22 +59,46 @@
       "title": "Dusty panels",
       "todo": "Dust covers the solar panels.",
       "briefing": "Dust is on our panels. Dirty panels make less power.",
+      "hint": "Clean the panels early. Clean panels make more power tomorrow.",
       "teaches": "Dust blocks sunlight, so solar panels make less power.",
       "showRadiation": false,
-      "event": { "addDust": 2 },
-      "goal": { "type": "endDay" },
+      "event": {
+        "addDust": 2
+      },
+      "goal": {
+        "type": "endDay"
+      },
       "predict": {
         "question": "You skip cleaning. What happens tomorrow?",
         "options": [
-          { "id": "less", "pic": "power-down", "text": "Less power" },
-          { "id": "same", "pic": "power-same", "text": "Same power" },
-          { "id": "more", "pic": "power-up", "text": "More power" }
+          {
+            "id": "less",
+            "pic": "power-down",
+            "text": "Less power"
+          },
+          {
+            "id": "same",
+            "pic": "power-same",
+            "text": "Same power"
+          },
+          {
+            "id": "more",
+            "pic": "power-up",
+            "text": "More power"
+          }
         ],
         "answer": "less"
       },
-      "debrief": { "why": "Dust blocks sunlight. Cleaning costs time but gives power later." },
-      "factIds": ["insight-dust"],
-      "glossary": ["solarPanel", "dustOpacity"],
+      "debrief": {
+        "why": "Dust blocks sunlight. Cleaning costs time but gives power later."
+      },
+      "factIds": [
+        "insight-dust"
+      ],
+      "glossary": [
+        "solarPanel",
+        "dustOpacity"
+      ],
       "discussion": "Is it better to fix a problem now or later? Why?"
     },
     {
@@ -59,22 +108,48 @@
       "title": "Solar flare",
       "todo": "A solar flare is coming!",
       "briefing": "The Sun just sent a burst of energy! Raise the shield in time.",
+      "hint": "Each shield level blocks 1 flare point. Check the flare size.",
       "teaches": "Mars has thin air, so Sun radiation reaches the ground.",
       "showRadiation": true,
-      "event": { "flare": true },
-      "goal": { "type": "endDay" },
+      "event": {
+        "flare": true
+      },
+      "goal": {
+        "type": "endDay"
+      },
       "predict": {
         "question": "What happens if the shield is low?",
         "options": [
-          { "id": "hurt", "pic": "crew-radiation", "text": "The crew gets radiation" },
-          { "id": "nothing", "pic": "crew-ok", "text": "Nothing happens" },
-          { "id": "plants", "pic": "plants-up", "text": "Plants grow faster" }
+          {
+            "id": "hurt",
+            "pic": "crew-radiation",
+            "text": "The crew gets radiation"
+          },
+          {
+            "id": "nothing",
+            "pic": "crew-ok",
+            "text": "Nothing happens"
+          },
+          {
+            "id": "plants",
+            "pic": "plants-up",
+            "text": "Plants grow faster"
+          }
         ],
         "answer": "hurt"
       },
-      "debrief": { "why": "Mars has very thin air. It cannot block the Sun's radiation." },
-      "factIds": ["flare-classes", "donki-flare"],
-      "glossary": ["solarFlare", "radiation", "atmosphere"],
+      "debrief": {
+        "why": "Mars has very thin air. It cannot block the Sun's radiation."
+      },
+      "factIds": [
+        "flare-classes",
+        "donki-flare"
+      ],
+      "glossary": [
+        "solarFlare",
+        "radiation",
+        "atmosphere"
+      ],
       "discussion": "Why does Earth's air keep us safe? What would you pack for Mars?"
     },
     {
@@ -84,21 +159,45 @@
       "title": "Weak plants",
       "todo": "The plants look weak.",
       "briefing": "Our plants are droopy. They need light and warmth.",
+      "hint": "Turn on the grow lights today. Weak plants need light.",
       "teaches": "Growing food in space costs power for light and heat.",
       "showRadiation": false,
-      "event": { "foodLossIfNoLights": 2 },
-      "goal": { "type": "anyAction", "actions": ["growLights"] },
+      "event": {
+        "foodLossIfNoLights": 2
+      },
+      "goal": {
+        "type": "anyAction",
+        "actions": [
+          "growLights"
+        ]
+      },
       "predict": {
         "question": "You skip the grow lights. What happens?",
         "options": [
-          { "id": "droop", "pic": "plants-down", "text": "Plants droop, less food" },
-          { "id": "same", "pic": "plants-same", "text": "Plants stay the same" },
-          { "id": "grow", "pic": "plants-up", "text": "Plants grow anyway" }
+          {
+            "id": "droop",
+            "pic": "plants-down",
+            "text": "Plants droop, less food"
+          },
+          {
+            "id": "same",
+            "pic": "plants-same",
+            "text": "Plants stay the same"
+          },
+          {
+            "id": "grow",
+            "pic": "plants-up",
+            "text": "Plants grow anyway"
+          }
         ],
         "answer": "droop"
       },
-      "debrief": { "why": "Plants need light to make food. On Mars, light costs power." },
-      "factIds": ["veggie-lettuce"],
+      "debrief": {
+        "why": "Plants need light to make food. On Mars, light costs power."
+      },
+      "factIds": [
+        "veggie-lettuce"
+      ],
       "glossary": [],
       "discussion": "What do plants need to grow? Which of those is hard on Mars?"
     },
@@ -109,22 +208,45 @@
       "title": "Slow air maker",
       "todo": "The air maker is slow.",
       "briefing": "The air maker is tired. Fix it, or use less air.",
+      "hint": "Fixing takes time. After that, the machine works well again.",
       "teaches": "Life support machines need care. Air is the most urgent need.",
       "showRadiation": false,
-      "event": { "airMakerSlow": true },
-      "goal": { "type": "endDay" },
+      "event": {
+        "airMakerSlow": true
+      },
+      "goal": {
+        "type": "endDay"
+      },
       "predict": {
         "question": "The air maker stays broken. What happens?",
         "options": [
-          { "id": "less", "pic": "air-down", "text": "Air goes down" },
-          { "id": "same", "pic": "air-same", "text": "Air stays the same" },
-          { "id": "more", "pic": "air-up", "text": "Air goes up" }
+          {
+            "id": "less",
+            "pic": "air-down",
+            "text": "Air goes down"
+          },
+          {
+            "id": "same",
+            "pic": "air-same",
+            "text": "Air stays the same"
+          },
+          {
+            "id": "more",
+            "pic": "air-up",
+            "text": "Air goes up"
+          }
         ],
         "answer": "less"
       },
-      "debrief": { "why": "The crew breathes all day. A slow machine means less air." },
-      "factIds": ["moxie-oxygen"],
-      "glossary": ["oxygen"],
+      "debrief": {
+        "why": "The crew breathes all day. A slow machine means less air."
+      },
+      "factIds": [
+        "moxie-oxygen"
+      ],
+      "glossary": [
+        "oxygen"
+      ],
       "discussion": "You can live weeks without food but minutes without air. What does that mean for a base?"
     },
     {
@@ -134,22 +256,45 @@
       "title": "Late message",
       "todo": "A message from Earth arrives late.",
       "briefing": "Earth sent advice. But it took minutes to get here!",
+      "hint": "Old news can be wrong. Check what is happening now.",
       "teaches": "Radio messages take minutes to travel between Earth and Mars.",
       "showRadiation": false,
-      "event": { "lateMessage": true },
-      "goal": { "type": "endDay" },
+      "event": {
+        "lateMessage": true
+      },
+      "goal": {
+        "type": "endDay"
+      },
       "predict": {
         "question": "Is Earth's advice still right?",
         "options": [
-          { "id": "maybe", "pic": "message-old", "text": "Maybe not, it is old" },
-          { "id": "always", "pic": "message-ok", "text": "Yes, always" },
-          { "id": "never", "pic": "message-wrong", "text": "No, never" }
+          {
+            "id": "maybe",
+            "pic": "message-old",
+            "text": "Maybe not, it is old"
+          },
+          {
+            "id": "always",
+            "pic": "message-ok",
+            "text": "Yes, always"
+          },
+          {
+            "id": "never",
+            "pic": "message-wrong",
+            "text": "No, never"
+          }
         ],
         "answer": "maybe"
       },
-      "debrief": { "why": "Messages travel at light speed, but Mars is far. Advice can be old." },
-      "factIds": ["signal-delay"],
-      "glossary": ["signalDelay"],
+      "debrief": {
+        "why": "Messages travel at light speed, but Mars is far. Advice can be old."
+      },
+      "factIds": [
+        "signal-delay"
+      ],
+      "glossary": [
+        "signalDelay"
+      ],
       "discussion": "When should you trust old advice? When should you decide yourself?"
     },
     {
@@ -159,22 +304,46 @@
       "title": "Big dust storm",
       "todo": "A big dust storm is here!",
       "briefing": "A huge storm blocks the Sun. Save power for what matters most.",
+      "hint": "The storm cuts power. Do only what keeps the crew alive.",
       "teaches": "Dust storms can block the Sun for weeks. Plan ahead.",
       "showRadiation": true,
-      "event": { "addDust": 3 },
-      "goal": { "type": "endDay" },
+      "event": {
+        "addDust": 3,
+        "flare": "C"
+      },
+      "goal": {
+        "type": "endDay"
+      },
       "predict": {
         "question": "What will the storm do to power?",
         "options": [
-          { "id": "less", "pic": "power-down", "text": "Much less power" },
-          { "id": "same", "pic": "power-same", "text": "Same power" },
-          { "id": "more", "pic": "power-up", "text": "More power" }
+          {
+            "id": "less",
+            "pic": "power-down",
+            "text": "Much less power"
+          },
+          {
+            "id": "same",
+            "pic": "power-same",
+            "text": "Same power"
+          },
+          {
+            "id": "more",
+            "pic": "power-up",
+            "text": "More power"
+          }
         ],
         "answer": "less"
       },
-      "debrief": { "why": "Storm dust blocks sunlight. Saving power earlier helped you now." },
-      "factIds": ["opportunity-storm"],
-      "glossary": ["dustOpacity"],
+      "debrief": {
+        "why": "Storm dust blocks sunlight. Saving power earlier helped you now."
+      },
+      "factIds": [
+        "opportunity-storm"
+      ],
+      "glossary": [
+        "dustOpacity"
+      ],
       "discussion": "How did choices on Sol 2 change Sol 7? Where else do early choices matter?"
     }
   ]

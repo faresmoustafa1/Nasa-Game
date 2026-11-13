@@ -26,5 +26,13 @@ Read the official docs before writing any fetch code (Step 5):
 - [ ] Mars weather: confirm there is no live public API (InSight ended 2022)
 - [ ] DEMO_KEY rate limits
 
+## Game rules
+- [ ] Ask Earth wait is GAME-SIZED (10 s). Step 5: show today's real
+      Earth–Mars delay next to it.
+- [ ] Days 4-7 play with the generic loop. Step 7 adds the late-message
+      choice (trust old advice or decide) and the storm finale polish.
+- [ ] "Mars nights are very cold" in the Day Report: add a real temperature
+      value with a source in Step 5.
+
 ## Game text
 - [ ] Reading-level pass on days.json (grade 2–4, ≤ 12 words a sentence)

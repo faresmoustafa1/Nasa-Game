@@ -1,31 +1,83 @@
 {
   "_about": "Every word on the base screen. Rule: max 12 words per sentence, max 2 sentences. {n}, {max} and similar are filled in by the game.",
-
   "stats": {
-    "power": { "name": "Power", "explain": "Power runs every machine. The Sun makes it." },
-    "air": { "name": "Air", "explain": "Air means oxygen. The crew breathes it all day." },
-    "food": { "name": "Food", "explain": "Food comes from the greenhouse. The crew eats every sol." },
-    "time": { "name": "Time", "explain": "You get {n} time points each sol. Walking uses 1." },
-    "shield": { "name": "Shield", "explain": "The shield blocks radiation. Radiation is invisible energy that can hurt bodies." },
-    "dust": { "name": "Dust", "explain": "Dust on the panels blocks sunlight. Less sunlight means less power." },
-    "science": { "name": "Science stars", "explain": "Stars show the science you did. They raise your score." }
+    "power": {
+      "name": "Power",
+      "explain": "Power runs every machine. The Sun makes it."
+    },
+    "air": {
+      "name": "Air",
+      "explain": "Air means oxygen. The crew breathes it all day."
+    },
+    "food": {
+      "name": "Food",
+      "explain": "Food comes from the greenhouse. The crew eats every sol."
+    },
+    "time": {
+      "name": "Time",
+      "explain": "You get {n} time points each sol. Walking uses 1."
+    },
+    "shield": {
+      "name": "Shield",
+      "explain": "The shield blocks radiation. Radiation is invisible energy that can hurt bodies."
+    },
+    "dust": {
+      "name": "Dust",
+      "explain": "Dust on the panels blocks sunlight. Less sunlight means less power."
+    },
+    "science": {
+      "name": "Science stars",
+      "explain": "Stars show the science you did. They raise your score."
+    },
+    "dose": {
+      "name": "Dose",
+      "explain": "Dose is how much radiation got into the crew. Too much is a Mission Pause."
+    }
   },
-
   "rooms": {
-    "power": { "name": "Power Room", "about": "Solar panels and the battery live here." },
-    "air": { "name": "Air Room", "about": "This machine makes oxygen for the crew to breathe." },
-    "greenhouse": { "name": "Greenhouse", "about": "Plants grow our food here." },
-    "shelter": { "name": "Shield Shelter", "about": "Thick walls keep the crew safe from radiation." }
+    "power": {
+      "name": "Power Room",
+      "about": "Solar panels and the battery live here."
+    },
+    "air": {
+      "name": "Air Room",
+      "about": "This machine makes oxygen for the crew to breathe."
+    },
+    "greenhouse": {
+      "name": "Greenhouse",
+      "about": "Plants grow our food here."
+    },
+    "shelter": {
+      "name": "Shield Shelter",
+      "about": "Thick walls keep the crew safe from radiation."
+    }
   },
-
   "actions": {
-    "cleanPanels": { "name": "Clean the panels", "about": "Less dust means more power tomorrow." },
-    "makeOxygen": { "name": "Make oxygen", "about": "The machine turns power into air." },
-    "growLights": { "name": "Turn on grow lights", "about": "Plants make food over the next 2 sols." },
-    "raiseShield": { "name": "Raise the shield", "about": "Blocks radiation from the Sun." },
-    "science": { "name": "Do science", "about": "Study Mars and earn a star." }
+    "cleanPanels": {
+      "name": "Clean the panels",
+      "about": "Less dust means more power tomorrow."
+    },
+    "makeOxygen": {
+      "name": "Make oxygen",
+      "about": "The machine turns power into air."
+    },
+    "growLights": {
+      "name": "Turn on grow lights",
+      "about": "Plants make food over the next 2 sols."
+    },
+    "raiseShield": {
+      "name": "Raise the shield",
+      "about": "Blocks radiation from the Sun."
+    },
+    "science": {
+      "name": "Do science",
+      "about": "Study Mars and earn a star."
+    },
+    "fixAirMaker": {
+      "name": "Fix the air maker",
+      "about": "Takes time. Then the machine makes full air again."
+    }
   },
-
   "hud": {
     "sol": "Sol {n} of {total}",
     "solExplain": "A sol is one day on Mars. It is about 40 minutes longer than Earth's day.",
@@ -36,9 +88,13 @@
     "gameSizedExplain": "These numbers are made small for the game. Real bases use bigger numbers.",
     "low": "Low!",
     "shield": "Shield {n} of {max}",
-    "menu": "New game"
+    "menu": "New game",
+    "dose": "Dose {n} of {max}",
+    "flare": "Flare tonight: class {cls} ({word})",
+    "flarePoints": "{n} flare points. Each shield level blocks 1.",
+    "notebook": "Notebook: {n}",
+    "flareShort": "Flare {cls} tonight: {n} points"
   },
-
   "panel": {
     "tapRoom": "Tap a room to walk there.",
     "walkCost": "Walk",
@@ -52,7 +108,6 @@
     "noActions": "Nothing to do here yet.",
     "usesToday": "{n}/{max} today"
   },
-
   "reasons": {
     "noTime": "Not enough time. You need {n}, you have {have}.",
     "notEnough": "Not enough {stat}. You need {n}, you have {have}.",
@@ -60,8 +115,110 @@
     "limit": "Done for today. Try again next sol.",
     "notHere": "Walk to the {room} first.",
     "noDust": "The panels are already clean.",
-    "walking": "Wait, you are still walking."
+    "walking": "Wait, you are still walking.",
+    "fixed": "Already fixed today."
   },
-
-  "confirmNewGame": "Start a new game? Your base will reset."
+  "confirmNewGame": "Start a new game? Your base will reset.",
+  "endbar": {
+    "tonight": "Tonight the crew needs",
+    "notEnough": "Not enough {stat} for tonight!",
+    "endSol": "End Sol {n}",
+    "flareWarn": "Flare {n} vs shield {s}"
+  },
+  "askEarth": {
+    "button": "Ask Earth",
+    "left": "{n} left today",
+    "used": "Asked today",
+    "sending": "Message flying to Earth… {s}s",
+    "earthSays": "Earth says:",
+    "delayNote": "That took {s} seconds here. A real message takes minutes each way!",
+    "close": "Thanks!"
+  },
+  "briefing": {
+    "title": "Sol {n}: {title}",
+    "from": "Commander Rivera",
+    "words": "New words",
+    "go": "Let's go!"
+  },
+  "predict": {
+    "title": "What do you think will happen?",
+    "sub": "Pick one. Then the night begins.",
+    "back": "Not yet, keep playing"
+  },
+  "night": {
+    "title": "Night on Mars…",
+    "flareHit": "The flare hits!",
+    "flareBlocked": "The shield holds!"
+  },
+  "report": {
+    "title": "Sol {n} Report",
+    "today": "Today",
+    "night": "Tonight",
+    "tomorrow": "Tomorrow morning",
+    "todoDone": "To-do done!",
+    "todoNot": "To-do not done.",
+    "nothing": "You rested all day.",
+    "walked": "Walks today: {n}",
+    "did": "{name} ×{n}",
+    "breathe": "The crew breathed air.",
+    "eat": "The crew ate food.",
+    "heat": "Heaters kept the base warm. Mars nights are very cold.",
+    "plantsDroop": "Weak plants drooped without light.",
+    "flareAll": "A class {cls} flare hit. Your shield blocked it all!",
+    "flareSome": "A class {cls} flare hit. The shield blocked {blocked}. {through} got in.",
+    "flareNone": "A class {cls} flare hit. No shield! {through} got in.",
+    "shieldFade": "The shield faded a little overnight.",
+    "sun": "The Sun makes power.",
+    "sunDusty": "The Sun makes power. Dust blocks some light.",
+    "pending": "The grow lights made food.",
+    "dustAdd": "Dust blew onto the panels.",
+    "next": "Next"
+  },
+  "debrief": {
+    "title": "Here is why",
+    "right": "You guessed right!",
+    "wrong": "Good guess! Testing ideas is what scientists do.",
+    "answer": "What really happens: {text}",
+    "notebook": "Added to your Mars Notebook! Cards: {n}",
+    "unchecked": "SOURCE NOT CHECKED YET",
+    "next": "Start Sol {n}",
+    "finish": "Finish the mission"
+  },
+  "pause": {
+    "title": "Mission Pause",
+    "air": "The crew ran out of air tonight. People need air all the time.",
+    "food": "The crew ran out of food tonight. Plants grow slowly, so plan ahead.",
+    "power": "The heaters ran out of power tonight. Save power for the night.",
+    "dose": "Too much radiation got in. Raise the shield before a flare.",
+    "tipAir": "Try: make oxygen before the night.",
+    "tipFood": "Try: turn on grow lights a sol early.",
+    "tipPower": "Try: keep {n} power for the heaters.",
+    "tipDose": "Try: raise the shield as high as the flare size.",
+    "calm": "Nothing is lost. Try a new plan!",
+    "retry": "Retry Sol {n}",
+    "stuck": "From this morning, no plan can save Sol {n}. Earlier choices matter!",
+    "back": "Back to Sol {n}",
+    "retryAnyway": "Retry Sol {n} anyway"
+  },
+  "complete": {
+    "title": "Mission complete!",
+    "body": "You kept the base alive for {n} sols. Great job, Mars helper!",
+    "stars": "Science stars: {n}",
+    "cards": "Notebook cards: {n}",
+    "again": "Play again"
+  },
+  "coach": {
+    "bars": "These 3 bars keep the crew alive. Tap one to learn more.",
+    "rooms": "Tap a room to walk there. Walking costs 1 time.",
+    "panel": "Each button shows its cost first. Try one!",
+    "endsol": "Done for today? End the sol. Tonight the crew uses air, food and power.",
+    "next": "Next",
+    "skip": "Skip tips"
+  },
+  "labels": {
+    "game": "GAME-SIZED",
+    "real": "REAL NASA VALUE",
+    "example": "GAME EXAMPLE",
+    "exampleFlare": "Example flare. Real NASA flare data comes next."
+  }
 }

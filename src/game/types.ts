@@ -3,7 +3,7 @@
 
 export type ResourceId = "power" | "air" | "food";
 export type RoomId = "power" | "air" | "greenhouse" | "shelter";
-export type StatId = ResourceId | "time" | "shield" | "dust" | "science";
+export type StatId = ResourceId | "time" | "shield" | "dust" | "science" | "dose";
 
 /** A set of changes, e.g. { power: 3, time: 1 }. */
 export type Amounts = Partial<Record<StatId, number>>;
@@ -13,6 +13,10 @@ export type ActionDef = {
   maxPerDay: number;
   /** Only possible while there is dust on the panels. */
   needsDust?: boolean;
+  /** Only shows up on a sol with this event (e.g. "airMakerSlow"). */
+  needsEvent?: string;
+  /** Sets a flag for the rest of the sol (e.g. "airMakerFixed"). */
+  setsFlag?: string;
   cost: Amounts;
   gain: Amounts;
   /** Gains that arrive on a later sol (e.g. food from grow lights). */
@@ -40,12 +44,28 @@ export type BalanceConfig = {
   walk: { time: number };
   shield: { max: number; dropPerDay: number };
   dust: { max: number };
+  radiation: { maxDose: number };
+  events: {
+    airMakerSlow: { oxygenAirGain: number };
+  };
+  askEarth: { perDay: number; cost: Amounts; waitSeconds: number };
   actions: Record<string, ActionDef>;
 };
 
 export type DayGoal =
   | { type: "anyAction"; actions: string[] }
   | { type: "endDay" };
+
+export type DayEvent = {
+  /** Dust added in the morning. */
+  addDust?: number;
+  /** A flare tonight: true = this run's flare (DONKI), or a class letter like "C". */
+  flare?: boolean | string;
+  /** Food lost tonight if the grow lights were not used today. */
+  foodLossIfNoLights?: number;
+  airMakerSlow?: boolean;
+  lateMessage?: boolean;
+};
 
 export type DayDef = {
   id: string;
@@ -54,9 +74,10 @@ export type DayDef = {
   title: string;
   todo: string;
   briefing: string;
+  hint: string;
   teaches: string;
   showRadiation: boolean;
-  event: Record<string, number | boolean>;
+  event: DayEvent;
   goal: DayGoal;
   predict: {
     question: string;
@@ -72,14 +93,16 @@ export type DayDef = {
 /** A gain that is waiting for a later sol. */
 export type PendingGain = { sol: number; gain: Amounts; from: string };
 
-/** One thing the player did today (feeds the Day Report in Step 3). */
+/** One thing the player did today. */
 export type LogEntry =
   | { kind: "walk"; from: RoomId; to: RoomId; change: Amounts }
   | { kind: "action"; id: string; change: Amounts };
 
+export type Prediction = { sol: number; dayId: string; choice: string; right: boolean };
+
 export type GameState = {
   /** Save format version. Bump it when this shape changes. */
-  v: 1;
+  v: 2;
   /** Which mission day it is, 1-based. */
   sol: number;
   /** Day ids in play order (Step 8 shuffles the middle ones). */
@@ -90,12 +113,71 @@ export type GameState = {
   shield: number;
   dust: number;
   science: number;
+  /** Radiation the crew has taken in so far (Mission Pause at radiation.maxDose). */
+  dose: number;
   timeLeft: number;
   room: RoomId;
+  /** Today's event, copied from the day in the morning. */
+  events: DayEvent;
+  /** Things fixed today, e.g. { airMakerFixed: true }. */
+  flags: Record<string, boolean>;
   /** How many times each action was used this sol. */
   usedToday: Record<string, number>;
+  askedEarth: number;
   pending: PendingGain[];
   log: LogEntry[];
+  /** Mars Notebook: fact ids collected. */
+  notebook: string[];
+  predictions: Prediction[];
+  /** The state at the start of this sol, for "Retry this sol". */
+  morning: Snapshot | null;
+};
+
+export type Snapshot = Omit<GameState, "morning">;
+
+/** Per-run info that is not in balance.json (from NASA data or the mode). */
+export type RunInfo = {
+  /** Flare class for "flare: true" days, e.g. "M2.4". */
+  flareClass: string;
+  flareTable: Record<string, { word: string; strength: number }>;
+};
+
+export type ReportLine =
+  | { kind: "did"; id: string; count: number; change: Amounts }
+  | { kind: "walked"; count: number; change: Amounts }
+  | { kind: "breathe"; change: Amounts }
+  | { kind: "eat"; change: Amounts }
+  | { kind: "heat"; change: Amounts }
+  | { kind: "plantsDroop"; change: Amounts }
+  | { kind: "flare"; cls: string; word: string; strength: number; blocked: number; through: number; change: Amounts }
+  | { kind: "shieldFade"; change: Amounts }
+  | { kind: "sun"; dust: number; change: Amounts }
+  | { kind: "pending"; from: string; change: Amounts }
+  | { kind: "dustAdd"; change: Amounts };
+
+export type PauseStat = "air" | "food" | "power" | "dose";
+
+export type DayReport = {
+  sol: number;
+  dayId: string;
+  /** Bars at the start of the sol and after the night. */
+  before: { power: number; air: number; food: number };
+  after: { power: number; air: number; food: number };
+  today: ReportLine[];
+  night: ReportLine[];
+  /** What tomorrow morning brings (sun, food from grow lights, dust). */
+  tomorrow: ReportLine[];
+  paused: PauseStat | null;
+  complete: boolean;
+  goalDone: boolean;
+};
+
+export type EndResult = {
+  report: DayReport;
+  /** The base after the night (bars dropped). */
+  night: GameState;
+  /** Tomorrow morning, or null if paused or the mission is over. */
+  next: GameState | null;
 };
 
 export type ReasonId =
@@ -104,7 +186,8 @@ export type ReasonId =
   | "full"
   | "limit"
   | "notHere"
-  | "noDust";
+  | "noDust"
+  | "fixed";
 
 /** Can the player do this? If not, why, in words the screen can show. */
 export type Check =

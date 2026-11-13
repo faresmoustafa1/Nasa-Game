@@ -11,6 +11,8 @@ export type IconName =
   | "shield"
   | "dust"
   | "science"
+  | "dose"
+  | "night"
   | "walk"
   | "base"
   | "flare"
@@ -27,6 +29,8 @@ const ICON_COLOR: Record<IconName, string> = {
   shield: "#c39bff",
   dust: "#d49a6a",
   science: "#ff9ecf",
+  dose: "#ff7b6b",
+  night: "#b9c6ff",
   walk: "#f4f1e8",
   base: "#f4f1e8",
   flare: "#ff9b3d",
@@ -84,6 +88,18 @@ function Shape({ name }: { name: IconName }) {
       );
     case "science":
       return <path d="m12 1.8 3 6.4 7 .9-5.1 4.8 1.3 6.9L12 17.5l-6.2 3.3 1.3-6.9L2 9.1l7-.9z" fill={c} stroke={DARK} strokeWidth="1.3" strokeLinejoin="round" />;
+    case "dose":
+      return (
+        <g stroke={DARK} strokeWidth="1.2" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10.5" fill={c} />
+          {[0, 120, 240].map((a) => (
+            <path key={a} d="M12 12 L8.2 5.4 A7.6 7.6 0 0 1 15.8 5.4 Z" fill={DARK} transform={`rotate(${a} 12 12)`} />
+          ))}
+          <circle cx="12" cy="12" r="2.2" fill={DARK} />
+        </g>
+      );
+    case "night":
+      return <path d="M15 2.5a9.5 9.5 0 1 0 6.5 15A8 8 0 0 1 15 2.5z" fill={c} stroke={DARK} strokeWidth="1.3" strokeLinejoin="round" />;
     case "walk":
       return (
         <g fill={c} stroke={DARK} strokeWidth="1">

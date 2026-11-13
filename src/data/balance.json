@@ -33,12 +33,29 @@
 
   "dust": { "max": 4 },
 
+  "radiation": {
+    "_about": "Flare points that get past the shield add to the crew's dose. Reaching maxDose is a Mission Pause.",
+    "maxDose": 3
+  },
+
+  "events": {
+    "airMakerSlow": { "oxygenAirGain": 1 }
+  },
+
+  "askEarth": {
+    "_about": "One hint per sol. waitSeconds is the GAME-SIZED wait (the real delay is minutes).",
+    "perDay": 1,
+    "cost": { "power": 1 },
+    "waitSeconds": 10
+  },
+
   "actions": {
     "cleanPanels": {
       "room": "power",
       "maxPerDay": 1,
       "needsDust": true,
-      "cost": { "time": 2 },
+      "_why": "Cleaning means a walk outside in a spacesuit: it uses suit air.",
+      "cost": { "time": 2, "air": 1 },
       "gain": { "dust": -1 }
     },
     "makeOxygen": {
@@ -56,6 +73,14 @@
         { "inDays": 1, "gain": { "food": 1 } },
         { "inDays": 2, "gain": { "food": 1 } }
       ]
+    },
+    "fixAirMaker": {
+      "room": "air",
+      "maxPerDay": 1,
+      "needsEvent": "airMakerSlow",
+      "setsFlag": "airMakerFixed",
+      "cost": { "time": 3 },
+      "gain": {}
     },
     "raiseShield": {
       "room": "shelter",

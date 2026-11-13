@@ -13,8 +13,9 @@ import { SceneIcon } from "./Icons";
 import { KID_X } from "./layout";
 import type { IconName } from "./Icons";
 
-const SCENE_W = 1600;
-const SCENE_H = 800;
+// The art is drawn on a 1600 × 800 canvas; the camera frames just the base
+// (sky and ground spill past the frame, so wide or tall screens never show bars).
+const VIEW = "70 140 1460 500";
 
 const INNER = { x: 130, y: 262, w: 1340, h: 318 };
 const ROOM_W = INNER.w / 4; // 335
@@ -47,6 +48,10 @@ type SceneProps = {
   walking: { ms: number } | null;
   facing: 1 | -1;
   canWalk: boolean;
+  /** Night falls after End Sol (consequences play out). */
+  night: boolean;
+  /** Tonight's flare, while night: blocked by the shield, or hit the crew. */
+  flare: "blocked" | "hit" | null;
   onRoomTap: (room: RoomId) => void;
 };
 
@@ -109,8 +114,8 @@ function Sky({ dust, dustMax }: { dust: number; dustMax: number }) {
       </defs>
       <rect x="-2000" y="-1200" width="5600" height="1820" fill="url(#bscene-sky)" />
       <g style={{ opacity: 1 - haze * 0.7 }}>
-        <circle cx="1390" cy="120" r="80" fill="url(#bscene-sun)" />
-        <circle cx="1390" cy="120" r="24" fill="#fffbea" />
+        <circle cx="1470" cy="190" r="70" fill="url(#bscene-sun)" />
+        <circle cx="1470" cy="190" r="22" fill="#fffbea" />
       </g>
       <path
         d="M-2000 560 L-200 560 Q60 500 260 540 T700 520 T1150 545 T1600 515 Q1800 500 3600 540 L3600 640 L-2000 640 Z"
@@ -286,13 +291,45 @@ function Shelter({ shield, shieldMax }: { shield: number; shieldMax: number }) {
   );
 }
 
-function ShieldDome({ shield, shieldMax }: { shield: number; shieldMax: number }) {
+function NightSky({ on }: { on: boolean }) {
+  const stars = [
+    [80, 60], [240, 130], [420, 40], [610, 110], [760, 30], [930, 90], [1120, 50], [1290, 140],
+    [1480, 70], [1560, 160], [330, 200], [1010, 180], [-120, 120], [1700, 40], [520, 170],
+  ];
+  return (
+    <g className={`bscene__night${on ? " is-on" : ""}`} aria-hidden="true">
+      <rect x="-2000" y="-1200" width="5600" height="3800" fill="#070b22" />
+      <g fill="#e8ecff">
+        {stars.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r={i % 3 ? 2.2 : 3.2} />
+        ))}
+      </g>
+    </g>
+  );
+}
+
+function FlareStreaks({ flare }: { flare: "blocked" | "hit" | null }) {
+  if (!flare) return null;
+  return (
+    <g className={`bscene__flare bscene__flare--${flare}`} aria-hidden="true">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <path
+          key={i}
+          d={`M${1650 + i * 40} ${-60 + i * 30} L${1250 + i * 45} ${flare === "blocked" ? 200 + i * 6 : 330 + i * 30}`}
+          style={{ animationDelay: `${i * 0.12}s` }}
+        />
+      ))}
+    </g>
+  );
+}
+
+function ShieldDome({ shield, shieldMax, flash }: { shield: number; shieldMax: number; flash: boolean }) {
   if (shield <= 0) return null;
   const x0 = INNER.x + 3 * ROOM_W - 16;
   const x1 = INNER.x + 4 * ROOM_W + 26;
   return (
     <path
-      className="bscene__dome"
+      className={`bscene__dome${flash ? " is-flash" : ""}`}
       d={`M${x0} 612 Q${x0} 190 ${(x0 + x1) / 2} 190 Q${x1} 190 ${x1} 612`}
       fill="none"
       stroke="#c39bff"
@@ -317,7 +354,7 @@ function RoomSign({ room, i }: { room: RoomId; i: number }) {
 }
 
 export default function BaseScene(props: SceneProps) {
-  const { room, walking, facing, canWalk, onRoomTap } = props;
+  const { room, walking, facing, canWalk, onRoomTap, night, flare } = props;
   const dim = props.power <= 2 ? 0.5 : props.power <= 5 ? 0.25 : 0;
 
   const onKey = (r: RoomId) => (e: KeyboardEvent) => {
@@ -329,14 +366,15 @@ export default function BaseScene(props: SceneProps) {
 
   return (
     <svg
-      className="bscene"
-      viewBox={`0 0 ${SCENE_W} ${SCENE_H}`}
+      className={`bscene${night ? " is-night" : ""}`}
+      viewBox={VIEW}
       preserveAspectRatio="xMidYMid meet"
       role="group"
       aria-label="The Mars base. Tap a room to walk there."
     >
       <Sky dust={props.dust} dustMax={props.dustMax} />
       <Ground />
+      <NightSky on={night} />
 
       {/* Hull */}
       <rect x="130" y="606" width="40" height="22" fill="#6c7383" />
@@ -348,7 +386,7 @@ export default function BaseScene(props: SceneProps) {
         <path d="M1340 240 V196" stroke="#8b93a0" strokeWidth="8" />
         <path d="M1302 196 Q1340 150 1378 196 Z" fill="#e6e9ee" stroke="#8b93a0" strokeWidth="4" />
       </g>
-      <ShieldDome shield={props.shield} shieldMax={props.shieldMax} />
+      <ShieldDome shield={props.shield} shieldMax={props.shieldMax} flash={flare === "blocked"} />
 
       {/* Inside */}
       <rect x={INNER.x} y={INNER.y} width={INNER.w} height={INNER.h} rx="42" fill="#1d2333" />
@@ -372,12 +410,26 @@ export default function BaseScene(props: SceneProps) {
       <rect x={INNER.x} y={FLOOR_Y} width={INNER.w} height="20" fill="#454d61" />
       <path d={`M${INNER.x} ${FLOOR_Y + 10} H${INNER.x + INNER.w}`} stroke="#5a6378" strokeWidth="3" strokeDasharray="30 14" />
 
+      {/* Radiation got in */}
+      <rect
+        className={`bscene__hitflash${flare === "hit" ? " is-on" : ""}`}
+        x={INNER.x}
+        y={INNER.y}
+        width={INNER.w}
+        height={INNER.h}
+        rx="42"
+        fill="#ff6a3d"
+        aria-hidden="true"
+      />
+
       {/* Lights dim when power is low */}
       <rect className="bscene__dim" x={INNER.x} y={INNER.y} width={INNER.w} height={INNER.h} rx="42" fill="#05070d" style={{ opacity: dim }} />
 
       {ROOMS.map((r, i) => (
         <RoomSign key={r} room={r} i={i} />
       ))}
+
+      <FlareStreaks flare={night ? flare : null} />
 
       {/* The kid */}
       <g
