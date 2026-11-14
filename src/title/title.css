@@ -1,0 +1,374 @@
+/* Mission ARES — the main menu. */
+
+.title {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  overflow-y: auto;
+  background: #03050d;
+  color: #fff;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-align: center;
+}
+.title__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.title__beacon {
+  fill: #ff4d3d;
+  animation: title-blink 1.2s steps(1, end) infinite;
+}
+@keyframes title-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.15; }
+}
+.title__box {
+  position: relative;
+  margin: auto;
+  width: min(640px, 92vw);
+  padding: 18px 10px;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+.title__head {
+  display: grid;
+  gap: 4px;
+}
+.title__small {
+  margin: 0;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #ffcf99;
+  font-size: 14px;
+  text-shadow: 0 2px 10px #000;
+}
+.title h1 {
+  margin: 0;
+  font-size: clamp(38px, 7vw, 92px);
+  white-space: nowrap;
+  letter-spacing: 0.07em;
+  text-shadow: 0 0 34px rgba(255, 140, 80, 0.65), 0 4px 18px rgba(0, 0, 0, 0.7);
+}
+
+.title__menu {
+  width: min(360px, 90vw);
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 24px;
+  background: rgba(6, 10, 24, 0.72);
+  border: 2px solid rgba(255, 207, 153, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+}
+.title__menu button,
+.title__back {
+  min-height: 52px;
+  border: 2px solid #4a5a86;
+  border-radius: 999px;
+  background: #101a38;
+  color: #e6edff;
+  font: 700 19px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.title__menu button:hover,
+.title__back:hover {
+  background: #1b2a58;
+}
+.title__menu .title__play {
+  min-height: 64px;
+  border: 3px solid #ffcf99;
+  background: #2a1608;
+  color: #ffcf99;
+  font-size: 24px;
+  font-weight: 800;
+  box-shadow: 0 0 30px rgba(255, 207, 153, 0.35);
+}
+.title__menu .title__play:hover {
+  background: #3b200c;
+}
+.title__menu .title__dev {
+  min-height: 40px;
+  border-color: #34406b;
+  color: #9fb0cc;
+  font-size: 14px;
+}
+.title__menu button:focus-visible,
+.title__back:focus-visible,
+.title__jumps button:focus-visible,
+.title__seg button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Sub-screens: how to play, settings, credits, jump */
+.title__card {
+  width: min(640px, 92vw);
+  box-sizing: border-box;
+  display: grid;
+  gap: 14px;
+  padding: 20px 22px;
+  border-radius: 24px;
+  background: rgba(6, 10, 24, 0.88);
+  border: 2px solid rgba(255, 207, 153, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  text-align: left;
+}
+.title__card h2 {
+  margin: 0;
+  color: #ffcf99;
+  font-size: 26px;
+}
+.title__card p {
+  margin: 0;
+  color: #cfd8ea;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.title__back {
+  justify-self: start;
+  min-width: 120px;
+}
+.title__how {
+  display: grid;
+  gap: 12px;
+}
+.title__how > div {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  column-gap: 12px;
+  align-items: start;
+}
+.title__how span {
+  grid-row: span 2;
+  font-size: 34px;
+}
+.title__how strong {
+  font-size: 18px;
+}
+.title__how p {
+  font-size: 15px;
+}
+.title__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.title__rowlabel {
+  font-weight: 700;
+  font-size: 18px;
+}
+.title__seg {
+  display: inline-flex;
+  border: 2px solid #4a5a86;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.title__seg button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  background: #101a38;
+  color: #cfd8ea;
+  font: 700 16px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.title__seg button.is-on {
+  background: #ffcf99;
+  color: #2a1806;
+}
+.title__hint {
+  font-size: 13px !important;
+  color: #9fb0cc !important;
+}
+.title__jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.title__jumps button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 2px solid #4a8be0;
+  border-radius: 999px;
+  background: #101a38;
+  color: #cfe0ff;
+  font: 700 14px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.title__jumps button:hover {
+  background: #1b2a58;
+}
+
+/* Short screens (phones held sideways): two columns of buttons, smaller title. */
+@media (max-height: 560px) {
+  .title__box {
+    gap: 8px;
+    padding: 8px;
+  }
+  .title h1 {
+    font-size: clamp(34px, 8vh, 52px);
+  }
+  .title__small {
+    font-size: 11px;
+  }
+  .title__menu {
+    grid-template-columns: 1fr 1fr;
+    width: min(560px, 92vw);
+    gap: 8px;
+    padding: 10px;
+  }
+  .title__menu .title__play {
+    grid-column: 1 / -1;
+    min-height: 52px;
+    font-size: 20px;
+  }
+  .title__menu button {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .title__card {
+    gap: 6px;
+    padding: 10px 16px;
+  }
+  .title__card h2 {
+    font-size: 20px;
+  }
+  .title__seg button {
+    min-height: 36px;
+    font-size: 14px;
+  }
+  .title__rowlabel {
+    font-size: 16px;
+  }
+  .title__hint {
+    display: none;
+  }
+  .title__how {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .title__how > div {
+    grid-template-columns: 1fr;
+  }
+  .title__how span {
+    grid-row: auto;
+    font-size: 26px;
+  }
+}
+
+/* A small reminder while Judge Mode is on */
+.judge-pill {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  z-index: 50;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(20, 26, 50, 0.85);
+  border: 1px solid #4a8be0;
+  color: #cfe0ff;
+  font: 700 12px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  pointer-events: none;
+}
+
+.title__team-head {
+  margin: 0 0 4px;
+}
+.title__team {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+/* For judges: a quick tour and jump-ins to the best moments. */
+.title__judges {
+  max-height: min(86vh, 820px);
+  overflow-y: auto;
+}
+.title__judges p {
+  margin: 0;
+}
+.title__tour {
+  min-height: 52px;
+  border: 3px solid #ffcf99;
+  border-radius: 999px;
+  background: #2a1608;
+  color: #ffcf99;
+  font: 800 18px/1.1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.title__tour:hover {
+  background: #3b200c;
+}
+.title__judges-head {
+  color: #ffcf99;
+  font: 800 12px/1 system-ui, sans-serif !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.title__tourlist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.title__tourlist button {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 2px solid #4a8be0;
+  border-radius: 14px;
+  background: #101a38;
+  color: #cfe0ff;
+  font: 500 12px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.title__tourlist button b {
+  color: #ffffff;
+  font-size: 15px;
+}
+.title__tourlist button:hover {
+  background: #1b2a58;
+}
+.title__tour:focus-visible,
+.title__tourlist button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+.title__judges-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.title__judges-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+@media (max-height: 560px) {
+  .title__judges {
+    max-height: 92vh;
+  }
+  .title__judges .title__hint {
+    display: block;
+  }
+  .title__tourlist {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .title__tourlist button span {
+    display: none;
+  }
+}

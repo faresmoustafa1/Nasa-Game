@@ -1,0 +1,145 @@
+/* Mission ARES — Step 1: the cruise. Art is SVG + CSS (no image files).
+ * The root gets one class per beat that has started (at-leave, at-locker, …). */
+
+.cruise__abs {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transition: transform 0.15s linear;
+}
+
+/* ---------- Space ---------- */
+
+.cruise__path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-opacity: 0.4;
+  stroke-width: 3;
+  stroke-dasharray: 3 14;
+  stroke-linecap: round;
+}
+.cruise__flame {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  animation: cruise-flicker 0.14s ease-in-out infinite alternate;
+}
+
+/* ---------- The cabin fades in from the cut and out for the trip ---------- */
+
+.cruise__cabin {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+.at-locker:not(.at-trip) .cruise__cabin {
+  opacity: 1;
+}
+
+.cruise__drift {
+  animation: cruise-drift 6s linear infinite;
+}
+.cruise__led {
+  animation: ares-twinkle 1.2s ease-in-out infinite alternate;
+}
+
+/* The locker knocks, then the door swings open and the boy steps out. */
+.cruise__locker {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.at-locker:not(.at-open) .cruise__locker {
+  animation: cruise-knock 0.34s ease-in-out 3 alternate;
+  animation-delay: 0.5s;
+}
+.cruise__door {
+  transform-box: view-box;
+  transform-origin: 1206px 0;
+  transition: transform 0.9s cubic-bezier(0.3, 0.8, 0.3, 1);
+}
+.at-open .cruise__door {
+  transform: scaleX(0.1);
+}
+.cruise__boy {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transform: translate(1290px, 758px) scale(1.1);
+}
+.at-open .cruise__boy {
+  transform: translate(1120px, 760px) scale(1.1);
+  transition: transform 1s ease-in-out 0.3s;
+}
+
+.cruise__bangs {
+  opacity: 0;
+}
+.at-open:not(.at-doctor) .cruise__bangs {
+  opacity: 1;
+}
+.cruise__bang {
+  font: 900 64px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  fill: #ffcf99;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ares-pop-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.5) both;
+}
+.cruise__clipboard {
+  animation: ares-pop-in 0.4s ease both;
+}
+
+/* ---------- Calendar (like the prologue's launch clock) ---------- */
+
+.cruise__calendar {
+  position: absolute;
+  top: clamp(10px, 2.2vh, 20px);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 92px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 207, 153, 0.5);
+  border-radius: 10px;
+  background: rgba(3, 5, 13, 0.7);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.cruise__calendar small {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: #9fb0cc;
+}
+.cruise__calendar strong {
+  display: block;
+  font-size: clamp(26px, 3.4vw, 40px);
+  line-height: 1.1;
+  color: #ffcf99;
+  animation: cruise-page 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.cruise__calendar--day strong {
+  animation: none;
+}
+
+@keyframes cruise-flicker {
+  from { transform: scaleX(0.82); opacity: 0.85; }
+  to { transform: scaleX(1.05); opacity: 1; }
+}
+@keyframes cruise-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-120px); }
+}
+@keyframes cruise-knock {
+  from { transform: translateX(-4px); }
+  to { transform: translateX(4px); }
+}
+@keyframes cruise-page {
+  from { opacity: 0; transform: translateY(-14px) rotateX(70deg); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cruise__flame,
+  .cruise__drift,
+  .at-locker:not(.at-open) .cruise__locker {
+    animation: none;
+  }
+}

@@ -1,0 +1,325 @@
+/* Mission ARES — the Commander's tablet. Pinned top-left of any Mars scene. */
+
+.tablet {
+  position: absolute;
+  z-index: 4;
+  top: clamp(10px, 2.2vh, 20px);
+  left: clamp(10px, 2.2vw, 24px);
+  width: clamp(210px, 24vw, 290px);
+  box-sizing: border-box;
+  padding: 10px 12px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 18px;
+  background: rgba(6, 10, 24, 0.88);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  animation: tablet-in 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+.tablet__title {
+  margin: 0 0 6px;
+  color: #9fb0cc;
+  font: 800 11px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.22em;
+}
+.tablet__item {
+  position: relative;
+  margin-top: 6px;
+}
+
+.tablet__row {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 34px;
+  grid-template-areas:
+    "icon label num"
+    "icon bar num";
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 2px;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.tablet__row:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.tablet__row:focus-visible {
+  outline: 3px solid #ffcf99;
+  outline-offset: 2px;
+}
+.tablet__row.is-open {
+  border-color: #ffcf99;
+  background: rgba(255, 207, 153, 0.12);
+}
+.tablet__row.is-nudged {
+  animation: tablet-nudge 1.3s ease-in-out infinite;
+}
+
+.tablet__icon {
+  grid-area: icon;
+  width: 26px;
+  height: 26px;
+}
+.tablet__label {
+  grid-area: label;
+  font: 700 14px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.04em;
+}
+.tablet__num {
+  grid-area: num;
+  text-align: right;
+  font: 800 24px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.tablet__bar {
+  grid-area: bar;
+  height: 9px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+  position: relative;
+}
+/* Water locked in the shelter walls: striped, so it looks "held" (and is not counted). */
+.tablet__bar span.tablet__lockseg {
+  position: absolute;
+  top: 0;
+  border-radius: 0;
+  background: repeating-linear-gradient(45deg, rgba(91, 184, 255, 0.55) 0 4px, rgba(91, 184, 255, 0.12) 4px 8px);
+  animation: none;
+}
+.tablet__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: currentColor;
+  transform-origin: left;
+  animation: tablet-fill 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition: width 0.8s ease;
+}
+
+.tablet__row--power { color: #ffd166; }
+.tablet__row--water { color: #5bb8ff; }
+.tablet__row--air { color: #7ee0b0; }
+.tablet__row .tablet__label,
+.tablet__row .tablet__num {
+  color: #ffffff;
+}
+.tablet__row.is-low .tablet__num {
+  color: #ff7a66;
+}
+.tablet__row.is-low .tablet__bar span {
+  background: #ff7a66;
+}
+
+/* Crew faces */
+.tablet__row--crew {
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-areas: "label faces";
+}
+.tablet__row--crew .tablet__label {
+  grid-area: label;
+}
+.tablet__faces {
+  grid-area: faces;
+  display: flex;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.tablet__face {
+  width: 28px;
+  height: 28px;
+}
+.tablet__face circle:first-child {
+  stroke-width: 2;
+}
+.tablet__face--happy circle:first-child { fill: #ffd166; stroke: #c58c27; }
+.tablet__face--okay circle:first-child { fill: #d8c9a0; stroke: #9a8a5c; }
+.tablet__face--tired circle:first-child { fill: #6c7894; stroke: #46526e; }
+.tablet__eye { fill: #2a1a12; }
+.tablet__mouth {
+  fill: none;
+  stroke: #2a1a12;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+/* The note that slides out beside a tapped row. */
+.tablet__note {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: calc(100% + 26px);
+  width: clamp(220px, 26vw, 330px);
+  box-sizing: border-box;
+  padding: 12px 16px;
+  translate: 0 -50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  background: rgba(6, 10, 24, 0.92);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  animation: tablet-note-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.tablet__note::before {
+  /* the dotted pointer back to the row */
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 22px;
+  border-top: 2.5px dotted #ffffff;
+}
+.tablet__note-tag,
+.tablet__note-text {
+  margin: 0;
+}
+.tablet__note-text {
+  font: 600 17px/24px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.tablet__note--fact {
+  border-radius: 6px;
+  border-color: transparent;
+  background: #f1ead3;
+  color: #26324a;
+}
+.tablet__note--fact::before {
+  border-top-color: #ffcf99;
+}
+.tablet__note--fact .tablet__note-text {
+  font: 700 16px/23px "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
+}
+.tablet__note-tag {
+  color: #c2452d;
+  font: 800 11px/20px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Narrow screens: the note opens under the row instead of beside it. */
+@media (max-width: 760px) {
+  .tablet__note {
+    position: static;
+    width: auto;
+    margin-top: 6px;
+    translate: none;
+  }
+  .tablet__note::before {
+    display: none;
+  }
+}
+
+@keyframes tablet-in {
+  from { opacity: 0; transform: translateY(-24px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tablet-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes tablet-nudge {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: #ffcf99; }
+}
+@keyframes tablet-note-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tablet,
+  .tablet__bar span,
+  .tablet__row.is-nudged {
+    animation: none;
+  }
+}
+
+/* Short screens (a phone held sideways): a smaller tablet, so it does not cover the scene */
+@media (max-height: 560px) {
+  .tablet {
+    zoom: 0.62;
+  }
+}
+
+/* "Your choices": every decision with its consequence, under the meters. */
+.tablet__choices {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+}
+.tablet__choices-head {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: #9fb0cc;
+  font: 800 11px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+}
+.tablet__choices-head:focus-visible {
+  outline: 3px solid #ffcf99;
+  outline-offset: 2px;
+}
+.tablet__choices-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: clamp(110px, 26vh, 240px);
+  overflow-y: auto;
+}
+.tablet__choice {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  font: 600 13px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.tablet__choice.is-new {
+  animation: choice-in 0.9s ease-out both;
+}
+@keyframes choice-in {
+  0% { background: rgba(255, 207, 153, 0.5); transform: translateX(-8px); }
+  100% { background: rgba(255, 255, 255, 0.06); transform: none; }
+}
+.tablet__choice-mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #7ee0b0;
+  color: #06241a;
+  font-weight: 900;
+}
+.tablet__choice--cost .tablet__choice-mark { background: #ffd84a; color: #3a2a00; }
+.tablet__choice--wrong .tablet__choice-mark { background: #ff7a5c; color: #3a0d00; }
+.tablet__choice--info .tablet__choice-mark { background: #9fb0cc; color: #0b1226; }
+.tablet__choice--wrong { box-shadow: inset 0 0 0 2px #ff7a5c; }
+.tablet__choice-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tablet__choice-body b { font-weight: 800; }
+.tablet__choice-body span { color: #d7e0f0; font-weight: 500; }
+.tablet__choice-body em {
+  margin-left: 6px;
+  white-space: nowrap;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #ff7a5c;
+  color: #3a0d00;
+  font: 900 11px/1.4 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tablet__choice.is-new { animation: none; }
+}

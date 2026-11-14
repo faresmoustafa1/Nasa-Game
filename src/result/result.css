@@ -1,0 +1,271 @@
+/* Mission ARES — the result and Data Sources screens (plain page, scrolls on small screens). */
+
+.res {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 0%, #1b2447 0%, #03050d 70%);
+  color: #f4f1e8;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.res__page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: clamp(18px, 4vw, 40px);
+  display: grid;
+  gap: 20px;
+  animation: res-in 0.7s ease-out both;
+}
+@keyframes res-in {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+.res h1 {
+  margin: 0;
+  font-size: clamp(30px, 5vw, 48px);
+}
+.res h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  color: #ffcf99;
+}
+.res__head {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.res__head--small {
+  display: block;
+}
+.res__medal {
+  width: clamp(90px, 16vw, 150px);
+  flex: none;
+  filter: drop-shadow(0 0 18px rgba(255, 216, 74, 0.35));
+  animation: res-pop 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.4) 0.2s both;
+}
+@keyframes res-pop {
+  from {
+    scale: 0.2;
+    rotate: -25deg;
+    opacity: 0;
+  }
+}
+.res__badge {
+  margin: 6px 0 0;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 800;
+}
+.res__line {
+  margin: 6px 0 0;
+  color: #cfd8ea;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.res__score,
+.res__recap,
+.res__storm,
+.res__src {
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(20, 26, 50, 0.85);
+  border: 2px solid #34406b;
+}
+.res__score h2 b {
+  margin-left: 10px;
+  font-size: 34px;
+  color: #fff;
+}
+.res__score ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.res__score li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 18px;
+}
+.res__score li small {
+  display: block;
+  color: #9fb0cc;
+  font-size: 13px;
+}
+.res__score li b {
+  font-size: 22px;
+}
+.res__crew {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.res__crew .tablet__face {
+  width: 40px;
+  height: 40px;
+}
+.res__storm p {
+  margin: 0;
+  color: #cfd8ea;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.res__storm a {
+  color: #8fd0ff;
+}
+
+.res__recap ol {
+  margin: 0;
+  padding-left: 22px;
+  color: #cfd8ea;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.res__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.res__cards article {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(10, 40, 40, 0.85);
+  border: 2px solid #3fb6a8;
+}
+.res__cards b {
+  display: block;
+  color: #7ee0b0;
+  font-size: 17px;
+}
+.res__cards p {
+  margin: 8px 0;
+  line-height: 1.45;
+  font-size: 16px;
+}
+.res__cards small,
+.res__src small {
+  display: block;
+  color: #8fa3c4;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.res__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.res__btn {
+  min-height: 52px;
+  padding: 0 26px;
+  border: 3px solid #ffcf99;
+  border-radius: 999px;
+  background: #2a1608;
+  color: #ffcf99;
+  font: 800 18px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.res__btn:hover {
+  background: #3b200c;
+}
+.res__btn--main {
+  box-shadow: 0 0 26px rgba(255, 207, 153, 0.35);
+}
+.res__btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+.res__note {
+  margin: 0;
+  text-align: center;
+  color: #9fb0cc;
+  font-size: 14px;
+}
+
+.res__blurb {
+  margin: -4px 0 10px;
+  color: #9fb0cc;
+  font-size: 14px;
+}
+.res__src ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.res__src li {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.res__src li b {
+  color: #7ee0b0;
+  font-size: 15px;
+}
+.res__src li span {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+@media (max-width: 560px) {
+  .res__head {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .res__page,
+  .res__medal {
+    animation: none;
+  }
+}
+
+.res__junior {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 6px 14px;
+  border: 2px solid #7ee0b0;
+  border-radius: 999px;
+  color: #d9ffe9;
+  font-weight: 800;
+}
+
+.res__tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.res__tiers li {
+  padding: 4px 12px;
+  border: 2px solid;
+  border-radius: 999px;
+  font-size: 14px;
+  opacity: 0.75;
+}
+.res__tiers li.is-you {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 800;
+}
+.res__next {
+  margin: 0 0 10px;
+  font-size: 14px;
+  opacity: 0.85;
+}

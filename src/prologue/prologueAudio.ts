@@ -2,6 +2,7 @@
 // Everything is synthesized with the Web Audio API, so there are no audio
 // files to load, license or cite. If audio is blocked or unsupported, every
 // method silently does nothing and the scene still plays.
+import { getSettings } from "../game/settings";
 
 export type PrologueAudio = {
   /** One soft countdown beep. */
@@ -30,7 +31,7 @@ const SILENT: PrologueAudio = {
 type AudioContextCtor = typeof AudioContext;
 
 export function createPrologueAudio(): PrologueAudio {
-  if (typeof window === "undefined") return SILENT;
+  if (typeof window === "undefined" || !getSettings().sound) return SILENT;
 
   const Ctor: AudioContextCtor | undefined =
     window.AudioContext ??

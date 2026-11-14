@@ -1,0 +1,248 @@
+/* Mission ARES — the solar storm: shield buttons, the data tag, the radiation card. */
+
+.storm__tag {
+  position: absolute;
+  z-index: 3;
+  top: clamp(10px, 2.2vh, 20px);
+  left: 50%;
+  translate: -50% 0;
+  margin: 0;
+  padding: 7px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  background: rgba(3, 5, 13, 0.7);
+  color: #cfe9ff;
+  font: 700 13px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.08em;
+  text-align: center;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.storm__tag small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
+}
+
+.storm__shields {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: clamp(16px, 4vh, 40px);
+  translate: -50% 0;
+  display: flex;
+  gap: clamp(10px, 2vw, 22px);
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.storm__shield {
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+  min-width: clamp(150px, 17vw, 210px);
+  padding: 8px 12px;
+  border: 3px solid #ffcf99;
+  border-radius: 18px;
+  background: #2a1608;
+  color: #ffffff;
+  font: 600 13px/1.2 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(255, 207, 153, 0.25);
+}
+.storm__shield b {
+  color: #ffcf99;
+  font-size: 18px;
+}
+.storm__shield:hover {
+  background: #3b200c;
+  box-shadow: 0 0 34px rgba(255, 207, 153, 0.5);
+}
+.storm__shield:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+.storm__tanks {
+  display: flex;
+  gap: 4px;
+}
+.storm__tanks i {
+  width: 22px;
+  height: 14px;
+  border: 2px solid #8fd0ff;
+  border-radius: 5px;
+  opacity: 0.35;
+}
+.storm__tanks i.is-on {
+  background: #3b7fb8;
+  opacity: 1;
+}
+
+.storm__dose {
+  position: absolute;
+  z-index: 3;
+  right: clamp(10px, 2.2vw, 24px);
+  top: clamp(64px, 12vh, 110px);
+  width: clamp(200px, 22vw, 260px);
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  background: rgba(6, 10, 24, 0.9);
+  color: #ffffff;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.storm__dose p {
+  margin: 0;
+}
+.storm__dose-title {
+  color: #9fb0cc;
+  font: 800 11px/1 system-ui, sans-serif;
+  letter-spacing: 0.18em;
+}
+.storm__dose-bar {
+  display: flex;
+  gap: 4px;
+  margin: 10px 0 6px;
+}
+.storm__dose-bar span {
+  flex: 1;
+  height: 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.storm__dose-bar span.is-on {
+  background: #7ee0b0;
+}
+.storm__dose-bar span.is-on.is-1 {
+  background: #ffd166;
+}
+.storm__dose-bar span.is-on.is-2 {
+  background: #ff7a66;
+}
+.storm__dose-label {
+  font: 800 20px/1 system-ui, sans-serif;
+}
+.storm__dose-text {
+  margin-top: 6px !important;
+  color: #cfd8ea;
+  font: 500 14px/1.3 system-ui, sans-serif;
+}
+
+/* Short screens: a small tag in the corner, so it does not sit on the notes */
+@media (max-height: 560px) {
+  .storm__tag {
+    left: auto;
+    right: 10px;
+    top: 8px;
+    translate: none;
+    padding: 3px 10px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+}
+
+/* Real readings from NASA RadLab, under the game's radiation card. */
+.storm__real {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.35);
+}
+.storm__real p {
+  margin: 4px 0;
+  color: #e8ecf6;
+  font: 500 12px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.storm__real b {
+  color: #ffd84a;
+}
+.storm__real small {
+  opacity: 0.75;
+}
+.storm__chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 6px 0;
+}
+.storm__grid {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1;
+}
+.storm__grid.is-day {
+  stroke-dasharray: 3 3;
+}
+.storm__axis {
+  fill: #b8c0d2;
+  font: 500 9px system-ui, sans-serif;
+}
+.storm__axis.is-peak {
+  fill: #ffd84a;
+  font-weight: 800;
+  font-size: 10px;
+}
+.storm__axis.is-quiet {
+  fill: #7ee0b0;
+  font-weight: 700;
+}
+.storm__line {
+  fill: none;
+  stroke: #ff7a66;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+.storm__area {
+  fill: rgba(255, 122, 102, 0.18);
+}
+.storm__peak {
+  fill: #ffd84a;
+  stroke: #ffffff;
+  stroke-width: 1;
+}
+
+/* A real NASA photo of a solar eruption, next to the forecast (until the shield is picked). */
+.storm__photo {
+  position: absolute;
+  z-index: 3;
+  right: clamp(10px, 2.2vw, 24px);
+  top: clamp(64px, 12vh, 110px);
+  width: clamp(190px, 18vw, 240px);
+  margin: 0;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  background: rgba(6, 10, 24, 0.9);
+  color: #e8ecf6;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.storm__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #000;
+}
+.storm__photo figcaption {
+  margin-top: 6px;
+  font: 500 11px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.storm__photo b {
+  display: block;
+  color: #ffd84a;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+.storm__photo small {
+  display: block;
+  margin-top: 3px;
+  color: #b8c0d2;
+  font-size: 9px;
+}
+/* Short screens (a phone held sideways): the photo would cover the notes, so it is only in the sources list. */
+@media (max-height: 560px) {
+  .storm__photo {
+    display: none;
+  }
+}

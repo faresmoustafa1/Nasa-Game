@@ -1,27 +1,32 @@
-// Mission ARES — Step 0: the prologue (about 60 seconds).
+// Mission ARES — Step 0: the prologue (about 53 seconds: 40 s in the field, then 13 s at the rocket).
 //
 // Third-person view: we watch the boy. All the words are IN the scene: one
-// short note at a time, placed next to what it talks about, with a pointer
-// line. Story notes are dark glass; space facts are paper notes. Nothing pauses.
+// short note at a time, placed next to what it talks about, long enough to read.
+// Story notes are dark glass; space facts are paper notes.
 //
 // Timeline (seconds) — edit BEATS (what happens) and SCENE_NOTES (the words).
 //    0  Asleep in the grass, right next to a launch site.
-//    5  He wakes up and looks at the sky.            Fact: planet or star?
-//   13  A Planetary Parade: five planets in a row.   Fact: Planetary Parade
-//   22  Loudspeaker: "Launch in 5 minutes!" The launch clock appears.
-//   27  He runs toward the launch pad.
-//   32  Cut to the launch pad. Fog everywhere. He is lost.
-//   38  He walks up a ramp, through an open door.
-//   43  The door slams shut. His face appears in the rocket's window.
-//   47  5…4…3…2…1, the engines roar.                  Fact: how rockets fly
-//   52  Liftoff, with him inside.                     Fact: orbit speed
-//   58.5 Flash, cut to black, onDone() at 60.5.
+//    6.8 He wakes up and looks at the sky.           Fact: planet or star?
+//   18.5 A Planetary Parade: five planets in a row.  Fact: Planetary Parade
+//   30.3 Loudspeaker: "Launch in 5 minutes!" The launch clock appears.
+//   34.8 He runs toward the launch pad.
+//   40   Cut to the launch pad. He heads for the ramp.
+//   41   He walks up the ramp, through an open door.
+//   43.6 The door slams shut. His face appears in the rocket's window.
+//   45.2 5…4…3…2…1, the engines roar.
+//   47.4 Liftoff, with him inside.
+//   52.4 Flash (after 5 s of flying up), cut to black, onDone() at 53.4.
 //
-// Usage:
-//   <Prologue onDone={() => setScene("launch")} />
-// Mount it from a "Play" button so the browser allows sound.
+// Next ▸ / ◂ Back (and the arrow keys) jump between notes.
+//
+// Usage:  <Prologue onDone={() => setScene("cruise")} />   Dev: ?at=40 starts at 40 s.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { NavIcons } from "../game/notes";
+import type { NoteNav } from "../game/notes";
+import SceneNav from "../game/SceneNav";
+import { backTarget, nextTarget, stopsOf } from "../game/sceneStops";
+import { useTimeline } from "../game/useTimeline";
 import { createPrologueAudio } from "./prologueAudio";
 import type { PrologueAudio } from "./prologueAudio";
 import "./Prologue.css";
@@ -36,23 +41,23 @@ type PrologueProps = {
 /** What happens, and when. The CSS reacts to these (`.at-run`, …). */
 const BEATS = [
   { id: "asleep", at: 0 },
-  { id: "awake", at: 5 },
-  { id: "parade", at: 13 },
-  { id: "announce", at: 22 },
-  { id: "run", at: 27 },
-  { id: "lost", at: 32 },
-  { id: "door", at: 38 },
-  { id: "trapped", at: 43 },
-  { id: "countdown", at: 47 },
-  { id: "liftoff", at: 52 },
+  { id: "awake", at: 6.8 },
+  { id: "parade", at: 18.5 },
+  { id: "announce", at: 30.3 },
+  { id: "run", at: 34.8 },
+  { id: "lost", at: 40 },
+  { id: "door", at: 41 },
+  { id: "trapped", at: 43.6 },
+  { id: "countdown", at: 45.2 },
+  { id: "liftoff", at: 47.4 },
 ] as const;
 
 type BeatId = (typeof BEATS)[number]["id"];
 
 const beatAt = (id: BeatId) => BEATS.find((b) => b.id === id)!.at;
 
-const FLASH_AT = 58.5;
-const END_AT = 60.5;
+const FLASH_AT = 52.4;
+const END_AT = 53.4;
 const LAUNCH_CLOCK_START = 5 * 60; // "launches in 5 minutes"
 
 // ---------------------------------------------------------------------------
@@ -76,24 +81,24 @@ type SceneNote = {
 
 const SCENE_NOTES: SceneNote[] = [
   {
-    from: 0.6,
-    to: 5,
+    from: 0.4,
+    to: 6.5,
     kind: "story",
     text: "A boy fell asleep in the grass, right next to a rocket launch site.",
     box: { x: 300, y: 500, w: 450 },
     point: { x: 585, y: 728 },
   },
   {
-    from: 5.4,
-    to: 8.2,
+    from: 6.8,
+    to: 11.0,
     kind: "story",
     text: "He wakes up and looks at the sky.",
     box: { x: 240, y: 470, w: 350 },
     point: { x: 628, y: 592 },
   },
   {
-    from: 8.4,
-    to: 13,
+    from: 11.3,
+    to: 18.2,
     kind: "fact",
     title: "Planet or star?",
     text: "Stars twinkle. Planets shine steady, because they are closer and reflect our Sun's light.",
@@ -102,16 +107,16 @@ const SCENE_NOTES: SceneNote[] = [
     point: { x: 590, y: 322 },
   },
   {
-    from: 13.3,
-    to: 16.6,
+    from: 18.5,
+    to: 22.4,
     kind: "story",
     text: "The planets are lined up in a row!",
     box: { x: 860, y: 300, w: 400 },
     point: { x: 800, y: 250 },
   },
   {
-    from: 16.8,
-    to: 22,
+    from: 22.7,
+    to: 30.0,
     kind: "fact",
     title: "Planetary Parade",
     text: "All planets orbit the Sun on one flat path, so from Earth they look lined up in a row.",
@@ -120,80 +125,56 @@ const SCENE_NOTES: SceneNote[] = [
     point: { x: 485, y: 371 },
   },
   {
-    from: 22.4,
-    to: 27,
+    from: 30.3,
+    to: 34.5,
     kind: "shout",
     text: "“Attention! The rocket launches in 5 minutes!”",
     box: { x: 540, y: 380, w: 380 },
     point: { x: 950, y: 532 },
   },
   {
-    from: 27.3,
-    to: 31.8,
+    from: 34.8,
+    to: 39.0,
     kind: "story",
     text: "He runs to see the rocket up close!",
     box: { x: 680, y: 330, w: 380 },
     point: { x: 1150, y: 560 },
   },
   {
-    from: 32.6,
-    to: 37.8,
+    from: 40.2,
+    to: 43.3,
     kind: "story",
-    text: "Up close it's huge and foggy… He's lost!",
-    box: { x: 240, y: 460, w: 420 },
-  },
-  {
-    from: 38.3,
-    to: 42.8,
-    kind: "story",
-    text: "He finds an open door and walks in…",
+    text: "An open door… he walks in!",
     box: { x: 470, y: 380, w: 380 },
     point: { x: 972, y: 560 },
   },
   {
-    from: 43.2,
-    to: 46.8,
+    from: 43.7,
+    to: 46.9,
     kind: "story",
-    text: "CLANG! The door shuts. He's inside the rocket!",
+    text: "CLANG! He's inside the rocket!",
     box: { x: 450, y: 330, w: 400 },
     point: { x: 982, y: 472 },
   },
   {
-    from: 47.3,
-    to: 51.8,
-    kind: "fact",
-    title: "How rockets fly",
-    text: "The engines push hot gas DOWN, so the rocket goes UP!",
-    source: "NASA Glenn · Beginner's Guide to Rockets",
-    box: { x: 300, y: 540, w: 440 },
-    point: { x: 1000, y: 770 },
-  },
-  {
-    from: 52.3,
-    to: 55.2,
+    from: 47.5,
+    to: 52.2,
     kind: "shout",
     text: "LIFTOFF! He's on his way to space!",
     box: { x: 520, y: 300, w: 560 },
   },
-  {
-    from: 55.4,
-    to: 58.4,
-    kind: "fact",
-    title: "How fast?",
-    text: "To stay in orbit around Earth, a rocket needs about 28,000 km/h!",
-    source: "NASA Glenn · Beginner's Guide to Rockets",
-    box: { x: 520, y: 300, w: 560 },
-  },
 ];
 
-// Rough text metrics at the note font sizes (viewBox units), used to size each box.
-const NOTE_CHAR_W = 14;
-const NOTE_LINE_H = 34;
+const STOPS = stopsOf(SCENE_NOTES);
 
-function noteHeight(note: SceneNote) {
+// Rough text metrics at the note font sizes (viewBox units), used to size each box.
+const NOTE_CHAR_W = 17;
+const NOTE_LINE_H = 40;
+
+function noteHeight(note: SceneNote, nav = false) {
   const perLine = Math.max(8, Math.floor((note.box.w - 40) / NOTE_CHAR_W));
   const lines = Math.ceil(note.text.length / perLine);
-  return lines * NOTE_LINE_H + 36 + (note.title ? 34 : 0);
+  return lines * NOTE_LINE_H + 40 + (note.title ? 40 : 0) + (nav ? 44 : 0);
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -324,9 +305,9 @@ function Planets() {
 }
 
 /** One note in the scene, with a pointer line to what it talks about. */
-function SceneNoteView({ note, leaving }: { note: SceneNote; leaving: boolean }) {
+function SceneNoteView({ note, leaving, nav }: { note: SceneNote; leaving: boolean; nav?: NoteNav }) {
   const { x, y, w } = note.box;
-  const h = noteHeight(note);
+  const h = noteHeight(note, Boolean(nav));
   const p = note.point;
   const from = p && { x: clamp(p.x, x + 18, x + w - 18), y: clamp(p.y, y, y + h) };
   return (
@@ -342,6 +323,7 @@ function SceneNoteView({ note, leaving }: { note: SceneNote; leaving: boolean })
         <div className="scene-note__box">
           {note.title && <p className="scene-note__tag">SPACE FACT · {note.title}</p>}
           <p className="scene-note__text">{note.text}</p>
+          {nav && <NavIcons nav={nav} className="scene-note__nav" />}
         </div>
       </foreignObject>
     </g>
@@ -414,20 +396,11 @@ function SleepingKid() {
 }
 
 export default function Prologue({ onDone, sound = true }: PrologueProps) {
-  const [t, setT] = useState(0);
-
   const audioRef = useRef<PrologueAudio | null>(null);
   const doneRef = useRef(false);
 
   const stars = useMemo(() => makeStars(110), []);
   const grass = useMemo(() => makeGrass(), []);
-
-  const sec = Math.floor(t);
-  const current = Math.max(0, BEATS.findLastIndex((b) => t >= b.at));
-  const beat = BEATS[current];
-  const clock = launchClock(t);
-  const noteIndex = SCENE_NOTES.findIndex((n) => t >= n.from && t < n.to);
-  const note = noteIndex >= 0 ? SCENE_NOTES[noteIndex] : undefined;
 
   const finish = useCallback(() => {
     if (doneRef.current) return;
@@ -436,18 +409,20 @@ export default function Prologue({ onDone, sound = true }: PrologueProps) {
     onDone();
   }, [onDone]);
 
-  // The clock. Uses real elapsed time, so a slow frame never stretches the scene.
-  // Dev only: open http://localhost:5173/?t=40 and press Play to start at 40 s.
-  useEffect(() => {
-    const jump = import.meta.env.DEV
-      ? Number(new URLSearchParams(window.location.search).get("t")) || 0
-      : 0;
-    const startedAt = performance.now() - jump * 1000;
-    const id = window.setInterval(() => {
-      setT(Math.floor((performance.now() - startedAt) / 100) / 10);
-    }, 100);
-    return () => window.clearInterval(id);
-  }, []);
+  const { t, seek } = useTimeline({ endAt: END_AT, onEnd: finish });
+  const onNext = useCallback(() => {
+    const target = nextTarget(STOPS, t);
+    if (target === undefined) return finish();
+    seek(target);
+  }, [t, seek, finish]);
+  const onBack = useCallback(() => seek(backTarget(STOPS, t)), [t, seek]);
+
+  const sec = Math.floor(t);
+  const current = Math.max(0, BEATS.findLastIndex((b) => t >= b.at));
+  const beat = BEATS[current];
+  const clock = launchClock(t);
+  const noteIndex = SCENE_NOTES.findIndex((n) => t >= n.from && t < n.to);
+  const note = noteIndex >= 0 ? SCENE_NOTES[noteIndex] : undefined;
 
   // Sound on / off.
   useEffect(() => {
@@ -463,11 +438,11 @@ export default function Prologue({ onDone, sound = true }: PrologueProps) {
   // Things that happen at a given second.
   useEffect(() => {
     const audio = audioRef.current;
-    if (sec === beatAt("announce")) audio?.announce();
-    if (sec === beatAt("lost")) audio?.hushCrickets();
-    if (sec === beatAt("trapped")) audio?.clang();
-    if (sec === beatAt("countdown")) audio?.rumble(beatAt("liftoff") - beatAt("countdown") + 1);
-    if (sec >= beatAt("countdown") && sec < beatAt("liftoff")) audio?.tick();
+    if (sec === Math.floor(beatAt("announce"))) audio?.announce();
+    if (sec === Math.floor(beatAt("lost"))) audio?.hushCrickets();
+    if (sec === Math.floor(beatAt("trapped"))) audio?.clang();
+    if (sec === Math.floor(beatAt("countdown"))) audio?.rumble(beatAt("liftoff") - beatAt("countdown") + 1);
+    if (sec >= Math.floor(beatAt("countdown")) && sec < Math.floor(beatAt("liftoff"))) audio?.tick();
     if (sec >= END_AT) finish();
   }, [sec, finish]);
 
@@ -716,11 +691,13 @@ export default function Prologue({ onDone, sound = true }: PrologueProps) {
           preserveAspectRatio="xMidYMid slice"
           aria-hidden="true"
         >
-          {note && <SceneNoteView key={noteIndex} note={note} leaving={t >= note.to - 0.4} />}
+          {note && <SceneNoteView key={noteIndex} note={note} leaving={t >= note.to - 0.4} nav={{ onBack, onNext }} />}
         </svg>
         <p className="prologue__sr-only" aria-live="polite">
           {note ? `${note.title ? `Space fact, ${note.title}: ` : ""}${note.text}` : ""}
         </p>
+
+        <SceneNav onBack={onBack} onNext={onNext} />
 
         <div className="prologue__progress" aria-hidden="true">
           <span style={{ width: `${Math.min(100, (t / END_AT) * 100)}%` }} />

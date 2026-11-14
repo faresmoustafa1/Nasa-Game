@@ -1,0 +1,128 @@
+/* Mission ARES — the garage close-up (the frame, switch and preview reuse the greenhouse styles). */
+
+.garage__tick {
+  fill: #cfd8ea;
+  font: 700 22px/1 system-ui, sans-serif;
+  letter-spacing: 0.06em;
+}
+.garage__temp {
+  fill: #ffffff;
+  font: 800 34px/1 system-ui, sans-serif;
+}
+.garage__snowflake {
+  fill: #bfe3ff;
+  font: 800 34px/1 system-ui, sans-serif;
+}
+
+.gh__lamp.garage__switch {
+  left: 2%;
+  right: auto;
+  top: 45%;
+}
+/* Short screens (phones held sideways): the tablet takes more of the height, so the switch sits lower and tighter. */
+@media (max-height: 560px) {
+  .gh__lamp.garage__switch {
+    top: auto;
+    bottom: 3%;
+    gap: 4px;
+    padding: 0.6% 0.8%;
+  }
+  .gh__lamp.garage__switch button {
+    padding: 3px 4px;
+  }
+}
+.gh__preview.garage__feel {
+  bottom: 15%;
+}
+.garage__feel.is-cold {
+  border-color: #8fd0ff;
+  background: rgba(6, 22, 40, 0.92);
+}
+.garage__feel.is-ok {
+  border-color: #7ee0b0;
+}
+.garage__feel.is-hot {
+  border-color: #ff6a3c;
+}
+
+.garage__shiver {
+  animation: garage-shiver 0.12s linear infinite alternate;
+}
+@keyframes garage-shiver {
+  from {
+    transform: translateX(-1.6px);
+  }
+  to {
+    transform: translateX(1.6px);
+  }
+}
+.garage__breath {
+  fill: #ffffff;
+  opacity: 0;
+  animation: garage-breath 1.6s ease-out infinite;
+}
+@keyframes garage-breath {
+  0% {
+    opacity: 0.8;
+    transform: translate(0, 0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(16px, -22px) scale(1.6);
+  }
+}
+.garage__sweat {
+  animation: garage-sweat 1.2s ease-in infinite;
+}
+@keyframes garage-sweat {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+.garage__waves path {
+  animation: garage-wave 1.4s ease-in-out infinite alternate;
+}
+@keyframes garage-wave {
+  from {
+    opacity: 0.25;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 0.9;
+    transform: translateY(-8px);
+  }
+}
+.garage__snow circle {
+  animation-name: garage-snow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes garage-snow {
+  to {
+    transform: translate(-60px, 940px);
+  }
+}
+
+.garage__wave {
+  transform-origin: 150px 596px;
+  animation: garage-wave-hand 0.5s ease-in-out infinite alternate;
+}
+@keyframes garage-wave-hand {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+.garage__name {
+  fill: #ffffff;
+  font: 800 38px/1 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+}
