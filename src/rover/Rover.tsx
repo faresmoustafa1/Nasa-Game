@@ -24,10 +24,10 @@ import Tablet from "../game/Tablet";
 import { useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import { JUDGE_DELAY_MIN, isJudge } from "../game/judge";
-import { earthMarsDelayMinutes } from "./delay";
+import { safeDelayMinutes } from "./delay";
 import { addDecision } from "../game/state";
 import { ADVICE_NOTE, DUST_NOTE, HINT_NOTE, INTRO_NOTE, JEZERO_FACT, OPPORTUNITY_FACT, choiceNote, missionNote, sampleNote, waitingNote } from "./notes";
-import { BASE_POS, MISSIONS, MISSION_POINTS, SITES, rockValue, sampleCap, sampleCost } from "./sites";
+import { BASE_POS, DELTA_PHOTO, MISSION_POINTS, missionOf, SITES, rockValue, sampleCap, sampleCost } from "./sites";
 import type { Site } from "./sites";
 import "./rover.css";
 
@@ -78,7 +78,7 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const { t } = useTimeline({});
 
   const first = game.tasks.length === 0;
-  const [delay] = useState(() => (isJudge() ? JUDGE_DELAY_MIN : earthMarsDelayMinutes(new Date())));
+  const [delay] = useState(() => (isJudge() ? JUDGE_DELAY_MIN : safeDelayMinutes()));
 
   const [cur, setCur] = useState<GameState>(game);
   const [decision, setDecision] = useState<Decision>(null);
@@ -88,6 +88,8 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const [last, setLast] = useState<{ at: number; text: string } | null>(null);
   /** The second the first rock was collected. Until then Mission Control's rock request stays on screen. */
   const [firstRockAt, setFirstRockAt] = useState<number | null>(null);
+  /** The NASA photo could not load (a broken deploy path, a blocked file): show a drawing instead, and say so. */
+  const [photoFailed, setPhotoFailed] = useState(false);
   const clock = useRef(0);
   useEffect(() => {
     clock.current = t;
@@ -98,7 +100,7 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const picking = decision?.kind === "go" || waitDone;
   const pickAt = decision ? (decision.kind === "go" ? decision.at : decision.at + WAIT_SECONDS) : 0;
   const rockAt = waited ? pickAt + ADVICE_SECONDS : pickAt;
-  const mission = MISSIONS[game.bonusSite];
+  const mission = missionOf(game.bonusSite);
   const tired = cur.crew <= 2;
   const cap = sampleCap(first, waited);
   const gained = cur.samples - game.samples;
@@ -219,10 +221,12 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
       list.push({ ...missionNote(mission, rockAt, rockAt), to: NEVER_AT });
     } else {
       const at = firstRockAt + 3.2; // after the "rock collected" box
-      list.push(JEZERO_FACT(at), OPPORTUNITY_FACT(at), HINT_NOTE(at));
+      list.push(JEZERO_FACT(at), OPPORTUNITY_FACT(at));
+      // The hint only makes sense while the rock the team asked for is still out there.
+      if (!done.includes(game.bonusSite)) list.push(HINT_NOTE(at));
     }
     return list;
-  }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, firstRockAt, mission]);
+  }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, firstRockAt, mission, done, game.bonusSite]);
 
   const dust = Math.min(1, 0.12 + (picking ? gained / cap : 0) * 0.8 + (decision ? 0.08 : 0));
   const canPick = picking && busy === null && !capped;
@@ -383,6 +387,27 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
               </>
             )}
           </aside>
+        )}
+
+        {!picking && t >= 0.6 && (
+          <figure className="rover__photo">
+            {photoFailed ? (
+              <svg viewBox="0 0 320 256" role="img" aria-label="A drawing of the fan-shaped river delta (the photo could not load)">
+                <rect width="320" height="256" rx="8" fill="#5c5650" />
+                <path d="M0 128 Q60 118 110 128" stroke="#3c3630" strokeWidth="10" fill="none" />
+                <path d="M100 128 Q190 40 260 90 Q300 150 250 210 Q170 240 100 128 Z" fill="#9a7a5a" stroke="#c9a87a" strokeWidth="3" />
+                {[-30, -10, 10, 30].map((o) => (
+                  <path key={o} d={`M108 128 Q180 ${128 + o * 1.4} 250 ${150 + o * 2}`} stroke="#6f8f6a" strokeWidth="3" fill="none" />
+                ))}
+              </svg>
+            ) : (
+              <img src={DELTA_PHOTO.src} alt="A real photo from orbit of the fan-shaped river delta in Jezero Crater, in false colors." onError={() => setPhotoFailed(true)} />
+            )}
+            <figcaption>
+              <b>{photoFailed ? "THE REAL PHOTO (could not load, here is a drawing)" : "REAL PHOTO"}</b> {DELTA_PHOTO.caption}
+              <small>{DELTA_PHOTO.credit}</small>
+            </figcaption>
+          </figure>
         )}
 
         {!decision && t >= CHOICE_AT && (

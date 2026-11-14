@@ -7,7 +7,7 @@
 import type { CSSProperties } from "react";
 import { Astronaut } from "../game/art";
 import type { Level } from "../game/state";
-import { COLD_NAME, GEAR, coldExtra } from "./weather";
+import { COLD_CREW, COLD_NAME, GEAR, coldExtra } from "./weather";
 import type { Reading } from "./weather";
 
 type Props = {
@@ -152,7 +152,7 @@ export default function GarageCloseup({ on, reading, cold, choice, locked, onCho
     feel === "none"
       ? `Pilot: “Ready when you are! It is ${COLD_NAME[cold]} outside. Pick a heater.”`
       : feel === "cold"
-        ? `Pilot: “Brrr! It is ${reading.temp} °C. Cold battery: each sample costs +${short} Power.”`
+        ? `Pilot: “Brrr! It is ${reading.temp} °C. We'll be shivering (crew −${COLD_CREW}), and the cold battery makes each sample cost +${short} Power.”`
         : feel === "ok"
           ? "Pilot: “Warm and cozy. Just right!”"
           : "Pilot: “Too hot in here! The extra heat wastes Power.”";
@@ -269,7 +269,7 @@ export default function GarageCloseup({ on, reading, cold, choice, locked, onCho
 
         <div className={`gh__preview garage__feel is-${feel}`} role="status">
           <b>{label}</b>
-          {choice !== null && <span>Power −{GEAR[choice].power}{short > 0 ? ` · each sample +${short} Power` : ""}</span>}
+          {choice !== null && <span>Power −{GEAR[choice].power}{short > 0 ? ` · crew −${COLD_CREW} · each sample +${short} Power` : ""}</span>}
         </div>
       </div>
     </div>

@@ -100,6 +100,9 @@ export const CROPS: Record<CropId, Crop> = {
 
 export const CROP_IDS = Object.keys(CROPS) as CropId[];
 
+/** This game's crop, or radishes if the stored id is unknown. */
+export const cropOf = (id: string): Crop => CROPS[id as CropId] ?? CROPS.radish;
+
 /** A random crop, never the same as last game's in this tab. Dev: ?crop=radish|lettuce|mizuna|tomato|pepper. */
 export function pickCrop(): CropId {
   if (import.meta.env.DEV) {

@@ -30,8 +30,8 @@ export const HUB_INTRO_NOTES: SceneNote[] = [
     from: 13.4,
     to: NEVER,
     kind: "story",
-    text: "Tap a room that glows to send the boy there.",
-    box: { x: 560, y: 130, w: 560 },
+    text: "Tap a room that glows to send the boy there. The job that waits gets harder: read the chips first!",
+    box: { x: 540, y: 130, w: 620 },
   },
 ];
 
@@ -96,11 +96,21 @@ export const NIGHT_NOTES: SceneNote[] = [
   },
   {
     from: 14.2,
-    to: 17.4,
+    to: 16.8,
     kind: "fact",
     title: "A Mars day",
     text: "A day on Mars (a sol) lasts 24 hours 39 minutes. Good morning, Sol 2!",
-    source: "Royal Museums Greenwich · Sol",
+    source: "NASA Goddard · Time on Mars · eclipse2017.nasa.gov/time-mars",
     box: { x: 560, y: 110, w: 620 },
+  },
+  {
+    from: 17,
+    to: 21.4,
+    kind: "fact",
+    title: "Sunrise power",
+    text: "The Sun is up: the solar panels charge the batteries. Power +2. Dust in the Mars air blocks some sunlight, so panels make less. Dust ended the solar-powered rover Opportunity.",
+    source: "NASA/JPL · Opportunity mission end announcement, Feb 13, 2019",
+    box: { x: 520, y: 110, w: 700 },
+    point: { x: 840, y: 440 },
   },
 ];

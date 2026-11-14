@@ -32,12 +32,28 @@ export function resultNotes(crop: Crop, out: Outcome, at: number): SceneNote[] {
     { from: at, to: at + 5.5, kind: "story", text, box: { x: 400, y: 90, w: 820 } },
     {
       from: at + 5.5,
-      to: NEVER,
+      to: at + 12.5,
       kind: "fact",
       title: crop.fact.title,
       text: crop.fact.text,
       source: crop.fact.source,
       box: { x: 400, y: 90, w: 820 },
     },
+    {
+      from: at + 12.9,
+      to: NEVER,
+      kind: "fact",
+      title: OSDR_FACT.title,
+      text: OSDR_FACT.text,
+      source: OSDR_FACT.source,
+      box: { x: 400, y: 90, w: 820 },
+    },
   ];
 }
+
+/** A real study from NASA's Open Science Data Repository: why fresh food matters to the crew score. */
+export const OSDR_FACT = {
+  title: "Is space food safe?",
+  text: "NASA brought lettuce from the space station's Veggie garden back to Earth and tested it for germs and nutrients. Space food has to be safe AND healthy.",
+  source: "NASA OSDR · OSD-268: Microbiological and nutritional analysis of lettuce crops grown on the ISS (VEG-01B) · osdr.nasa.gov/bio/repo/data/studies/OSD-268",
+};

@@ -74,7 +74,8 @@
 .gh__tank {
   position: absolute;
   left: 15%;
-  top: 37%;
+  /* Anchored to the bottom (not the top), so the crew tablet in the top-left corner never covers it. */
+  bottom: 13%;
   width: 9.4%;
   display: grid;
   gap: 8px;

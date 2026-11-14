@@ -17,7 +17,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Astronaut, Boy } from "../game/art";
 import { NoteLayer } from "../game/notes";
 import type { SceneNote } from "../game/notes";
-import { addDecision, applySteps } from "../game/state";
 import type { GameState, Level } from "../game/state";
 import Tablet from "../game/Tablet";
 import { useTimeline } from "../game/useTimeline";
@@ -30,7 +29,7 @@ import "../greenhouse/greenhouse.css";
 import "./garage.css";
 import GarageCloseup from "./GarageCloseup";
 import Rover from "./Rover";
-import { COLD_NAME, GEAR, WEATHER_SOURCE, coldExtra, coldLevel, nextReading } from "./weather";
+import { COLD_CREW, COLD_NAME, GEAR, WEATHER_SOURCE, applyGear, coldExtra, coldLevel, nextReading } from "./weather";
 
 type Props = {
   game: GameState;
@@ -79,16 +78,7 @@ export default function GarageTrip({ game, onDone }: Props) {
 
   const pick = (level: Level | null) => {
     if (phase !== "gear" || level === null) return;
-    const g = GEAR[level];
-    const paid = applySteps(game, [{ key: "power", delta: -g.power, at: 0 }]);
-    const short = coldExtra(cold, level);
-    const line = `Garage: ${reading.temp} °C (${COLD_NAME[cold]}), picked ${g.name.toLowerCase()}${short ? `, cold battery +${short} Power per sample` : ""}`;
-    setGeared(
-      addDecision(
-        { ...paid, log: [...paid.log, line] },
-        { what: `Garage heater: ${g.name.toLowerCase()}`, effect: `Power −${g.power}${short ? `, still cold: each sample +${short} Power` : ", the battery stays warm"}`, mark: short ? "cost" : "ok" },
-      ),
-    );
+    setGeared(applyGear(game, reading, level));
     setGear({ level, at: t });
     setPhase("geared");
   };
@@ -150,7 +140,7 @@ export default function GarageTrip({ game, onDone }: Props) {
         kind: "radio",
         noNav: true,
         title: "Weather report",
-        text: `Perseverance's weather station measured ${reading.temp} °C at Jezero (${reading.when}). That is ${COLD_NAME[cold]}! Cold batteries run down fast. Pick a heater for his suit and the rover.`,
+        text: `Perseverance's weather station measured ${reading.temp} °C at Jezero (${reading.when}). That is ${COLD_NAME[cold]}! Cold batteries run down fast, and a cold crew gets tired. Pick a heater for the suits and the rover.`,
         source: WEATHER_SOURCE,
         box: { x: 440, y: 76, w: 800 },
       },
@@ -159,7 +149,7 @@ export default function GarageTrip({ game, onDone }: Props) {
     const g = GEAR[gear.level];
     const text =
       extra > 0
-        ? `${g.name} is not enough for ${reading.temp} °C. The battery will be cold: each sample costs +${extra} Power.`
+        ? `${g.name} is not enough for ${reading.temp} °C. The crew is shivering (crew −${COLD_CREW}) and the battery is cold: each sample costs +${extra} Power.`
         : gear.level > cold
           ? `Toasty! ${g.name} is more than ${reading.temp} °C needs, so it used extra Power.`
           : `Just right! ${g.name} keeps the suit and the battery warm at ${reading.temp} °C.`;
@@ -171,7 +161,7 @@ export default function GarageTrip({ game, onDone }: Props) {
         kind: "fact",
         title: "Cold Mars",
         text: "Jezero's air is about −55 °C on average, and it can change by 50 to 60 °C between day and night. Extreme cold can freeze and crack electronics, so rovers carry heaters.",
-        source: "NASA/JPL · Perseverance MEDA (first 250 sols, via Space.com); NASA",
+        source: "NASA's MEDA team · Rodriguez-Manfredi et al., Nature Geoscience (2023): the first 250 sols of Perseverance weather",
         box: { x: 440, y: 76, w: 800 },
       },
     ];
@@ -197,7 +187,14 @@ export default function GarageTrip({ game, onDone }: Props) {
           </BaseArt>
         </div>
         <NoteLayer notes={notes} t={phase === "back" ? 1 : t} selfNav />
-        <Tablet meters={shown.meters} locked={shown.locked} crew={shown.crew} decisions={shown.decisions} nudge={phase === "geared" && t < (gear?.at ?? 0) + 1.6 ? ["power"] : []} />
+        <Tablet
+          meters={shown.meters}
+          locked={shown.locked}
+          crew={shown.crew}
+          decisions={shown.decisions}
+          nudge={phase === "geared" && t < (gear?.at ?? 0) + 1.6 ? ["power"] : []}
+          compact={phase === "in" || phase === "gear"}
+        />
 
         <GarageCloseup
           on={phase === "gear" || phase === "geared"}

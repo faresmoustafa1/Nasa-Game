@@ -3,7 +3,7 @@
 import { SOURCE_GROUPS } from "../game/sources";
 import "./result.css";
 
-export default function Sources({ onBack }: { onBack: () => void }) {
+export default function Sources({ onBack, backLabel = "◂ Back" }: { onBack: () => void; backLabel?: string }) {
   return (
     <div className="res">
       <div className="res__page">
@@ -30,7 +30,7 @@ export default function Sources({ onBack }: { onBack: () => void }) {
         ))}
         <div className="res__buttons">
           <button type="button" className="res__btn res__btn--main" onClick={onBack}>
-            ◂ Back to the result
+            {backLabel}
           </button>
         </div>
       </div>

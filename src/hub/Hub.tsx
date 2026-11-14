@@ -104,8 +104,9 @@ export default function Hub({ game, onDone, sound = true }: HubProps) {
     audioRef.current?.blip(row === "power" ? 660 : row === "water" ? 760 : row === "air" ? 880 : 560);
   }, []);
 
-  // Which job is marked "Later": the other one after the first pick, or the one that is left.
-  const later: Task | null = second ? (todo[0] ?? null) : picked ? OTHER[picked] : null;
+  // Which job is marked "Later": before the first pick BOTH (so the player sees the price of waiting before choosing),
+  // then the other one after the pick, or the one that is left on the second visit.
+  const later: Task | Task[] | null = second ? (todo[0] ?? null) : picked ? OTHER[picked] : todo;
 
   const notes = useMemo(() => {
     if (second) return todo[0] ? [secondNote(todo[0])] : [];

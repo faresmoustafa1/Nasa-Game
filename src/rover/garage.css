@@ -17,7 +17,19 @@
 .gh__lamp.garage__switch {
   left: 2%;
   right: auto;
-  top: 43%;
+  top: 45%;
+}
+/* Short screens (phones held sideways): the tablet takes more of the height, so the switch sits lower and tighter. */
+@media (max-height: 560px) {
+  .gh__lamp.garage__switch {
+    top: auto;
+    bottom: 3%;
+    gap: 4px;
+    padding: 0.6% 0.8%;
+  }
+  .gh__lamp.garage__switch button {
+    padding: 3px 4px;
+  }
 }
 .gh__preview.garage__feel {
   bottom: 15%;

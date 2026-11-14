@@ -244,3 +244,48 @@
   stroke-width: 6px;
   stroke-linejoin: round;
 }
+
+/* A real NASA photo of the delta, shown before the trip. */
+.rover__photo {
+  position: absolute;
+  z-index: 3;
+  top: clamp(64px, 11vh, 96px);
+  right: clamp(10px, 2.2vw, 24px);
+  width: clamp(180px, 20vw, 270px);
+  margin: 0;
+  padding: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 14px;
+  background: rgba(6, 10, 24, 0.88);
+  color: #e8ecf6;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.rover__photo img,
+.rover__photo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.rover__photo figcaption {
+  margin-top: 6px;
+  font: 500 12px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.rover__photo b {
+  color: #ffd84a;
+  letter-spacing: 0.06em;
+}
+.rover__photo small {
+  display: block;
+  margin-top: 4px;
+  color: #b8c0d2;
+  font-size: 10px;
+}
+@media (max-height: 480px) {
+  .rover__photo {
+    width: clamp(150px, 20vw, 220px);
+  }
+  .rover__photo figcaption {
+    font-size: 10px;
+  }
+}

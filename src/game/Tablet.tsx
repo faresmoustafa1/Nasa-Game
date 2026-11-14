@@ -27,7 +27,7 @@ const ICONS: Record<MeterKey, ReactNode> = {
   ),
 };
 
-function FaceIcon({ face }: { face: Face }) {
+export function FaceIcon({ face }: { face: Face }) {
   return (
     <svg className={`tablet__face tablet__face--${face}`} viewBox="0 0 32 32" aria-hidden="true">
       <circle cx="16" cy="16" r="14" />
@@ -44,7 +44,7 @@ type TabletProps = {
   meters: Meters;
   /** Water locked in the shelter walls: shown hatched, and not counted in the number. */
   locked?: number;
-  /** Crew score, 0–6. */
+  /** Crew score, 0–5 (one face per crew member). */
   crew: number;
   /** Every choice made so far, with its consequence. Shown under the meters in every Mars scene. */
   decisions?: Decision[];
@@ -54,6 +54,8 @@ type TabletProps = {
   nudge?: TabletFocus[];
   /** If given, rows are tappable. */
   onPick?: (row: TabletFocus) => void;
+  /** Close-up scenes: start with "Your choices" folded, so the tablet never covers the controls. Tap to open. */
+  compact?: boolean;
 };
 
 const MARK: Record<Decision["mark"], { icon: string; word: string }> = {
@@ -64,8 +66,8 @@ const MARK: Record<Decision["mark"], { icon: string; word: string }> = {
 };
 
 /** "Your choices": what you picked and what it caused. It stays on the tablet so choices always show their consequences. */
-function Choices({ decisions }: { decisions: Decision[] }) {
-  const [open, setOpen] = useState(true);
+function Choices({ decisions, startOpen }: { decisions: Decision[]; startOpen: boolean }) {
+  const [open, setOpen] = useState(startOpen);
   const list = useRef<HTMLOListElement>(null);
   // Keep the newest choice in view.
   useEffect(() => {
@@ -106,7 +108,7 @@ function Note({ note }: { note: TabletNote }) {
   );
 }
 
-export default function Tablet({ meters, locked = 0, crew, decisions = [], focus = null, nudge = [], onPick }: TabletProps) {
+export default function Tablet({ meters, locked = 0, crew, decisions = [], focus = null, nudge = [], onPick, compact = false }: TabletProps) {
   const keys: MeterKey[] = ["power", "water", "air"];
   const faces = crewFaces(crew);
   const usable = (k: MeterKey) => (k === "water" ? Math.max(0, meters.water - locked) : meters[k]);
@@ -156,7 +158,7 @@ export default function Tablet({ meters, locked = 0, crew, decisions = [], focus
         </button>
         {focus === "crew" && <Note note={TABLET_NOTES.crew} />}
       </div>
-      {decisions.length > 0 && <Choices decisions={decisions} />}
+      {decisions.length > 0 && <Choices key={compact ? "folded" : "open"} decisions={decisions} startOpen={!compact} />}
     </aside>
   );
 }

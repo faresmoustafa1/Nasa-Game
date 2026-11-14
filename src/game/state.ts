@@ -2,7 +2,7 @@
 //
 // One object, owned by App.tsx, passed to every scene on Mars. A scene reads
 // it, and reports back what the player chose. The numbers are the START values
-// from the cost table (power 12, water 10, air 6, crew 4 of 6).
+// from the cost table (power 12, water 10, air 6, crew 4 of 5).
 
 import { pickCrop } from "../greenhouse/crops";
 import type { CropId } from "../greenhouse/crops";
@@ -17,7 +17,8 @@ export type TabletFocus = MeterKey | "crew";
 
 /** Every bar is drawn on the same 0–12 scale, so they compare at a glance. */
 export const METER_MAX = 12;
-export const CREW_MAX = 6;
+/** Crew score, 0–5: one face per crew member (4 adults and the boy). */
+export const CREW_MAX = 5;
 
 export const METER_LABEL: Record<MeterKey, string> = {
   power: "Power",
@@ -55,7 +56,10 @@ export const SHIELD: Record<Level, { name: string; power: number; lock: number }
 
 /** What happened in the storm (kept for the result screen's recap). */
 export type StormRecord = {
+  /** How big the storm really was when it arrived. */
   level: Level;
+  /** What Mission Control's forecast said (null: the forecast never arrived, see `lost`). */
+  forecast: Level | null;
   shield: Level;
   /** Cloud speed in km/s from NASA DONKI. */
   speed: number;
@@ -65,8 +69,13 @@ export type StormRecord = {
   live: boolean;
   /** Strongest flare linked to the event (e.g. "X1.8"), if any. */
   flare: string | null;
-  /** The Earth message was lost (an M or X flare blocked the signal). */
+  /** The forecast never arrived: a big flare's particles reach Mars before Earth's warning can (see donki.ts). */
   lost: boolean;
+  /** NASA's WSA-Enlil model predicted this cloud would reach Mars (false: it was aimed elsewhere). */
+  marsHit?: boolean;
+  /** DONKI activity ID and page, so anyone can look the event up. */
+  id?: string;
+  link?: string;
   /** How many levels the storm was bigger than the shield. Crew −2 per level. */
   hits: number;
 };
@@ -79,7 +88,7 @@ export type Decision = { what: string; effect: string; mark: "ok" | "cost" | "wr
 
 export type GameState = {
   meters: Meters;
-  /** Crew score, 0–6. Shown as 5 faces. */
+  /** Crew score, 0–5. Shown as 5 faces, one per crew member. */
   crew: number;
   /** Mars day. Sol 1 is the first task, Sol 2 the second (the storm). */
   sol: number;
@@ -152,27 +161,28 @@ export function applySteps(game: GameState, steps: Step[]): GameState {
   return g;
 }
 
-/** Every night: five people breathe (air −3), and the oxygen maker answers (power −1, water −1, air +2). */
+/** Power the solar panels make at sunrise. Less than a clear day would give: there is dust in the Mars air. */
+export const SUNRISE_POWER = 2;
+
+/**
+ * Every night: five people breathe (air −3), and the oxygen maker answers (power −1, water −1, air +2).
+ * At sunrise the solar panels charge the batteries a little (power +SUNRISE_POWER). Power does not come back
+ * by itself during the day: what you spend today is not there tomorrow.
+ */
 export const NIGHT_STEPS: Step[] = [
   { key: "air", delta: -3, at: 6 },
   { key: "power", delta: -1, at: 10 },
   { key: "water", delta: -1, at: 10.6 },
   { key: "air", delta: 2, at: 11.4 },
+  { key: "power", delta: SUNRISE_POWER, at: 17 },
 ];
 
 export type Face = "happy" | "okay" | "tired";
 
-/**
- * Crew score (0–6) → 5 faces. Each full 1.2 points is one happy face; a
- * partly-filled one shows "okay". Start (4 of 6) = 3 happy, 1 okay, 1 tired.
- */
+/** Crew score (0–5) → 5 faces, one per crew member: a happy face for each point. Start (4 of 5) = 4 happy, 1 tired. */
 export function crewFaces(score: number): Face[] {
-  const filled = (Math.max(0, Math.min(CREW_MAX, score)) / CREW_MAX) * 5;
-  const happy = Math.floor(filled);
-  const partial = filled - happy >= 0.3;
-  return Array.from({ length: 5 }, (_, i) =>
-    i < happy ? "happy" : i === happy && partial ? "okay" : "tired",
-  );
+  const happy = Math.max(0, Math.min(CREW_MAX, Math.round(score)));
+  return Array.from({ length: CREW_MAX }, (_, i) => (i < happy ? "happy" : "tired"));
 }
 
 /**
@@ -184,7 +194,8 @@ export function applyStorm(game: GameState, rec: Omit<StormRecord, "hits">): Gam
   const hits = Math.max(0, rec.level - rec.shield);
   const paid = applySteps(game, [{ key: "power", delta: -shield.power, at: 0 }]);
   const crew = Math.max(0, paid.crew - 2 * hits);
-  const line = `Storm (${LEVEL_NAME[rec.level]}): picked a ${shield.name} shield${hits ? `, crew −${paid.crew - crew}` : ""}`;
+  const said = rec.forecast === null ? "no forecast" : rec.forecast === rec.level ? "as forecast" : `forecast said ${LEVEL_NAME[rec.forecast]}`;
+  const line = `Storm (${LEVEL_NAME[rec.level]}, ${said}): picked a ${shield.name} shield${hits ? `, crew −${paid.crew - crew}` : ""}`;
   const locked = Math.min(shield.lock, paid.meters.water);
   return addDecision(
     {
@@ -195,7 +206,7 @@ export function applyStorm(game: GameState, rec: Omit<StormRecord, "hits">): Gam
       log: [...paid.log, line],
     },
     {
-      what: `Storm (${LEVEL_NAME[rec.level]}): ${shield.name} shield`,
+      what: `Storm (${LEVEL_NAME[rec.level]}${rec.forecast !== null && rec.forecast !== rec.level ? `, forecast said ${LEVEL_NAME[rec.forecast]}` : ""}): ${shield.name} shield`,
       effect: `Power −${shield.power}, ${locked} water locked${hits ? `, storm was bigger: crew −${paid.crew - crew}` : ", the crew was safe"}`,
       mark: hits ? "cost" : "ok",
     },

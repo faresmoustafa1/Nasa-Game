@@ -39,24 +39,31 @@ function firstScene(): Scene {
 function sampleEnd(): GameState {
   const rich = devParam("rich") === "1";
   const pen = Number(devParam("pen")) || 0;
+  // A finished game that follows the real rules: radishes (harvest 3), a medium storm and a medium shield,
+  // then the rover with 2 rocks (crater floor 4 + delta foot 6, the rock the team needed, +2).
   return {
     ...newGame(),
     order: "GR",
     tasks: ["greenhouse", "rover"],
-    meters: rich ? { power: 5, water: 4, air: 2 } : { power: 4, water: 5, air: 2 },
+    meters: rich ? { power: 2, water: 3, air: 1 } : { power: 3, water: 5, air: 2 },
     crew: rich ? 5 : 3,
-    samples: 3,
-    rockPoints: rich ? 17 : 8,
-    harvest: rich ? 7 : 3,
+    samples: rich ? 3 : 2,
+    rockPoints: rich ? 19 : 12,
+    harvest: rich ? 5 : 3,
     penalty: pen,
-    log: ["Chose the greenhouse first", "Greenhouse (radishes): water 1, light 1 → healthy plants, harvest 3", "Storm (medium): picked a medium shield", "Rover: 3 rocks (9 points), went right away"],
+    log: [
+      "Chose the greenhouse first",
+      `Greenhouse (radishes): ${rich ? "water 2, light 2 → lush plants, harvest 5" : "water 1, light 1 → healthy plants, harvest 3"}`,
+      "Storm (medium, as forecast): picked a medium shield",
+      rich ? "Rover: 3 rocks (19 points), went right away" : "Rover: 2 rocks (12 points), went right away",
+    ],
   };
 }
 
 /** A game that is part-way through: one job done, the night and the storm over (a medium storm, a medium shield). */
 function midGame(first: Task): GameState {
   const g = { ...newGame(), order: first === "greenhouse" ? ("GR" as const) : ("RG" as const), tasks: [first], log: [`Chose the ${first} first`], decisions: [{ what: `${first === "greenhouse" ? "Greenhouse" : "Rover"} first`, effect: LATER_COST[first === "greenhouse" ? "rover" : "greenhouse"].chip, mark: "cost" as const }] };
-  return applyStorm({ ...applySteps(g, NIGHT_STEPS), sol: 2 }, { level: 2, shield: 2, speed: 758, date: "2025-06-06", live: false, flare: null, lost: false });
+  return applyStorm({ ...applySteps(g, NIGHT_STEPS), sol: 2 }, { level: 2, forecast: 2, shield: 2, speed: 758, date: "2025-06-06", live: false, flare: null, lost: false, marsHit: true });
 }
 
 function firstGame(): GameState {
@@ -92,7 +99,7 @@ function Game() {
     else if (key === "storm") set(applySteps({ ...fresh, order: "GR", tasks: ["greenhouse"] }, NIGHT_STEPS), "storm");
     else if (key === "greenhouse2") set(midGame("rover"), "task", "greenhouse");
     else if (key === "rover2") set(midGame("greenhouse"), "task", "rover");
-    else if (key === "crowning") set({ ...sampleEnd(), rockPoints: 17, harvest: 7, crew: 5 }, "crown");
+    else if (key === "crowning") set({ ...sampleEnd(), meters: { power: 2, water: 3, air: 1 }, samples: 3, rockPoints: 19, harvest: 5, crew: 5 }, "crown");
     else if (key === "result") set(sampleEnd(), "end");
     else set(fresh, "sources");
   };
@@ -183,7 +190,7 @@ function Game() {
 
 
     if (scene === "sources") {
-      return <Sources onBack={() => setScene("title")} />;
+      return <Sources onBack={() => setScene("title")} backLabel="◂ Back to the menu" />;
     }
 
     if (scene === "end") {
@@ -206,6 +213,10 @@ function Game() {
         onPlay={() => {
           setGame(newGame());
           setScene("prologue");
+        }}
+        onSkipIntro={() => {
+          setGame(newGame());
+          setScene("touchdown");
         }}
         onJump={jump}
         onSources={() => setScene("sources")}

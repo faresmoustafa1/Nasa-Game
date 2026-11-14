@@ -66,6 +66,7 @@
 
 .res__score,
 .res__recap,
+.res__storm,
 .res__src {
   padding: 18px 20px;
   border-radius: 18px;
@@ -103,9 +104,22 @@
   font-size: 22px;
 }
 .res__crew {
+  display: flex;
+  gap: 8px;
   margin-top: 12px;
-  font-size: 30px;
-  letter-spacing: 4px;
+}
+.res__crew .tablet__face {
+  width: 40px;
+  height: 40px;
+}
+.res__storm p {
+  margin: 0;
+  color: #cfd8ea;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.res__storm a {
+  color: #8fd0ff;
 }
 
 .res__recap ol {

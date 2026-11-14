@@ -4,8 +4,8 @@
 //   drag up to 3 water drops onto the plants (or tap a drop)   each costs 1 Water
 //   pick the lamp: Off / 1 / 2 / 3                             each step costs 1 Power
 // The plants react live (wilted / healthy / lush) so the player sees the trade-off BEFORE pressing Grow!
-// Rules are in rules.ts. After Grow! the plants grow in a time-lapse, a NASA OSDR fact appears,
-// and the camera zooms back out to the base.
+// Rules are in rules.ts. After Grow! the plants grow in a time-lapse, a real NASA fact about the crop appears,
+// then a study from NASA's Open Science Data Repository (OSDR, see notes.ts), and the camera zooms back out.
 //
 // Usage:  <Greenhouse game={game} onDone={(next) => …} />      Dev: ?scene=task&room=greenhouse (add &done=rover for "second")
 
@@ -24,7 +24,7 @@ import BaseArt from "../hub/BaseArt";
 import { FLOOR_Y, PERSON_SCALE, TASK_STAND_X } from "../hub/layout";
 import "../game/game.css";
 import { planNote, resultNotes } from "./notes";
-import { CROPS } from "./crops";
+import { cropOf } from "./crops";
 import type { CropId } from "./crops";
 import { LIGHT_MAX, WATER_MAX, applyGreenhouse, canBeLush, lightAvailable, needWater, outcomeOf, resultOf, waterAvailable } from "./rules";
 import type { Outcome } from "./rules";
@@ -138,7 +138,7 @@ export default function Greenhouse({ game, onDone, sound = true }: GreenhousePro
   const first = game.tasks.length === 0;
   const waterMax = waterAvailable(game);
   const lightMax = lightAvailable(game);
-  const crop = CROPS[game.crop];
+  const crop = cropOf(game.crop);
   const needW = needWater(crop, first);
 
   const [phase, setPhase] = useState<Phase>("in");
@@ -394,7 +394,14 @@ export default function Greenhouse({ game, onDone, sound = true }: GreenhousePro
 
         <NoteLayer notes={notes} t={t} />
 
-        <Tablet decisions={cur.decisions} meters={cur.meters} locked={cur.locked} crew={cur.crew} nudge={phase === "grow" || phase === "done" ? ["water", "power", "crew"] : []} />
+        <Tablet
+          decisions={cur.decisions}
+          meters={cur.meters}
+          locked={cur.locked}
+          crew={cur.crew}
+          nudge={phase === "grow" || phase === "done" ? ["water", "power", "crew"] : []}
+          compact={phase === "in" || phase === "plan" || phase === "grow"}
+        />
 
         {planning && (
           <button type="button" className="ares__cta" onClick={grow}>

@@ -1,12 +1,14 @@
 // Mission ARES — Phase 3: the solar storm (Sol 2).
 //
-// An alarm rings, the crew runs to the shelter, and Mission Control calls with the storm's size
-// (real data from NASA DONKI, or one of three saved real events). The player picks a shield:
+// An alarm rings, the crew runs to the shelter, and Mission Control calls with the storm FORECAST
+// (real data from NASA DONKI, or one of three saved real events). Forecasts can be off by one size
+// (stormLevel in donki.ts), so a thicker shield is insurance. The player picks a shield:
 //   thin   Power −1, locks 2 Water
 //   medium Power −2, locks 4 Water
 //   thick  Power −3, locks 6 Water
-// A storm bigger than the shield costs the crew 2 points per level. If a big flare blocked the
-// radio, the message is lost and the player has to guess. Nothing is "wrong": it all shows on the tablet.
+// A storm bigger than the shield costs the crew 2 points per level. With a big flare, the forecast cannot
+// arrive in time and the player has to guess. Nothing is "wrong": it all shows on the tablet.
+// After the pick, a card compares real Mars radiation readings from NASA RadLab (quiet day vs. a storm).
 //
 // Timeline (seconds): 0 alarm, 0.8 the crew runs, 3.4 radio message, 3.8 shield buttons.
 // After the pick the clock keeps going: result note, radiation fact, then "Storm over ▸".
@@ -27,9 +29,13 @@ import "../game/game.css";
 import BaseArt from "../hub/BaseArt";
 import { BOY_START_X, CREW_POS, FLOOR_Y, PERSON_SCALE } from "../hub/layout";
 import "../hub/hub.css";
-import { devEvent, fetchLiveEvent, levelOf, messageLost, nextSaved } from "./donki";
+import { JUDGE_DELAY_MIN, isJudge } from "../game/judge";
+import { safeDelayMinutes } from "../rover/delay";
+import { devEvent, fetchLiveEvent, levelOf, messageLost, nextSaved, stormLevel } from "./donki";
 import type { StormEvent } from "./donki";
 import { ALARM_NOTE, radioNote, resultNotes } from "./notes";
+import RadChart from "./RadChart";
+import { ERUPTION_PHOTO, RADLAB, RADLAB_TIMES } from "./radlab";
 import "./storm.css";
 
 type StormProps = {
@@ -49,33 +55,45 @@ const SHIELDS: Level[] = [1, 2, 3];
 
 const place = (x: number) => ({ transform: `translate(${x}px, ${FLOOR_Y}px) scale(${PERSON_SCALE})` });
 
-/** Asks NASA (1.5 s at most), else takes the next saved real event. Never blocks the scene. */
+/** Asks NASA (2.5 s at most), else takes the next saved real event. Never blocks the scene. */
 function useStormEvent(): StormEvent | null {
   const [event, setEvent] = useState<StormEvent | null>(null);
   useEffect(() => {
     let alive = true;
     const { forced, skipLive } = devEvent();
+    // Whatever happens (offline, NASA slow, odd data, an error), a saved real event takes over after 3.5 s at most.
+    const fallback = window.setTimeout(() => {
+      if (alive) setEvent((cur) => cur ?? nextSaved());
+    }, 3500);
     const get = forced ? Promise.resolve(forced) : skipLive ? Promise.resolve(nextSaved()) : fetchLiveEvent().then((e) => e ?? nextSaved());
-    void get.then((e) => {
-      if (alive) setEvent(e);
-    });
+    void get
+      .catch(() => nextSaved())
+      .then((e) => {
+        if (alive) setEvent((cur) => cur ?? e);
+      });
     return () => {
       alive = false;
+      window.clearTimeout(fallback);
     };
   }, []);
   return event;
 }
 
-const niceDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+const niceDate = (iso: string) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+};
 
 export default function Storm({ game, onDone, sound = true }: StormProps) {
   const audioRef = useRef<GameAudio | null>(null);
   const finished = useRef(false);
   const event = useStormEvent();
+  const [delay] = useState(() => (isJudge() ? JUDGE_DELAY_MIN : safeDelayMinutes()));
   const { t } = useTimeline({});
   const sec = Math.floor(t);
 
   const [pick, setPick] = useState<{ at: number; next: GameState } | null>(null);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const since = pick ? t - pick.at : -1;
   const rec = pick?.next.storm ?? null;
 
@@ -102,7 +120,20 @@ export default function Storm({ game, onDone, sound = true }: StormProps) {
   const choose = useCallback(
     (shield: Level) => {
       if (pick || !event) return;
-      const next = applyStorm(game, { level: levelOf(event), shield, speed: event.speed, date: event.date, live: event.live, flare: event.flare, lost: messageLost(event) });
+      const lost = messageLost(event);
+      const next = applyStorm(game, {
+        level: stormLevel(event),
+        forecast: lost ? null : levelOf(event),
+        shield,
+        speed: event.speed,
+        date: event.date,
+        live: event.live,
+        flare: event.flare,
+        lost,
+        marsHit: event.marsHit,
+        id: event.id,
+        link: event.link ?? undefined,
+      });
       setPick({ at: t, next });
       if ((next.storm?.hits ?? 0) > 0) audioRef.current?.thud();
       else audioRef.current?.chime();
@@ -118,8 +149,8 @@ export default function Storm({ game, onDone, sound = true }: StormProps) {
 
   const notes = useMemo(() => {
     if (rec && pick) return resultNotes(pick.at, rec);
-    return event ? [ALARM_NOTE, radioNote(event)] : [ALARM_NOTE];
-  }, [event, rec, pick]);
+    return event ? [ALARM_NOTE, radioNote(event, delay)] : [ALARM_NOTE];
+  }, [event, rec, pick, delay]);
 
   const view = pick?.next ?? game;
   const running = t >= RUN_AT && t < RUN_END;
@@ -157,9 +188,20 @@ export default function Storm({ game, onDone, sound = true }: StormProps) {
         <Tablet decisions={view.decisions} meters={view.meters} locked={view.locked} crew={view.crew} nudge={[...nudge]} />
 
         {event && t >= RADIO_AT && (
-          <p className="storm__tag">
-            {event.live ? "LIVE · NASA DONKI" : `SAVED REAL EVENT · ${niceDate(event.date)} · NASA DONKI`}
+          <p className="storm__tag" title={event.id}>
+            {event.live ? `LIVE FROM NASA DONKI · CME of ${niceDate(event.date)}` : `SAVED REAL EVENT · CME of ${niceDate(event.date)} · NASA DONKI`}
+            <small>{event.id}</small>
           </p>
+        )}
+
+        {event && !pick && t >= RADIO_AT && !photoFailed && (
+          <figure className="storm__photo">
+            <img src={ERUPTION_PHOTO.src} alt="A real NASA image of the Sun with a bright flare and a huge cloud of particles blasting into space." onError={() => setPhotoFailed(true)} />
+            <figcaption>
+              <b>REAL NASA PHOTO</b> {ERUPTION_PHOTO.caption}
+              <small>{ERUPTION_PHOTO.credit}</small>
+            </figcaption>
+          </figure>
         )}
 
         {event && !pick && t >= CHOOSE_AT && (
@@ -198,6 +240,21 @@ export default function Storm({ game, onDone, sound = true }: StormProps) {
             <p className="storm__dose-text">
               {hits === 0 ? "The shield was thick enough. The crew is safe." : `The shield was ${hits} level${hits > 1 ? "s" : ""} too thin. Crew −${2 * hits}.`}
             </p>
+            <div className="storm__real">
+              <p className="storm__dose-title">REAL MARS READINGS · NASA RADLAB</p>
+              <p>
+                {RADLAB.instrument}. Highest reading each hour, in microgray per hour (a tiny unit of radiation):
+              </p>
+              <RadChart />
+              <p>
+                Quiet days: <b>{RADLAB.quiet.rate}</b> <small>{RADLAB.quiet.when}</small>
+                <br />
+                Solar storm: <b>{RADLAB.storm.rate}</b> <small>{RADLAB.storm.when}</small>
+                <br />
+                About <b>{RADLAB_TIMES}×</b> more!
+              </p>
+              <small className="storm__src">Source: {RADLAB.source}</small>
+            </div>
           </aside>
         )}
 

@@ -14,7 +14,16 @@
   color: #cfe9ff;
   font: 700 13px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   letter-spacing: 0.08em;
+  text-align: center;
   animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.storm__tag small {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
 }
 
 .storm__shields {
@@ -130,5 +139,110 @@
     padding: 3px 10px;
     font-size: 10px;
     white-space: nowrap;
+  }
+}
+
+/* Real readings from NASA RadLab, under the game's radiation card. */
+.storm__real {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.35);
+}
+.storm__real p {
+  margin: 4px 0;
+  color: #e8ecf6;
+  font: 500 12px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.storm__real b {
+  color: #ffd84a;
+}
+.storm__real small {
+  opacity: 0.75;
+}
+.storm__chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 6px 0;
+}
+.storm__grid {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 1;
+}
+.storm__grid.is-day {
+  stroke-dasharray: 3 3;
+}
+.storm__axis {
+  fill: #b8c0d2;
+  font: 500 9px system-ui, sans-serif;
+}
+.storm__axis.is-peak {
+  fill: #ffd84a;
+  font-weight: 800;
+  font-size: 10px;
+}
+.storm__axis.is-quiet {
+  fill: #7ee0b0;
+  font-weight: 700;
+}
+.storm__line {
+  fill: none;
+  stroke: #ff7a66;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+.storm__area {
+  fill: rgba(255, 122, 102, 0.18);
+}
+.storm__peak {
+  fill: #ffd84a;
+  stroke: #ffffff;
+  stroke-width: 1;
+}
+
+/* A real NASA photo of a solar eruption, next to the forecast (until the shield is picked). */
+.storm__photo {
+  position: absolute;
+  z-index: 3;
+  right: clamp(10px, 2.2vw, 24px);
+  top: clamp(64px, 12vh, 110px);
+  width: clamp(190px, 18vw, 240px);
+  margin: 0;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  background: rgba(6, 10, 24, 0.9);
+  color: #e8ecf6;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.storm__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #000;
+}
+.storm__photo figcaption {
+  margin-top: 6px;
+  font: 500 11px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.storm__photo b {
+  display: block;
+  color: #ffd84a;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+.storm__photo small {
+  display: block;
+  margin-top: 3px;
+  color: #b8c0d2;
+  font-size: 9px;
+}
+/* Short screens (a phone held sideways): the photo would cover the notes, so it is only in the sources list. */
+@media (max-height: 560px) {
+  .storm__photo {
+    display: none;
   }
 }

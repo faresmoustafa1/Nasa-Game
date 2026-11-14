@@ -84,5 +84,15 @@ export function pickBonusSite(): SiteId {
   return pickNoRepeat("rock", ids);
 }
 
+/** The science team's request for this game, or the lake-mud rock if the stored site is unknown. */
+export const missionOf = (site: string): Mission => MISSIONS[site as SiteId] ?? MISSIONS.foot;
+
 /** Points for a rock from this site: its own points, plus the mission points if it is the rock the team needs. */
 export const rockValue = (site: Site, missionSite: SiteId) => site.points + (site.id === missionSite ? MISSION_POINTS : 0);
+
+/** A real NASA photo of the delta (shown on the map before the trip). Saved in public/nasa, so it works offline. */
+export const DELTA_PHOTO = {
+  src: `${import.meta.env.BASE_URL}nasa/jezero-delta-PIA23239.jpg`,
+  caption: "The REAL delta in Jezero Crater, photographed from space by NASA's Mars Reconnaissance Orbiter. The colors show minerals: clays and carbonates form in water.",
+  credit: "NASA/JPL-Caltech/MSSS/JHU-APL · PIA23239 · photojournal.jpl.nasa.gov/catalog/PIA23239",
+};

@@ -47,6 +47,9 @@ const JUMPS: { key: JumpKey; label: string }[] = [
 
 type View = "main" | "how" | "settings" | "credits" | "jump";
 
+/** The team, for the Credits screen. */
+const TEAM = ["Fares Mostafa", "Merna Hossam", "Eman Ahmed", "Amr Obaia", "Ahmed Zahran"];
+
 const HOW: { icon: string; title: string; text: string }[] = [
   {
     icon: "🔋",
@@ -181,10 +184,13 @@ function Seg<T extends string | boolean>({
 
 export default function Title({
   onPlay,
+  onSkipIntro,
   onJump,
   onSources,
 }: {
   onPlay: () => void;
+  /** Start a new game at the landing (skips the prologue and the trip): for replays and classrooms. */
+  onSkipIntro: () => void;
   onJump: (key: JumpKey) => void;
   onSources: () => void;
 }) {
@@ -213,6 +219,9 @@ export default function Title({
             <nav className="title__menu" aria-label="Main menu">
               <button type="button" className="title__play" onClick={onPlay}>
                 ▶ Start mission
+              </button>
+              <button type="button" className="title__dev" onClick={onSkipIntro}>
+                Skip the story: start at the landing ▸
               </button>
               <button type="button" onClick={() => setView("how")}>
                 How to play
@@ -300,13 +309,24 @@ export default function Title({
         {view === "credits" && (
           <section className="title__card" aria-label="Credits">
             <h2>Credits</h2>
+            <p>Mission ARES was made for the NASA Space Apps Challenge 2026 (Cairo), challenge: run a lunar or Martian outpost.</p>
+            <p className="title__team-head">Made by</p>
+            <ul className="title__team">
+              {TEAM.map((name) => (
+                <li key={name}>
+                  <b>{name}</b>
+                </li>
+              ))}
+            </ul>
             <p>
-              Mission ARES was made for the NASA Space Apps Challenge. All pictures and sounds are drawn and synthesized in code. No NASA
-              images are used.
+              All drawings and sounds are made in code. One real NASA photo is used (Jezero Crater from orbit, NASA/JPL-Caltech/MSSS/JHU-APL).
+              Real data: NASA DONKI (solar storms) with the WSA-Enlil model, NASA RadLab (Mars radiation), NASA OSDR (space lettuce study),
+              Perseverance MEDA (weather), NASA/JPL planet positions (message delay), and the Canadian Space Agency food toolkit. Game numbers are made up
+              to make a fair puzzle. See “NASA data” for every source.
             </p>
             <p>
-              Real data: NASA/JPL Mars 2020 Perseverance (MEDA weather), NASA DONKI (solar storms), NASA Space Place and NASA Glenn
-              (facts). Game numbers are made up to make a fair puzzle. See “NASA data” for every source.
+              <b>AI use:</b> we used Claude, an AI assistant by Anthropic, to help write and review code and text. Every NASA fact and number is listed
+              with its source under “NASA data”, so anyone can check it.
             </p>
             <button type="button" className="title__back" onClick={() => setView("main")}>
               ◂ Back

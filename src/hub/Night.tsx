@@ -14,7 +14,8 @@
 //   10  The oxygen maker runs: Power −1, Water −1 …
 //   11.4 … and Air +2.
 //   14  Morning. Sol 2.
-//   17.5 On to the next scene.
+//   17  Sunrise: the solar panels charge the batteries (Power +SUNRISE_POWER).
+//   21.5 On to the next scene.
 //
 // Usage:  <Night game={game} onDone={(next) => …} />      Dev: ?scene=night
 
@@ -50,8 +51,9 @@ const BEATS = [
   { id: "breathe", at: 5 },
   { id: "maker", at: 9 },
   { id: "morning", at: 14 },
+  { id: "sunrise", at: 17 },
 ] as const;
-const END_AT = 17.5;
+const END_AT = 21.5;
 /** The night waits here while the player connects the oxygen maker's pipe. */
 const PUZZLE_AT = 9;
 const NIGHT_STOPS = stopsOf(NIGHT_NOTES);
@@ -64,6 +66,7 @@ const POP_AT: Record<string, { x: number; y: number }> = {
   power: { x: 815, y: 610 },
   water: { x: 560, y: 600 },
   "air+": { x: 815, y: 690 },
+  "power+": { x: 840, y: 410 },
 };
 
 /** The sleepers: bunk positions match the beds drawn in BaseArt. */
@@ -140,7 +143,7 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
   useEffect(() => {
     const audio = audioRef.current;
     if (NIGHT_STEPS.some((s) => Math.floor(s.at) === sec)) audio?.blip(sec === 6 ? 330 : 520);
-    if (sec === 14) audio?.chime();
+    if (sec === 14 || sec === 17) audio?.chime();
   }, [sec]);
 
   const classes = ["ares", "hubn", ...BEATS.slice(0, current + 1).map((b) => `at-${b.id}`), asleep && "is-asleep", t < 1.4 && "is-opening"]
@@ -150,7 +153,7 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
   return (
     <div className={classes} data-beat={BEATS[current].id}>
       <div className="ares__stage">
-        <BaseArt night={night} running={running}>
+        <BaseArt night={night} running={running} charging={t >= 17 && t < 19.5}>
           {/* Day: everybody is up and about */}
           <g className="hub__people hubn__day">
             <g className="hub__person" style={place(CREW_POS.commander)}>
@@ -193,7 +196,7 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
           <g aria-hidden="true">
             {NIGHT_STEPS.map((s, i) => {
               if (t < s.at || t >= s.at + POP_TIME) return null;
-              const where = s.key === "air" ? POP_AT[s.delta < 0 ? "air-" : "air+"] : POP_AT[s.key];
+              const where = s.key === "air" ? POP_AT[s.delta < 0 ? "air-" : "air+"] : s.key === "power" && s.delta > 0 ? POP_AT["power+"] : POP_AT[s.key];
               return (
                 <text
                   key={i}

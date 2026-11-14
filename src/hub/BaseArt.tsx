@@ -6,7 +6,8 @@
 //   running  the oxygen maker's fan spins and bubbles rise
 //   glow     rooms that glow gold and can be tapped (the two jobs)
 //   picked   the job the boy is walking to (it stays lit, the other goes quiet)
-//   later    a job that has to wait: it gets a "Later: …" chip under its room
+//   later    a job that has to wait (or, before the first pick, both jobs): a "Later: …" chip under its room
+//   charging the solar panels on the roof glow (sunrise)
 //   roverAway the rover has driven out of the garage door (used by the garage zoom)
 //   pilotInRover the pilot waits in the rover's cab
 //   children the people (drawn on top of the rooms)
@@ -26,8 +27,11 @@ type BaseArtProps = {
   running?: boolean;
   glow?: Task[];
   picked?: Task | null;
-  later?: Task | null;
+  /** One job, or both before the first pick (then each chip says what happens IF it waits). */
+  later?: Task | Task[] | null;
   onPick?: (task: Task) => void;
+  /** The solar panels glow: they are charging the batteries. */
+  charging?: boolean;
   /** Solar storm: red sky, particles raining down. */
   storm?: boolean;
   /** Water tanks around the shelter walls: 0 = none, 1 = thin, 2 = medium, 3 = thick. */
@@ -79,7 +83,9 @@ function makeStreaks() {
   }));
 }
 
-export default function BaseArt({ night = false, running = false, glow = [], picked = null, later = null, onPick, storm = false, shield = 0, hit = false, roverAway = false, pilotInRover = false, children }: BaseArtProps) {
+export default function BaseArt({ night = false, running = false, glow = [], picked = null, later = null, onPick, charging = false, storm = false, shield = 0, hit = false, roverAway = false, pilotInRover = false, children }: BaseArtProps) {
+  const waiting: Task[] = later === null ? [] : Array.isArray(later) ? later : [later];
+  const ifLater = Array.isArray(later) && later.length > 1;
   const rocks = useMemo(() => makeRocks(), []);
   const streaks = useMemo(() => makeStreaks(), []);
   const classes = ["hub__svg", night && "is-night", running && "is-running", storm && "is-storm"].filter(Boolean).join(" ");
@@ -141,6 +147,17 @@ export default function BaseArt({ night = false, running = false, glow = [], pic
       <g className="hub__storm" aria-hidden="true">
         {streaks.map((st, i) => (
           <path key={i} d={`M${st.x} ${st.y} l-${st.len * 0.5} ${st.len}`} style={{ animationDelay: `${st.delay}s` }} />
+        ))}
+      </g>
+
+      {/* ---------- Solar panels on the roof (they charge the batteries at sunrise) ---------- */}
+      <g className={`hub__panels${charging ? " is-charging" : ""}`} aria-hidden="true">
+        {[620, 740, 860, 980].map((x) => (
+          <g key={x}>
+            <path d={`M${x + 50} ${ROOF_Y - 14} V${ROOF_Y - 34}`} stroke="#5a6685" strokeWidth="6" />
+            <path className="hub__panel" d={`M${x} ${ROOF_Y - 30} L${x + 100} ${ROOF_Y - 30} L${x + 88} ${ROOF_Y - 62} L${x + 12} ${ROOF_Y - 62} Z`} />
+            <path d={`M${x + 50} ${ROOF_Y - 30} L${x + 50} ${ROOF_Y - 62} M${x + 6} ${ROOF_Y - 46} L${x + 94} ${ROOF_Y - 46}`} stroke="#8fb4e8" strokeWidth="2" opacity="0.6" />
+          </g>
         ))}
       </g>
 
@@ -293,14 +310,14 @@ export default function BaseArt({ night = false, running = false, glow = [], pic
       })}
 
       {/* The rule: the job that waits gets harder. Said once, kindly. */}
-      {later && (
-        <g className="hub__chip">
-          <rect x={roomCenter(TASK_ROOM[later]) - 170} y="782" width="340" height="46" rx="23" />
-          <text x={roomCenter(TASK_ROOM[later])} y="813" textAnchor="middle">
-            {LATER_COST[later].chip}
+      {waiting.map((job) => (
+        <g key={job} className="hub__chip">
+          <rect x={roomCenter(TASK_ROOM[job]) - 180} y="782" width="360" height="46" rx="23" />
+          <text x={roomCenter(TASK_ROOM[job])} y="813" textAnchor="middle">
+            {ifLater ? LATER_COST[job].chip.replace(/^Later:/, "If later:") : LATER_COST[job].chip}
           </text>
         </g>
-      )}
+      ))}
 
       {children}
     </svg>

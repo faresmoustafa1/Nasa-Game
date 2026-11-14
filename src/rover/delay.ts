@@ -36,6 +36,17 @@ function position(el: Elements, T: number): [number, number, number] {
   ];
 }
 
+/** Used when the date is outside the orbit data's range (1800–2050) or the maths fails: a typical delay. */
+export const FALLBACK_DELAY_MIN = 12;
+
+/** Today's delay in minutes, or FALLBACK_DELAY_MIN if it cannot be worked out (never NaN, always in the real 3–23 min range). */
+export function safeDelayMinutes(date: Date = new Date()): number {
+  const year = date.getUTCFullYear();
+  if (!(year >= 1800 && year <= 2050)) return FALLBACK_DELAY_MIN;
+  const d = earthMarsDelayMinutes(date);
+  return Number.isFinite(d) && d >= 3 && d <= 23 ? d : FALLBACK_DELAY_MIN;
+}
+
 /** About how many minutes a radio message takes from Earth to Mars on `date` (one way). */
 export function earthMarsDelayMinutes(date: Date): number {
   const jd = date.getTime() / 86_400_000 + 2_440_587.5;

@@ -418,3 +418,15 @@
   background: #ff8a2c;
   opacity: 1;
 }
+
+/* Solar panels on the roof: they glow while they charge at sunrise. */
+.hub__panel {
+  fill: #2b4a7a;
+  stroke: #9aa6b8;
+  stroke-width: 3;
+  transition: fill 0.6s, filter 0.6s;
+}
+.hub__panels.is-charging .hub__panel {
+  fill: #4a8be0;
+  filter: drop-shadow(0 0 12px rgba(255, 216, 74, 0.9));
+}

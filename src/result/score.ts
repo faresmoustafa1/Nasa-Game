@@ -1,9 +1,10 @@
 // Mission ARES — the final score and badge.
 //
 //   score = rock points + harvest + crew + what is left (Power + Water + Air) − emergency-backup penalty
-// Everyone gets a badge: there is no "fail". The limits come from the balance check (src/sim/balance.ts), which plays
-// every possible set of choices: scores run 13–37, the best score in any situation is 29–37, so Gold (30+) can always be
-// reached by good choices (about 7% of random play), Silver (25+) is about half of random play, everyone else gets Bronze.
+// Everyone gets a badge: there is no "fail". The limits come from the balance check (npm run balance), which plays
+// every possible set of choices: scores run 17–39, and the best plan's expected score in any situation is 31–39, so
+// Gold (31+) can always be reached by good choices (about 10% of random play), Silver (27+) is about half of random
+// play, everyone else gets Bronze.
 
 import { METER_LABEL } from "../game/state";
 import type { GameState } from "../game/state";
@@ -26,8 +27,8 @@ export function scoreOf(g: GameState): Score {
 export type Badge = { id: "gold" | "silver" | "bronze"; name: string; min: number; color: string; rim: string; line: string };
 
 export const BADGES: Badge[] = [
-  { id: "gold", name: "Gold · Mars Commander", min: 30, color: "#ffd84a", rim: "#b98a10", line: "Amazing! Your crew is safe, fed and full of discoveries." },
-  { id: "silver", name: "Silver · Mars Pioneer", min: 25, color: "#d6deee", rim: "#8a97b0", line: "Great job! Your outpost made it through the storm." },
+  { id: "gold", name: "Gold · Mars Commander", min: 31, color: "#ffd84a", rim: "#b98a10", line: "Amazing! Your crew is safe, fed and full of discoveries." },
+  { id: "silver", name: "Silver · Mars Pioneer", min: 27, color: "#d6deee", rim: "#8a97b0", line: "Great job! Your outpost made it through the storm." },
   { id: "bronze", name: "Bronze · Mars Explorer", min: -999, color: "#e0a070", rim: "#9a5f30", line: "You made it! Try again and see what else you can discover." },
 ];
 

@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createGameAudio } from "../game/gameAudio";
 import type { GameAudio } from "../game/gameAudio";
+import { FaceIcon } from "../game/Tablet";
 import { crewFaces } from "../game/state";
 import type { GameState } from "../game/state";
 import { EARTH_CARDS } from "./earth";
@@ -20,8 +21,6 @@ type ResultProps = {
   onTitle: () => void;
   sound?: boolean;
 };
-
-const FACE = { happy: "😀", okay: "🙂", tired: "😟" } as const;
 
 function Medal({ badge }: { badge: Badge }) {
   return (
@@ -55,7 +54,7 @@ export default function Result({ game, junior = null, onAgain, onTitle, sound = 
     };
   }, [sound]);
 
-  if (view === "sources") return <Sources onBack={() => setView("result")} />;
+  if (view === "sources") return <Sources onBack={() => setView("result")} backLabel="◂ Back to the result" />;
 
   const rows: { label: string; value: string; hint: string }[] = [
     { label: "Rocks", value: `+${s.rocks}`, hint: `${game.samples} rock${game.samples === 1 ? "" : "s"} from Mars` },
@@ -113,9 +112,9 @@ export default function Result({ game, junior = null, onAgain, onTitle, sound = 
               </li>
             ))}
           </ul>
-          <div className="res__crew" aria-label="Crew mood">
+          <div className="res__crew" aria-label={`Crew: ${game.crew} of 5 happy`}>
             {crewFaces(game.crew).map((f, i) => (
-              <span key={i}>{FACE[f]}</span>
+              <FaceIcon key={i} face={f} />
             ))}
           </div>
         </section>
@@ -133,6 +132,21 @@ export default function Result({ game, junior = null, onAgain, onTitle, sound = 
               : game.log.map((line, i) => <li key={i}>{line}</li>)}
           </ol>
         </section>
+
+        {game.storm && (
+          <section className="res__storm" aria-label="Your storm">
+            <h2>Your storm was real</h2>
+            <p>
+              {game.storm.live ? "Fetched live" : "A saved real event"} from NASA DONKI: a cloud from the Sun on {game.storm.date}, flying at {game.storm.speed} km/s
+              {game.storm.marsHit ? ", that NASA's model sent toward Mars." : "."}{" "}
+              {game.storm.link && (
+                <a href={game.storm.link} target="_blank" rel="noreferrer">
+                  See it on NASA's website ({game.storm.id})
+                </a>
+              )}
+            </p>
+          </section>
+        )}
 
         <section className="res__earth" aria-label="Back on Earth">
           <h2>Back on Earth</h2>

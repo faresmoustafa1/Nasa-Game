@@ -31,7 +31,8 @@ export function pickNoRepeat<T extends string>(key: string, ids: readonly T[]): 
   } catch {
     /* private mode: no memory of the last one */
   }
-  const pool = ids.filter((i) => i !== last);
+  const others = ids.filter((i) => i !== last);
+  const pool = others.length ? others : ids; // only one option: repeat it
   const pick = pool[Math.floor(Math.random() * pool.length)];
   recent.set(key, { pick, at: now });
   try {

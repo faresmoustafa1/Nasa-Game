@@ -10,7 +10,7 @@
 
 import { CREW_MAX, addDecision, applySteps } from "../game/state";
 import type { GameState } from "../game/state";
-import { CROPS } from "./crops";
+import { cropOf } from "./crops";
 import type { Crop } from "./crops";
 
 export const WATER_MAX = 3;
@@ -41,7 +41,7 @@ export const lightAvailable = (game: GameState) => Math.min(LIGHT_MAX, Math.max(
 /** Pay for the water and light, then add the harvest and the crew's mood. */
 export function applyGreenhouse(game: GameState, water: number, light: number): GameState {
   const first = game.tasks.length === 0;
-  const crop = CROPS[game.crop];
+  const crop = cropOf(game.crop);
   const out = outcomeOf(crop, water, light, first);
   const r = resultOf(crop, out);
   const paid = applySteps(game, [
