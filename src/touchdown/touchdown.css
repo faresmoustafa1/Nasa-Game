@@ -1,0 +1,197 @@
+/* Mission ARES — Step 1b: touchdown. Art is SVG + CSS (no image files).
+ * The root gets one class per beat that has started (at-approach, at-entry, …).
+ * `is-skipped` means the player jumped ahead: nothing replays, it all just stands there. */
+
+/* ---------- High above Mars ---------- */
+
+.td__orbit {
+  transition: opacity 0.9s ease;
+}
+.at-chute .td__orbit {
+  opacity: 0;
+  pointer-events: none;
+}
+.at-entry:not(.at-chute) .td__orbit {
+  animation: ares-shake 0.13s linear infinite;
+}
+
+.td__cap {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transform: translate(160px, 140px) rotate(-30deg) scale(0.9);
+}
+.at-approach .td__cap {
+  animation: td-approach 5.5s linear both;
+}
+.at-entry .td__cap {
+  animation: td-entry 7s linear both;
+}
+.td__fire {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+.at-entry .td__fire {
+  opacity: 1;
+  animation: td-flick 0.12s ease-in-out infinite alternate;
+}
+
+/* ---------- On the ground ---------- */
+
+.td__surface {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.at-chute .td__surface {
+  opacity: 1;
+}
+
+.td__lander {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transform: translate(470px, 722px);
+}
+.at-chute .td__lander {
+  animation: td-descend 6s cubic-bezier(0.25, 0.1, 0.45, 1) both;
+}
+.td__lander-name {
+  font: 800 22px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.25em;
+  fill: #3a4256;
+}
+
+.td__chute {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: td-sway 2.4s ease-in-out infinite alternate;
+}
+.at-land .td__chute {
+  animation: td-cut 3.2s ease-in both;
+}
+
+.td__retro {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+.td__retro.is-on {
+  opacity: 1;
+  animation: td-flick 0.1s ease-in-out infinite alternate;
+}
+
+.td__dust circle {
+  fill: #d9a87a;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.at-land .td__dust circle {
+  animation: td-dust 3.4s ease-out both;
+}
+
+/* The hatch: shut, then it slides open and a ramp comes down. */
+.td__hatch-light {
+  opacity: 0;
+}
+.td__hatch-door {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.td__ramp {
+  opacity: 0;
+}
+.at-out .td__hatch-light {
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+.at-out .td__hatch-door {
+  transform: scaleY(0.05);
+  transition: transform 0.8s ease;
+}
+.at-out .td__ramp {
+  opacity: 1;
+  transition: opacity 0.6s ease 0.3s;
+}
+
+/* The crew: waiting inside (hidden), then each walks out and stands in a row. */
+.td__walker {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transform: translate(var(--x), var(--y)) scale(var(--s));
+}
+.at-out .td__walker {
+  animation: td-out 1.8s ease-in-out both;
+  animation-delay: calc(var(--i) * 0.9s);
+}
+.td__walker.is-walk .astro {
+  animation: td-step 0.36s ease-in-out infinite alternate;
+}
+.td__tablet-prop {
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+/* Jumped ahead with Skip (or a dev jump): no replaying, it all just stands there. */
+.is-skipped .td__lander,
+.is-skipped .td__walker,
+.is-skipped .td__dust circle,
+.is-skipped .td__chute,
+.is-skipped .td__hatch-door {
+  animation: none;
+  transition: none;
+}
+.is-skipped .td__walker {
+  opacity: 1;
+}
+.is-skipped .td__chute,
+.is-skipped .td__dust {
+  display: none;
+}
+
+@keyframes td-approach {
+  from { transform: translate(160px, 140px) rotate(-30deg) scale(0.9); }
+  to { transform: translate(560px, 330px) rotate(-40deg) scale(0.9); }
+}
+@keyframes td-entry {
+  from { transform: translate(560px, 330px) rotate(-40deg) scale(0.9); }
+  to { transform: translate(960px, 548px) rotate(-55deg) scale(0.9); }
+}
+@keyframes td-flick {
+  from { transform: scale(0.9, 0.82); }
+  to { transform: scale(1.08, 1.12); }
+}
+@keyframes td-descend {
+  from { transform: translate(620px, -420px); }
+  to { transform: translate(470px, 722px); }
+}
+@keyframes td-sway {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
+}
+@keyframes td-cut {
+  0% { transform: none; opacity: 1; }
+  100% { transform: translate(420px, -460px) rotate(24deg); opacity: 0; }
+}
+@keyframes td-dust {
+  0% { opacity: 0.75; transform: translateY(0) scale(0.4); }
+  100% { opacity: 0; transform: translateY(-46px) scale(3.2); }
+}
+@keyframes td-out {
+  0% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.28); }
+  8% { opacity: 1; }
+  100% { opacity: 1; transform: translate(var(--x), var(--y)) scale(var(--s)); }
+}
+@keyframes td-step {
+  from { transform: translateY(0); }
+  to { transform: translateY(-7px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .at-entry:not(.at-chute) .td__orbit,
+  .td__fire,
+  .td__chute,
+  .td__retro.is-on {
+    animation: none;
+  }
+}
