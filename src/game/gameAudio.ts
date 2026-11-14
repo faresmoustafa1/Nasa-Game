@@ -2,6 +2,7 @@
 // Like the prologue, everything is synthesized with the Web Audio API: no audio
 // files to load, license or cite. If audio is blocked or unsupported, every
 // method silently does nothing and the scene still plays.
+import { getSettings } from "./settings";
 
 export type GameAudio = {
   /** Low engine hum of the ship. */
@@ -51,7 +52,7 @@ const SILENT: GameAudio = {
 type AudioContextCtor = typeof AudioContext;
 
 export function createGameAudio(): GameAudio {
-  if (typeof window === "undefined") return SILENT;
+  if (typeof window === "undefined" || !getSettings().sound) return SILENT;
 
   const Ctor: AudioContextCtor | undefined =
     window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioContextCtor }).webkitAudioContext;

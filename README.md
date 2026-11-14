@@ -172,3 +172,21 @@ Shared by every Mars scene (src/game):
 - **Phones:** tested in landscape with touch (812×375): the tablet shrinks on short screens, tags and buttons move out of the way.
   Held upright, a "turn your phone sideways" screen shows.
 - **Demo video:** not included — record it yourself with Judge Mode on.
+
+
+## Phase 8 – Menu, readable opening, Next/Back
+
+- **Main menu** (`src/title/Title.tsx`): night field with Mars glowing, the launch site and the boy with his telescope. Start mission, How to play (3 cards), Settings, NASA data, Credits. The scene-jump panel only shows with Judge Mode on or `?dev=1`.
+- **Settings** (`src/game/settings.ts`, saved in the browser): sound on/off, story speed (slower 0.75 / normal / faster 1.3: it scales the story clock in `useTimeline`), Judge mode. There is no voice-over.
+- **Opening** (about 75 s in all): the original prologue is back as it was: 40 s in the field (sleeping, planet-or-star fact, planetary parade, loudspeaker, running), then 10 s at the rocket (ramp, door, liftoff), the 7 s trip with the stowaway, and a 7 s landing before the tablet tutorial. Notes are sized to be read (about 0.4 s a word plus a second), and the note text is bigger than before.
+- **Next ▸ / ◂ Back** (`src/game/SceneNav.tsx`, `sceneStops.ts`, also the arrow keys) on the prologue, trip, landing and night. Next jumps to the next note, Back replays it.
+- **Pipes puzzle:** Skip in the night scene used to skip it. Now Skip/Next stop at the puzzle, and the buttons hide while it is open.
+- Dev: `?scene=prologue&at=40` etc. start a scene part-way.
+
+### Phase 8b – note icons, in-game menu, rover "why"
+
+- **◂ ▸ icons inside every story note box** (prologue, trip, landing, night): next note / read it again. The arrow keys still work. (`NavIcons` in `src/game/notes.tsx`; `SceneNav` is now keyboard only.) The bottom Back/Next pill is gone.
+- **⚙ menu on every scene** (`src/menu/GameMenu.tsx`): pauses the story (`src/game/pause.ts`), with Resume, Settings (sound, story speed), Restart mission and Exit to main menu (both ask "Are you sure?").
+- **Rover:** the goal now says where to go and why: tap a place on the map to send the rover for a rock; rocks from the old river delta may hold signs of ancient life (new fact card, source: NASA Science, "Two Perseverance Sampling Locations in Jezero's Delta"). Mission Control says "Go to the gold star!".
+- **Longer flights:** the liftoff now flies for about 5 s, and the trip to Mars is about 15 s (3 s leaving Earth, the stowaway, then 5 s of the long curve with the months flipping).
+- `src/game/nav.css` and `src/game/speech.ts` are no longer used and can be deleted.

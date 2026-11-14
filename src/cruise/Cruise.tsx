@@ -1,28 +1,33 @@
-// Mission ARES — Step 1: the cruise (about 35 seconds, a watch scene).
+// Mission ARES — Step 1: the cruise (about 15 seconds, a watch scene).
 //
 // Right after the prologue's liftoff. Third-person, same 1600 × 900 stage.
 //
 // Timeline (seconds) — edit BEATS (what happens) here, and the words in ./notes.ts.
-//    0  Space. The ship leaves Earth. Calendar: month 1.
-//    6  Cut inside. Day 2. THUMP, THUMP from the storage locker.
-//   11  The door opens: the boy! A stowaway.
-//   16  The Doctor: "We packed for 4. Now we are 5."
-//   21  The Commander: "Nobody is in trouble. We'll make it work."
-//   24.5 Back outside. The calendar flips month 1 … 7 while Mars grows.
-//   32  Arrival. Fade out. onDone() at 35.
+//    0   Space. The ship flies away from Earth. Calendar: month 1.
+//    3.2 Cut inside. Day 2. THUMP from the storage locker.
+//    4.7 The door opens: the boy! A stowaway.
+//    6.1 The Doctor: "We packed for 4. Now we are 5."
+//    8.6 Back outside. The ship flies the long curve, the calendar flips month 1 … 7, Mars grows.
+//   13.6 Arrival. Fade out. onDone() at 15.4.
+//
+// Next ▸ / ◂ Back (and the arrow keys) jump between notes.
 //
 // Usage:  <Cruise onDone={() => setScene("touchdown")} />
-// Dev:    ?scene=cruise&at=20 starts at 20 seconds.
+// Dev:    ?scene=cruise&at=5 starts at 5 seconds.
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Boy, CrewMember, StarField } from "../game/art";
 import { createGameAudio } from "../game/gameAudio";
 import type { GameAudio } from "../game/gameAudio";
 import { NoteLayer } from "../game/notes";
+import SceneNav from "../game/SceneNav";
+import { backTarget, nextTarget, stopsOf } from "../game/sceneStops";
 import { seededRandom } from "../game/random";
 import { useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import { CRUISE_NOTES } from "./notes";
+
+const STOPS = stopsOf(CRUISE_NOTES);
 import "./cruise.css";
 
 type CruiseProps = {
@@ -34,19 +39,19 @@ type CruiseProps = {
 
 const BEATS = [
   { id: "leave", at: 0 },
-  { id: "locker", at: 6 },
-  { id: "open", at: 11 },
-  { id: "doctor", at: 16 },
-  { id: "commander", at: 21 },
-  { id: "trip", at: 24.5 },
-  { id: "arrive", at: 32 },
+  { id: "locker", at: 3.2 },
+  { id: "open", at: 4.7 },
+  { id: "doctor", at: 6.1 },
+  { id: "commander", at: 7.1 },
+  { id: "trip", at: 8.6 },
+  { id: "arrive", at: 13.6 },
 ] as const;
 
 type BeatId = (typeof BEATS)[number]["id"];
 const beatAt = (id: BeatId) => BEATS.find((b) => b.id === id)!.at;
 
-const FLASH_AT = 33.8;
-const END_AT = 35;
+const FLASH_AT = 14.4;
+const END_AT = 15.4;
 
 // ---------------------------------------------------------------------------
 // The flight path: a curve from Earth to Mars. `p` goes 0 → 1.
@@ -97,7 +102,13 @@ export default function Cruise({ onDone, sound = true }: CruiseProps) {
     onDone();
   }, [onDone]);
 
-  const { t } = useTimeline({ endAt: END_AT, onEnd: finish });
+  const { t, seek } = useTimeline({ endAt: END_AT, onEnd: finish });
+  const onNext = useCallback(() => {
+    const target = nextTarget(STOPS, t);
+    if (target === undefined) return finish();
+    seek(target);
+  }, [t, seek, finish]);
+  const onBack = useCallback(() => seek(backTarget(STOPS, t)), [t, seek]);
   const sec = Math.floor(t);
 
   const current = Math.max(0, BEATS.findLastIndex((b) => t >= b.at));
@@ -124,7 +135,7 @@ export default function Cruise({ onDone, sound = true }: CruiseProps) {
   // Things that happen at a given second.
   useEffect(() => {
     const audio = audioRef.current;
-    if (sec === 7 || sec === 9) audio?.thump();
+    if (sec === 3 || sec === 4) audio?.thump();
     if (sec === Math.floor(beatAt("open"))) audio?.creak();
     if (sec === Math.floor(beatAt("commander"))) audio?.chime();
     if (sec === Math.floor(beatAt("arrive"))) audio?.hum(false);
@@ -142,7 +153,7 @@ export default function Cruise({ onDone, sound = true }: CruiseProps) {
   const inCabin = t >= beatAt("locker") && t < beatAt("trip");
   const afterDoctor = t >= beatAt("doctor");
   const afterCommander = t >= beatAt("commander");
-  const boyWalking = t >= beatAt("open") + 0.8 && t < beatAt("open") + 2.6;
+  const boyWalking = t >= beatAt("open") + 0.3 && t < beatAt("open") + 1.2;
 
   const classes = [
     "ares",
@@ -324,7 +335,7 @@ export default function Cruise({ onDone, sound = true }: CruiseProps) {
         </svg>
 
         {/* The words */}
-        <NoteLayer notes={CRUISE_NOTES} t={t} />
+        <NoteLayer notes={CRUISE_NOTES} t={t} nav={{ onBack, onNext }} />
 
         {/* Calendar (outside) / day chip (inside) */}
         {!inCabin && t < FLASH_AT && (
@@ -345,6 +356,7 @@ export default function Cruise({ onDone, sound = true }: CruiseProps) {
         </div>
         <div className="ares__flash" aria-hidden="true" />
 
+        <SceneNav onBack={onBack} onNext={onNext} />
         <button type="button" className="ares__skip" onClick={finish}>
           Skip ▸
         </button>

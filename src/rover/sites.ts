@@ -23,9 +23,9 @@ export type Site = {
 export const BASE_POS = { x: 1250, y: 650 };
 
 export const SITES: Site[] = [
-  { id: "floor", name: "Crater floor", climb: "Flat", base: 2, points: 4, x: 1010, y: 560, blurb: "Flat ground close to the base. Easy and cheap." },
-  { id: "foot", name: "Delta foot", climb: "Gentle climb", base: 3, points: 6, x: 650, y: 620, blurb: "Where the old river met the lake. A gentle climb." },
-  { id: "top", name: "Delta top", climb: "Steep climb", base: 4, points: 7, x: 370, y: 480, blurb: "The best rocks are up high. A steep climb." },
+  { id: "floor", name: "Crater floor", climb: "Flat", base: 2, points: 4, x: 1010, y: 560, blurb: "Flat ground close to the base. Easy and cheap, but plain old rocks." },
+  { id: "foot", name: "Delta foot", climb: "Gentle climb", base: 3, points: 6, x: 650, y: 620, blurb: "Where the old river met the lake: layers of old mud. A gentle climb." },
+  { id: "top", name: "Delta top", climb: "Steep climb", base: 4, points: 7, x: 370, y: 480, blurb: "Up on the delta: the best rocks for finding signs of life. A steep climb." },
 ];
 
 /** Power for one sample: the site's cost, +1 if the crew is tired (2 faces or fewer), + the cold-battery extra, −1 with Earth's advice, never below 1. */

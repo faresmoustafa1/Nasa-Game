@@ -271,10 +271,10 @@
 }
 .at-lost .prologue__pad-hero {
   opacity: 1;
-  animation: prologue-wander 6s ease-in-out forwards;
+  animation: prologue-wander 1s ease-in-out forwards;
 }
 .at-door .prologue__pad-hero {
-  animation: prologue-board 5s ease-in-out forwards;
+  animation: prologue-board 2.5s ease-in-out forwards;
 }
 .at-trapped .prologue__pad-hero {
   opacity: 0;
@@ -527,7 +527,7 @@
   border: 2px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
   color: #ffffff;
-  font: 600 26px/34px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 600 31px/40px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Someone shouting (loudspeaker, liftoff): bold and warm. */
@@ -536,7 +536,7 @@
   border: 3px solid #ffcf99;
   box-shadow: 0 0 34px rgba(255, 207, 153, 0.35);
   color: #ffcf99;
-  font: 800 27px/34px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 800 32px/40px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   text-align: center;
 }
 
@@ -546,7 +546,7 @@
   background: #f1ead3;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
   color: #26324a;
-  font: 700 23px/34px "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
+  font: 700 28px/40px "Segoe Print", "Bradley Hand", "Comic Sans MS", "Chalkboard SE", cursive;
   transform: rotate(-1.2deg);
 }
 .scene-note--fact .scene-note__box::before {
@@ -561,7 +561,7 @@
 }
 .scene-note__tag {
   color: #c2452d;
-  font: 800 15px/34px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 800 17px/40px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }

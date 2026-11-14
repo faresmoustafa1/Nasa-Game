@@ -21,10 +21,10 @@
   transform: translate(160px, 140px) rotate(-30deg) scale(0.9);
 }
 .at-approach .td__cap {
-  animation: td-approach 5.5s linear both;
+  animation: td-approach 1s linear both;
 }
 .at-entry .td__cap {
-  animation: td-entry 7s linear both;
+  animation: td-entry 1.4s linear both;
 }
 .td__fire {
   opacity: 0;
@@ -53,7 +53,7 @@
   transform: translate(470px, 722px);
 }
 .at-chute .td__lander {
-  animation: td-descend 6s cubic-bezier(0.25, 0.1, 0.45, 1) both;
+  animation: td-descend 1.2s cubic-bezier(0.25, 0.1, 0.45, 1) both;
 }
 .td__lander-name {
   font: 800 22px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -67,7 +67,7 @@
   animation: td-sway 2.4s ease-in-out infinite alternate;
 }
 .at-land .td__chute {
-  animation: td-cut 3.2s ease-in both;
+  animation: td-cut 1s ease-in both;
 }
 
 .td__retro {
@@ -87,7 +87,7 @@
   transform-origin: center;
 }
 .at-land .td__dust circle {
-  animation: td-dust 3.4s ease-out both;
+  animation: td-dust 1.4s ease-out both;
 }
 
 /* The hatch: shut, then it slides open and a ramp comes down. */
@@ -122,8 +122,8 @@
   transform: translate(var(--x), var(--y)) scale(var(--s));
 }
 .at-out .td__walker {
-  animation: td-out 1.8s ease-in-out both;
-  animation-delay: calc(var(--i) * 0.9s);
+  animation: td-out 0.8s ease-in-out both;
+  animation-delay: calc(var(--i) * 0.2s);
 }
 .td__walker.is-walk .astro {
   animation: td-step 0.36s ease-in-out infinite alternate;

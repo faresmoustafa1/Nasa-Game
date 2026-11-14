@@ -1,0 +1,43 @@
+/* Next / Back pill, bottom centre of every story scene. */
+.scenenav {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: clamp(10px, 3vh, 26px);
+  translate: -50% 0;
+  display: flex;
+  gap: 10px;
+}
+.scenenav__btn {
+  min-width: 104px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(3, 5, 13, 0.62);
+  color: #ffffff;
+  font: 700 17px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.scenenav__btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.scenenav__btn--next {
+  background: #ffcf99;
+  border-color: #ffcf99;
+  color: #2a1806;
+}
+.scenenav__btn--next:hover {
+  background: #ffdcb4;
+}
+.scenenav__btn:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+@media (max-height: 560px) {
+  .scenenav__btn {
+    min-width: 84px;
+    min-height: 40px;
+    font-size: 15px;
+  }
+}

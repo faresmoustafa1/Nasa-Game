@@ -23,13 +23,17 @@ export type SceneNote = {
 };
 
 // Rough text metrics at the note font sizes (viewBox units), used to size each box.
-const NOTE_CHAR_W = 14;
-const NOTE_LINE_H = 34;
+const NOTE_CHAR_W = 17;
+const NOTE_LINE_H = 40;
 
-function noteHeight(note: SceneNote) {
+/** The ◂ ▸ icons inside a note box. */
+export type NoteNav = { onBack: () => void; onNext: () => void };
+const NAV_H = 44;
+
+function noteHeight(note: SceneNote, nav = false) {
   const perLine = Math.max(8, Math.floor((note.box.w - 40) / NOTE_CHAR_W));
   const lines = Math.ceil(note.text.length / perLine);
-  return lines * NOTE_LINE_H + 36 + (note.title ? 34 : 0);
+  return lines * NOTE_LINE_H + 40 + (note.title ? 40 : 0) + (nav ? NAV_H : 0);
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
@@ -47,9 +51,9 @@ function noteSpeech(note: SceneNote | undefined) {
   return `${tag ? `${tag}: ` : ""}${note.text}`;
 }
 
-function SceneNoteView({ note, leaving }: { note: SceneNote; leaving: boolean }) {
+function SceneNoteView({ note, leaving, nav }: { note: SceneNote; leaving: boolean; nav?: NoteNav }) {
   const { x, y, w } = note.box;
-  const h = noteHeight(note);
+  const h = noteHeight(note, Boolean(nav));
   const p = note.point;
   const from = p && { x: clamp(p.x, x + 18, x + w - 18), y: clamp(p.y, y, y + h) };
   const tag = tagFor(note);
@@ -66,20 +70,36 @@ function SceneNoteView({ note, leaving }: { note: SceneNote; leaving: boolean })
         <div className="gnote__box">
           {tag && <p className="gnote__tag">{tag}</p>}
           <p className="gnote__text">{note.text}</p>
+          {nav && <NavIcons nav={nav} />}
         </div>
       </foreignObject>
     </g>
   );
 }
 
-/** Draws whichever note is active at second `t`. Drop it on top of a scene. */
-export function NoteLayer({ notes, t }: { notes: SceneNote[]; t: number }) {
+/** Small back / next icons in the corner of a note box. Shared with the prologue's own notes. */
+export function NavIcons({ nav, className = "gnote__nav" }: { nav: NoteNav; className?: string }) {
+  return (
+    <span className={className}>
+      <button type="button" aria-label="Back: read the last note again" onClick={nav.onBack}>
+        ◂
+      </button>
+      <button type="button" aria-label="Next note" onClick={nav.onNext}>
+        ▸
+      </button>
+    </span>
+  );
+}
+
+/** Draws whichever note is active at second `t`. Drop it on top of a scene. Pass `nav` for ◂ ▸ icons. */
+export function NoteLayer({ notes, t, nav }: { notes: SceneNote[]; t: number; nav?: NoteNav }) {
   const index = notes.findIndex((n) => t >= n.from && t < n.to);
   const note = index >= 0 ? notes[index] : undefined;
+
   return (
     <>
       <svg className="ares__scene ares__notes" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        {note && <SceneNoteView key={index} note={note} leaving={t >= note.to - 0.4} />}
+        {note && <SceneNoteView key={index} note={note} leaving={t >= note.to - 0.4} nav={nav} />}
       </svg>
       <p className="ares__sr-only" aria-live="polite">
         {noteSpeech(note)}

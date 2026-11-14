@@ -1,19 +1,21 @@
 // Mission ARES — Step 1b: touchdown at Jezero Crater, then the tablet tutorial.
 //
-// A watch scene (about 31 seconds) that ends in the first thing the player does:
+// A watch scene (about 6 seconds) that ends in the first thing the player does:
 // tap each bar on the Commander's tablet to learn what it means.
 //
 // Timeline (seconds) — edit BEATS (what happens) here, and the words in ./notes.ts.
 //    0  Mars fills the sky. The ship drops toward it.
-//    5.5 Entry: a fireball. Fact: the 7-minute landing.
-//   12.5 The parachute opens, then the rockets fire.
-//   18.5 Touchdown. Dust. The crew made it.
-//   22.5 The hatch opens. The crew walks out, the boy last, in a spare suit.
-//   31   The Commander hands over the tablet. The clock holds here, and the
+//    1.6 Entry: a fireball. Fact: the 7-minute landing.
+//    3.8 The parachute opens, then the rockets fire.
+//    5.6 Touchdown. Dust. The crew made it.
+//    6.4 The hatch opens. The crew walks out, the boy last, in a spare suit.
+//    9   The Commander hands over the tablet. The clock holds here, and the
 //        player taps power, water and air. Then "Start mission".
 //
+// Next ▸ / ◂ Back (and the arrow keys) jump between notes.
+//
 // Usage:  <Touchdown game={game} onDone={(g) => { setGame(g); setScene("hub"); }} />
-// Dev:    ?scene=touchdown&at=31 jumps straight to the tablet.
+// Dev:    ?scene=touchdown&at=9 jumps straight to the tablet.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
@@ -21,12 +23,16 @@ import { Astronaut, CrewMember, StarField } from "../game/art";
 import { createGameAudio } from "../game/gameAudio";
 import type { GameAudio } from "../game/gameAudio";
 import { NoteLayer } from "../game/notes";
+import SceneNav from "../game/SceneNav";
+import { backTarget, nextTarget, stopsOf } from "../game/sceneStops";
 import { seededRandom } from "../game/random";
 import type { GameState, TabletFocus } from "../game/state";
 import Tablet from "../game/Tablet";
 import { devJump, useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import { WATCH_NOTES, tabletNote } from "./notes";
+
+const STOPS = stopsOf(WATCH_NOTES);
 import "./touchdown.css";
 
 type TouchdownProps = {
@@ -38,20 +44,20 @@ type TouchdownProps = {
 
 const BEATS = [
   { id: "approach", at: 0 },
-  { id: "entry", at: 5.5 },
-  { id: "chute", at: 12.5 },
-  { id: "land", at: 18.5 },
-  { id: "out", at: 22.5 },
-  { id: "tablet", at: 31 },
+  { id: "entry", at: 1 },
+  { id: "chute", at: 2.4 },
+  { id: "land", at: 3.6 },
+  { id: "out", at: 4.2 },
+  { id: "tablet", at: 6 },
 ] as const;
 
 type BeatId = (typeof BEATS)[number]["id"];
 const beatAt = (id: BeatId) => BEATS.find((b) => b.id === id)!.at;
 
 /** The clock stops here, so the player can take their time with the tablet. */
-const HOLD_AT = 31.8;
-const WALK_GAP = 0.9; // seconds between one person and the next stepping out
-const WALK_TIME = 1.8;
+const HOLD_AT = 6.2;
+const WALK_GAP = 0.2; // seconds between one person and the next stepping out
+const WALK_TIME = 0.8;
 
 // ---------------------------------------------------------------------------
 // Scene pieces
@@ -101,7 +107,7 @@ export default function Touchdown({ game, onDone, sound = true }: TouchdownProps
   const current = Math.max(0, BEATS.findLastIndex((b) => t >= b.at));
   const atTablet = t >= beatAt("tablet");
   const learned = (["power", "water", "air"] as const).every((k) => seen.includes(k));
-  const retroOn = t >= beatAt("land") - 1.8 && t < beatAt("land") + 0.5;
+  const retroOn = t >= beatAt("land") - 0.8 && t < beatAt("land") + 0.2;
 
   // Sound on / off.
   useEffect(() => {
@@ -120,7 +126,7 @@ export default function Touchdown({ game, onDone, sound = true }: TouchdownProps
     const audio = audioRef.current;
     if (sec === Math.floor(beatAt("entry"))) {
       audio?.hum(false);
-      audio?.roar(7);
+      audio?.roar(1.6);
     }
     if (sec === Math.floor(beatAt("chute"))) audio?.chute();
     if (sec === Math.floor(beatAt("land"))) audio?.thud();
@@ -150,6 +156,14 @@ export default function Touchdown({ game, onDone, sound = true }: TouchdownProps
     .join(" ");
 
   const notes = atTablet ? [tabletNote(seen.length, learned)] : WATCH_NOTES;
+  const navBack = () => seek(backTarget(STOPS, t));
+  const navNext = () => {
+    const target = nextTarget(STOPS, t);
+    if (target === undefined || target >= beatAt("tablet") - 0.1) {
+      setSkipped(true);
+      seek(beatAt("tablet"));
+    } else seek(target);
+  };
 
   return (
     <div className={classes} data-beat={BEATS[current].id}>
@@ -319,7 +333,7 @@ export default function Touchdown({ game, onDone, sound = true }: TouchdownProps
         </svg>
 
         {/* The words */}
-        <NoteLayer notes={notes} t={Math.max(t, atTablet ? 31.3 : 0)} />
+        <NoteLayer notes={notes} t={Math.max(t, atTablet ? 6.2 : 0)} nav={atTablet ? undefined : { onBack: navBack, onNext: navNext }} />
 
         {/* The tablet: first appears here, then stays for the whole game. */}
         {atTablet && (
@@ -337,6 +351,8 @@ export default function Touchdown({ game, onDone, sound = true }: TouchdownProps
             Start mission ▸
           </button>
         )}
+
+        {!atTablet && <SceneNav onBack={navBack} onNext={navNext} />}
 
         {!atTablet && (
           <button

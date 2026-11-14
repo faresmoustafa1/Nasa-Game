@@ -23,6 +23,8 @@ import { Boy, CrewMember } from "../game/art";
 import { createGameAudio } from "../game/gameAudio";
 import type { GameAudio } from "../game/gameAudio";
 import { NoteLayer } from "../game/notes";
+import SceneNav from "../game/SceneNav";
+import { backTarget, nextTarget, stopsOf } from "../game/sceneStops";
 import { METER_LABEL, NIGHT_STEPS, applySteps } from "../game/state";
 import type { GameState, MeterKey } from "../game/state";
 import Tablet from "../game/Tablet";
@@ -52,6 +54,7 @@ const BEATS = [
 const END_AT = 17.5;
 /** The night waits here while the player connects the oxygen maker's pipe. */
 const PUZZLE_AT = 9;
+const NIGHT_STOPS = stopsOf(NIGHT_NOTES);
 const POP_TIME = 2.2; // how long a floating "+/−" stays
 const NUDGE_TIME = 1.6; // how long a tablet row pulses after it changes
 
@@ -102,6 +105,16 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
   const [puzzleDone, setPuzzleDone] = useState(() => devJump() > PUZZLE_AT);
   const { t, seek } = useTimeline({ endAt: END_AT, onEnd: finish, holdAt: puzzleDone ? undefined : PUZZLE_AT });
   const sec = Math.floor(t);
+
+  // Next / Back / Skip never skip the pipes puzzle: it is a thing to do, not a thing to read.
+  const puzzleOpen = t >= PUZZLE_AT - 0.05 && !puzzleDone;
+  const toPuzzleOrEnd = () => (puzzleDone ? finish() : seek(PUZZLE_AT));
+  const onNext = () => {
+    const target = nextTarget(NIGHT_STOPS, t, puzzleDone ? undefined : PUZZLE_AT);
+    if (target === undefined) toPuzzleOrEnd();
+    else seek(target);
+  };
+  const onBack = () => seek(backTarget(NIGHT_STOPS, t));
 
   // The tablet shows the numbers as they stand right now.
   const shown = applySteps(game, NIGHT_STEPS.filter((s) => s.at <= t));
@@ -197,7 +210,7 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
           </g>
         </BaseArt>
 
-        <NoteLayer notes={NIGHT_NOTES} t={t} />
+        <NoteLayer notes={NIGHT_NOTES} t={t} nav={puzzleOpen ? undefined : { onBack, onNext }} />
 
         <Tablet meters={shown.meters} locked={game.locked} crew={game.crew} nudge={nudge} />
 
@@ -216,9 +229,12 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
           />
         )}
 
-        <button type="button" className="ares__skip" onClick={finish}>
-          Skip ▸
-        </button>
+        <SceneNav onBack={onBack} onNext={onNext} hidden={puzzleOpen} />
+        {!puzzleOpen && (
+          <button type="button" className="ares__skip" onClick={toPuzzleOrEnd}>
+            Skip ▸
+          </button>
+        )}
         <div className="ares__flash" aria-hidden="true" />
       </div>
     </div>

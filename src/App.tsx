@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import Cruise from "./cruise/Cruise";
+import GameMenu from "./menu/GameMenu";
 import Prologue from "./prologue/Prologue";
 import Greenhouse from "./greenhouse/Greenhouse";
 import Hub from "./hub/Hub";
@@ -67,6 +68,8 @@ function firstGame(): GameState {
 function Game() {
   const [scene, setScene] = useState<Scene>(firstScene);
   const [game, setGame] = useState<GameState>(firstGame);
+  /** Bumped by Restart, so even the scene you are in starts over from the beginning. */
+  const [run, setRun] = useState(0);
   const [task, setTask] = useState<Task>(() => (devParam("room") === "rover" ? "rover" : "greenhouse"));
 
   /** Judge Mode: start any scene with a sensible game behind it. */
@@ -91,103 +94,124 @@ function Game() {
     else set(fresh, "sources");
   };
 
-  if (scene === "prologue") {
-    return <Prologue onDone={() => setScene("cruise")} />;
-  }
+  const view = (() => {
+    if (scene === "prologue") {
+      return <Prologue onDone={() => setScene("cruise")} />;
+    }
 
-  if (scene === "cruise") {
-    return <Cruise onDone={() => setScene("touchdown")} />;
-  }
+    if (scene === "cruise") {
+      return <Cruise onDone={() => setScene("touchdown")} />;
+    }
 
-  if (scene === "touchdown") {
+    if (scene === "touchdown") {
+      return (
+        <Touchdown
+          game={game}
+          onDone={(next) => {
+            setGame(next);
+            setScene("hub");
+          }}
+        />
+      );
+    }
+
+    if (scene === "hub") {
+      return (
+        <Hub
+          game={game}
+          onDone={(next, chosen) => {
+            setGame(next);
+            setTask(chosen);
+            setScene("task");
+          }}
+        />
+      );
+    }
+
+    if (scene === "task") {
+      // The job is over: record it, then go on to the night (first job) or the result (second job).
+      const finishTask = (next: GameState) => {
+        const done = [...next.tasks, task];
+        setGame({ ...next, tasks: done, locked: done.length === 2 ? 0 : next.locked });
+        setScene(done.length === 1 ? "night" : "crown");
+      };
+      if (task === "rover") return <GarageTrip game={game} onDone={finishTask} />;
+      return <Greenhouse game={game} onDone={finishTask} />;
+    }
+
+    if (scene === "night") {
+      return (
+        <Night
+          game={game}
+          onDone={(next) => {
+            setGame(next);
+            setScene("storm");
+          }}
+        />
+      );
+    }
+
+    if (scene === "storm") {
+      return (
+        <Storm
+          game={game}
+          onDone={(next) => {
+            setGame(next);
+            setScene("hub");
+          }}
+        />
+      );
+    }
+
+    if (scene === "crown") {
+      return <Crowning badge={badgeOf(scoreOf(game).total)} onDone={() => setScene("end")} />;
+    }
+
+    if (scene === "sources") {
+      return <Sources onBack={() => setScene("title")} />;
+    }
+
+    if (scene === "end") {
+      return (
+        <Result
+          game={game}
+          onAgain={() => {
+            setGame(newGame());
+            setScene("cruise");
+          }}
+          onTitle={() => setScene("title")}
+        />
+      );
+    }
+
     return (
-      <Touchdown
-        game={game}
-        onDone={(next) => {
-          setGame(next);
-          setScene("hub");
-        }}
-      />
-    );
-  }
-
-  if (scene === "hub") {
-    return (
-      <Hub
-        game={game}
-        onDone={(next, chosen) => {
-          setGame(next);
-          setTask(chosen);
-          setScene("task");
-        }}
-      />
-    );
-  }
-
-  if (scene === "task") {
-    // The job is over: record it, then go on to the night (first job) or the result (second job).
-    const finishTask = (next: GameState) => {
-      const done = [...next.tasks, task];
-      setGame({ ...next, tasks: done, locked: done.length === 2 ? 0 : next.locked });
-      setScene(done.length === 1 ? "night" : "crown");
-    };
-    if (task === "rover") return <GarageTrip game={game} onDone={finishTask} />;
-    return <Greenhouse game={game} onDone={finishTask} />;
-  }
-
-  if (scene === "night") {
-    return (
-      <Night
-        game={game}
-        onDone={(next) => {
-          setGame(next);
-          setScene("storm");
-        }}
-      />
-    );
-  }
-
-  if (scene === "storm") {
-    return (
-      <Storm
-        game={game}
-        onDone={(next) => {
-          setGame(next);
-          setScene("hub");
-        }}
-      />
-    );
-  }
-
-  if (scene === "crown") {
-    return <Crowning badge={badgeOf(scoreOf(game).total)} onDone={() => setScene("end")} />;
-  }
-
-  if (scene === "sources") {
-    return <Sources onBack={() => setScene("title")} />;
-  }
-
-  if (scene === "end") {
-    return (
-      <Result
-        game={game}
-        onAgain={() => {
+      <Title
+        onPlay={() => {
           setGame(newGame());
-          setScene("cruise");
+          setScene("prologue");
         }}
-        onTitle={() => setScene("title")}
+        onJump={jump}
+        onSources={() => setScene("sources")}
       />
     );
-  }
+  })();
 
+  const inMission = scene !== "title" && scene !== "sources" && scene !== "end";
   return (
-    <Title
-      onPlay={() => {
-        setGame(newGame());
-        setScene("prologue");
-      }}
-      onJump={jump}
-    />
+    <>
+      <Fragment key={run}>{view}</Fragment>
+      {inMission && (
+        <GameMenu
+          key={scene}
+          onRestart={() => {
+            setGame(newGame());
+            setScene("prologue");
+            setRun((r) => r + 1);
+          }}
+          onExit={() => setScene("title")}
+        />
+      )}
+    </>
   );
 }
 

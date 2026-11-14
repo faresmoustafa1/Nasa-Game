@@ -25,7 +25,7 @@ import { useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import { JUDGE_DELAY_MIN, isJudge } from "../game/judge";
 import { earthMarsDelayMinutes } from "./delay";
-import { ADVICE_NOTE, DUST_NOTE, HINT_NOTE, INTRO_NOTE, JEZERO_FACT, OPPORTUNITY_FACT, choiceNote, rockNote, sampleNote, waitingNote } from "./notes";
+import { ADVICE_NOTE, DUST_NOTE, HINT_NOTE, INTRO_NOTE, JEZERO_FACT, WHY_FACT, OPPORTUNITY_FACT, choiceNote, rockNote, sampleNote, waitingNote } from "./notes";
 import { BASE_POS, BONUS_POINTS, SITES, rockValue, sampleCap, sampleCost } from "./sites";
 import type { Site } from "./sites";
 import "./rover.css";
@@ -187,7 +187,7 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
     if (capped) return [DUST_NOTE];
     const list: SceneNote[] = [];
     if (waited) list.push({ ...ADVICE_NOTE, from: pickAt, to: pickAt + ADVICE_SECONDS });
-    list.push(rockNote(bonus.name, rockAt, factsAt), JEZERO_FACT(factsAt), OPPORTUNITY_FACT(factsAt), HINT_NOTE(factsAt));
+    list.push(rockNote(bonus.name, rockAt, factsAt), WHY_FACT(factsAt), JEZERO_FACT(factsAt + 6.4), OPPORTUNITY_FACT(factsAt + 6.4), HINT_NOTE(factsAt + 6.4));
     return list;
   }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, factsAt, bonus.name]);
 
@@ -343,8 +343,11 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
 
         {picking && (
           <aside className="rover__goal" aria-label="Goal">
-            <b>GOAL: collect rocks</b>
-            <span>Rocks are points ★. Far spots cost more Power, but their rocks are worth more. The gold star is an interesting rock: +{BONUS_POINTS} bonus!</span>
+            <b>GOAL: tap a place on the map to send the rover there for a rock</b>
+            <span>
+              Why? Rocks from the old river delta may hold signs of ancient life. Far places cost more Power but give more ★. Gold star:
+              +{BONUS_POINTS} bonus!
+            </span>
           </aside>
         )}
 

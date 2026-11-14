@@ -9,7 +9,7 @@ export const INTRO_NOTE: SceneNote = {
   from: 0.6,
   to: 5.4,
   kind: "story",
-  text: "This is the ROVER: a robot car that drives on Mars. Let's collect rocks!",
+  text: "This is the ROVER, a robot car. Its job: bring back rocks that might hold signs of ancient life on Mars!",
   box: { x: 520, y: 110, w: 680 },
   point: { x: 1250, y: 640 },
 };
@@ -24,7 +24,7 @@ export function choiceNote(delayMin: number): SceneNote {
     title: "Dust storm warning",
     text: `Dust is coming! Earth knows a shortcut, but a message takes about ${m} minutes. Wait for advice, or go now?`,
     source: "NASA/JPL · approximate planet positions; NASA Space Communications",
-    box: { x: 480, y: 100, w: 800 },
+    box: { x: 410, y: 100, w: 800 },
   };
 }
 
@@ -36,7 +36,7 @@ export function waitingNote(delayMin: number): SceneNote {
     kind: "radio",
     title: "Message sent",
     text: `Waiting for Earth… In real life: about ${round} minutes there and back.`,
-    box: { x: 480, y: 100, w: 800 },
+    box: { x: 410, y: 100, w: 800 },
   };
 }
 
@@ -45,9 +45,9 @@ export const rockNote = (siteName: string, at: number, until: number): SceneNote
   from: at,
   to: until,
   kind: "radio",
-  title: "Interesting rock!",
-  text: `We spotted an interesting rock at the ${siteName}! Bring it home for ${BONUS_POINTS} bonus points.`,
-  box: { x: 480, y: 100, w: 800 },
+  title: "Go to the gold star!",
+  text: `We spotted a rock with interesting layers at the ${siteName} (gold star ★). Drive there and bring it home for ${BONUS_POINTS} bonus points!`,
+  box: { x: 410, y: 100, w: 800 },
 });
 
 export const ADVICE_NOTE: SceneNote = {
@@ -56,8 +56,20 @@ export const ADVICE_NOTE: SceneNote = {
   kind: "radio",
   title: "Earth replies",
   text: "Use the old tracks! Trips cost 1 less Power. But dust is closer: 1 rock fewer.",
-  box: { x: 480, y: 100, w: 800 },
+  box: { x: 410, y: 100, w: 800 },
 };
+
+/** Why the rover goes out at all: the real reason Perseverance drives to the delta. */
+export const WHY_FACT = (at: number): SceneNote => ({
+  from: at + 0.4,
+  to: at + 6.4,
+  kind: "fact",
+  title: "Why these rocks?",
+  text: "Long ago a river flowed into a lake here and left mud that became rock. Scientists think rocks like these are the best place to look for signs of ancient life.",
+  source: "NASA Science · Two Perseverance Sampling Locations in Jezero's Delta (Sept 15, 2022)",
+  box: { x: 410, y: 100, w: 800 },
+  point: { x: 480, y: 520 },
+});
 
 export const JEZERO_FACT = (at: number): SceneNote => ({
   from: at + 0.4,
@@ -66,7 +78,7 @@ export const JEZERO_FACT = (at: number): SceneNote => ({
   title: "Jezero Crater",
   text: "Jezero is about 45 kilometers wide. Long ago a lake filled it, and a river built a fan-shaped delta on its west side.",
   source: "NASA · Mars 2020 Perseverance mission (science.nasa.gov)",
-  box: { x: 480, y: 100, w: 760 },
+  box: { x: 410, y: 100, w: 800 },
   point: { x: 480, y: 520 },
 });
 
@@ -77,7 +89,7 @@ export const OPPORTUNITY_FACT = (at: number): SceneNote => ({
   title: "Dust storms are no joke",
   text: "In 2018 a giant dust storm blocked the Sun from the solar-powered rover Opportunity. Its last message came on June 10, 2018.",
   source: "NASA/JPL · Opportunity mission end announcement, Feb 13, 2019",
-  box: { x: 440, y: 100, w: 800 },
+  box: { x: 410, y: 100, w: 800 },
 });
 
 export const HINT_NOTE = (at: number): SceneNote => ({

@@ -1,0 +1,143 @@
+/* Mission ARES — the in-game ⚙ menu. The gear sits top-right; Skip and the rover goal move aside for it. */
+
+.gmenu__gear {
+  position: fixed;
+  z-index: 40;
+  top: clamp(10px, 2.2vh, 20px);
+  right: clamp(10px, 2.2vw, 24px);
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(3, 5, 13, 0.62);
+  color: #fff;
+  font: 400 26px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.gmenu__gear:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.gmenu__gear:focus-visible {
+  outline: 3px solid #ffcf99;
+  outline-offset: 2px;
+}
+/* Make room next to the gear. */
+.ares__skip,
+.prologue__skip {
+  right: calc(clamp(10px, 2.2vw, 24px) + 56px) !important;
+}
+.rover__goal {
+  top: calc(clamp(10px, 2.2vh, 20px) + 56px) !important;
+}
+
+.gmenu {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 5, 13, 0.72);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.gmenu__card {
+  width: min(420px, 90vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 24px;
+  background: #0c1228;
+  border: 2px solid rgba(255, 207, 153, 0.45);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7);
+  color: #fff;
+  text-align: center;
+}
+.gmenu__card h2 {
+  margin: 0 0 4px;
+  color: #ffcf99;
+  font-size: 26px;
+}
+.gmenu__card > button {
+  min-height: 50px;
+  border: 2px solid #4a5a86;
+  border-radius: 999px;
+  background: #101a38;
+  color: #e6edff;
+  font: 700 18px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.gmenu__card > button:hover {
+  background: #1b2a58;
+}
+.gmenu__card button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+.gmenu__card > .gmenu__big {
+  min-height: 58px;
+  border: 3px solid #ffcf99;
+  background: #2a1608;
+  color: #ffcf99;
+  font-size: 21px;
+}
+.gmenu__card > .gmenu__danger {
+  border-color: #ff8a6a;
+  background: #3a1208;
+  color: #ffd0c0;
+}
+.gmenu__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 17px;
+  text-align: left;
+}
+.gmenu__seg {
+  display: inline-flex;
+  border: 2px solid #4a5a86;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.gmenu__seg button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 0;
+  background: #101a38;
+  color: #cfd8ea;
+  font: 700 15px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.gmenu__seg button.is-on {
+  background: #ffcf99;
+  color: #2a1806;
+}
+.gmenu__note {
+  margin: 0;
+  color: #9fb0cc;
+  font-size: 14px;
+}
+@media (max-height: 560px) {
+  .gmenu__gear {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+  .gmenu__card {
+    gap: 6px;
+    padding: 12px 16px;
+  }
+  .gmenu__card > button {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  .gmenu__card > .gmenu__big {
+    min-height: 44px;
+    font-size: 18px;
+  }
+}
