@@ -164,7 +164,7 @@ function flareRank(c: string) {
  * Returns null (so the game uses a saved real event) if none reached Mars, or NASA is slow, offline,
  * over its limit, or sends odd data. Gives up after `timeoutMs`.
  */
-export async function fetchLiveEvent(timeoutMs = 2500): Promise<StormEvent | null> {
+export async function fetchLiveEvent(timeoutMs = 3200): Promise<StormEvent | null> {
   const ctl = new AbortController();
   const timer = window.setTimeout(() => ctl.abort(), timeoutMs);
   try {
@@ -172,10 +172,15 @@ export async function fetchLiveEvent(timeoutMs = 2500): Promise<StormEvent | nul
     const end = new Date();
     const start = new Date(end.getTime() - 30 * 86_400_000);
     const q = `startDate=${iso(start)}&endDate=${iso(end)}&api_key=${key}`;
-    const [cmeRes, flrRes] = await Promise.all([fetch(`${BASE}/CME?${q}`, { signal: ctl.signal }), fetch(`${BASE}/FLR?${q}`, { signal: ctl.signal })]);
+    // The flare list is optional: if it fails (NASA's FLR service has been returning 404), the CME's note is used instead.
+    const [cmeRes, flrs] = await Promise.all([
+      fetch(`${BASE}/CME?${q}`, { signal: ctl.signal }),
+      fetch(`${BASE}/FLR?${q}`, { signal: ctl.signal })
+        .then((r) => (r.ok ? (r.json() as Promise<unknown>) : []))
+        .catch(() => []),
+    ]);
     if (!cmeRes.ok) return null;
     const cmes: unknown = await cmeRes.json();
-    const flrs: unknown = flrRes.ok ? await flrRes.json() : [];
     if (!Array.isArray(cmes)) return null;
 
     const flareClass = new Map<string, string>();

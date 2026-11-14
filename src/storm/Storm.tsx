@@ -55,7 +55,7 @@ const SHIELDS: Level[] = [1, 2, 3];
 
 const place = (x: number) => ({ transform: `translate(${x}px, ${FLOOR_Y}px) scale(${PERSON_SCALE})` });
 
-/** Asks NASA (2.5 s at most), else takes the next saved real event. Never blocks the scene. */
+/** Asks NASA (3.2 s at most), else takes the next saved real event. Never blocks the scene. */
 function useStormEvent(): StormEvent | null {
   const [event, setEvent] = useState<StormEvent | null>(null);
   useEffect(() => {
