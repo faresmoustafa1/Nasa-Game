@@ -372,3 +372,24 @@
     display: none;
   }
 }
+
+/* The two demo buttons get their own colors so judges spot them. */
+.title__menu .title__judges-btn {
+  border-color: #3fc7a8;
+  background: rgba(20, 70, 62, 0.75);
+  color: #9ff0da;
+  font-weight: 800;
+}
+.title__menu .title__judges-btn:hover {
+  background: rgba(30, 100, 88, 0.9);
+  color: #ffffff;
+}
+.title__menu .title__jump-btn {
+  border-color: #a585ff;
+  background: rgba(52, 36, 104, 0.75);
+  color: #d8c9ff;
+}
+.title__menu .title__jump-btn:hover {
+  background: rgba(72, 50, 140, 0.9);
+  color: #ffffff;
+}

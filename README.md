@@ -4,7 +4,7 @@
 
 NASA Space Apps Challenge 2026 (Cairo). Challenge: design a game that lets students run a lunar or Martian outpost and feel the trade-offs between life support, radiation shielding, power and food.
 
-▶ **Play:** _add the live link here after deploying_ · For a demo that plays the same every time, add `?judge=1` to the link (Judge Mode).
+▶ **Play:** _add the live link here after deploying_ · For a demo that plays the same every time, press **For judges** on the title screen (or add `?judge=1` to the link).
 
 ![The base on Mars: four rooms, the crew tablet and two jobs to choose from](docs/screenshots/hub.png)
 
@@ -76,9 +76,9 @@ There is no game over: if a meter would hit zero, an emergency backup saves the 
     npm run balance    # the balance check
     npm run build      # production build in dist/
 
-**NASA API key:** copy `.env.example` to `.env.local` and put your free key from https://api.nasa.gov in it. `.env.local` is never committed. Without a key the game uses NASA's shared `DEMO_KEY`, which is often rate-limited, so you will mostly see the saved storms. Note: a key in a `VITE_` variable is built into the page; that is normal for a free api.nasa.gov key, which only has a rate limit.
+**NASA API key:** copy `.env.example` to `.env` and put your free key from https://api.nasa.gov in it. `.env` is never committed. On Vercel (or any host), add the same `VITE_NASA_API_KEY` in the project's environment variables. Without a key the game uses NASA's shared `DEMO_KEY`, which is often rate-limited, so you will mostly see the saved storms. Note: a key in a `VITE_` variable is built into the page; that is normal for a free api.nasa.gov key, which only has a rate limit.
 
-**Judge Mode** (title screen → Settings, or `?judge=1`): the crop, weather, rock, delay and storm are fixed, so a demo always plays the same, and a "Jump to a scene" panel appears. "Skip the story" on the title screen starts at the landing.
+**For judges** (button on the title screen): a 3-minute quick tour from the base, jump-ins to the storm, rover, greenhouse and result, a switch between the saved storm and live NASA data, and a summary of the data used. It turns on **Judge Mode** (also in Settings, or `?judge=1`): the crop, weather, rock, delay and storm are fixed, so a demo always plays the same, and a "Jump to a scene" panel appears. "Skip the story" on the title screen starts at the landing.
 
 **Accessibility:** large in-scene text, adjustable story speed, sound on/off, keyboard play, meters that never rely on color alone, reduced-motion support, landscape phone layout.
 

@@ -279,3 +279,18 @@ Shared by every Mars scene (src/game):
   Hidden on short screens (phone held sideways); also listed on the Data Sources screen.
 - **Egypt card:** a new "Back on Earth" card on desert farming in Egypt, sourced to NASA Earth Observatory.
 - Two long notes were shortened (the "no forecast in time" radio call and the lettuce fact). The storm notes were narrowed so they do not touch the new photo card.
+
+## Phase 11b: For judges
+
+- New **For judges ▸** button on the title screen. Its panel has: a one-line pitch; "Quick tour" (turns Judge Mode on and starts at the base);
+  jump-ins to the storm, garage + rover, greenhouse and result, each with what NASA data it shows; a "Storm data" switch
+  (saved medium storm, or live from NASA DONKI with the saved one as fallback: `judgeLive` in `judge.ts`); the four NASA datasets in one line each;
+  a note on fixed values, made-up numbers, tests and the balance check; and a link to the NASA data screen.
+- Credits now mention both NASA photos.
+
+## Phase 11c: before deploying
+
+- The DONKI flare (FLR) request is now optional: if it fails or returns 404 (as api.nasa.gov does at the moment), the live CME is still used and the flare class comes from the CME's note.
+- The live DONKI call waits up to 3.2 s (was 2.5 s) before using a saved event; the alarm plays for about 3 s anyway.
+- `index.html` has a page description, so the shared link shows a summary.
+- The API key now lives in `.env` (git-ignored); `.env.example` shows the format.
