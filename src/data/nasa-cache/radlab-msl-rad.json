@@ -1,0 +1,13 @@
+{
+  "source": "NASA OSDR RadLab — Curiosity rover RAD instrument (MSL-RAD), Mars surface",
+  "docs": "https://visualization.osdr.nasa.gov/radlab/gui/data-api/",
+  "fetchedAt": "2026-11-14T01:06:45.538Z",
+  "request": "https://visualization.osdr.nasa.gov/radlab/api/?format=json&instrument=MSL-RAD&absorbed_dose_rate=&timestamp%3E=2015-01-01T00:00&timestamp%3C=2015-01-08T00:00",
+  "instrumentId": "MSL-RAD-Surface",
+  "from": "2015-01-01T00:00",
+  "to": "2015-01-08T00:00",
+  "readings": 577,
+  "unit": "µGy/hour (absorbed dose rate)",
+  "meanPerHour": 6.099,
+  "meanPerDay": 146.4
+}

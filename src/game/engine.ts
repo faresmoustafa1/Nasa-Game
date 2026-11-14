@@ -11,6 +11,8 @@
 
 import type {
   ActionDef,
+  AlertDef,
+  AlertThreat,
   Amounts,
   BalanceConfig,
   Check,
@@ -49,7 +51,7 @@ export function newGame(
 ): GameState {
   const s = { ...cfg.start, ...start };
   const base: GameState = {
-    v: 2,
+    v: 3,
     sol: startSol,
     dayOrder,
     power: s.power,
@@ -70,6 +72,7 @@ export function newGame(
     notebook: [],
     predictions: [],
     morning: null,
+    alert: null,
   };
   // Landing day: the start values ARE this morning's power (no extra sun).
   return beginSol(cfg, base, firstDay, false).state;
@@ -91,6 +94,7 @@ export function beginSol(
     usedToday: {},
     askedEarth: 0,
     log: [],
+    alert: null,
   };
 
   if (day.event.addDust) {
@@ -187,7 +191,8 @@ export function actionDeal(cfg: BalanceConfig, state: GameState, id: string): Ac
   return a;
 }
 
-export function actionCheck(cfg: BalanceConfig, state: GameState, id: string): Check {
+/** `free` = during the alert: Time Points do not apply, only Power/Air/Food. */
+export function actionCheck(cfg: BalanceConfig, state: GameState, id: string, free = false): Check {
   if (!cfg.actions[id]) return { ok: false, reason: "limit" };
   const a = actionDeal(cfg, state, id);
   if (state.room !== a.room) return { ok: false, reason: "notHere" };
@@ -196,6 +201,7 @@ export function actionCheck(cfg: BalanceConfig, state: GameState, id: string): C
   if (a.needsDust && state.dust <= 0) return { ok: false, reason: "noDust" };
 
   for (const [stat, need] of Object.entries(a.cost) as [StatId, number][]) {
+    if (free && stat === "time") continue;
     const have = statValue(state, stat);
     if (have < need) {
       return { ok: false, reason: stat === "time" ? "noTime" : "notEnough", stat, need, have };
@@ -210,10 +216,11 @@ export function actionCheck(cfg: BalanceConfig, state: GameState, id: string): C
   return { ok: true };
 }
 
-export function doAction(cfg: BalanceConfig, state: GameState, id: string): GameState {
-  if (!actionCheck(cfg, state, id).ok) return state;
+export function doAction(cfg: BalanceConfig, state: GameState, id: string, free = false): GameState {
+  if (!actionCheck(cfg, state, id, free).ok) return state;
   const a = actionDeal(cfg, state, id);
-  const { next, change } = applyChange(cfg, state, a.cost, a.gain);
+  const cost = free ? withoutTime(a.cost) : a.cost;
+  const { next, change } = applyChange(cfg, state, cost, a.gain);
   next.usedToday = { ...state.usedToday, [id]: (state.usedToday[id] ?? 0) + 1 };
   if (a.setsFlag) next.flags = { ...state.flags, [a.setsFlag]: true };
   next.pending = [
@@ -222,6 +229,86 @@ export function doAction(cfg: BalanceConfig, state: GameState, id: string): Game
   ];
   next.log = [...state.log, { kind: "action", id, change }];
   return next;
+}
+
+function withoutTime(a: Amounts): Amounts {
+  const { time: _t, ...rest } = a;
+  return rest;
+}
+
+// ---------------------------------------------------------------------------
+// Alert: a countdown at the end of the plan (the UI runs the clock).
+// Three problems; fixing one costs Power/Air/Food and real seconds of work.
+
+/** Start the alert: find the problems the plan already took care of. */
+export function beginAlert(state: GameState, def: AlertDef, run: RunInfo): GameState {
+  const flare = flareTonight(state, run);
+  const prepared = def.threats
+    .filter(
+      (t) =>
+        !t.decoy &&
+        ((t.preparedBy ?? []).some((id) => (state.usedToday[id] ?? 0) > 0) ||
+          (t.preparedIf === "shieldVsFlare" && (!flare || state.shield >= flare.strength))),
+    )
+    .map((t) => t.id);
+  return { ...state, alert: { handled: [], prepared } };
+}
+
+export function alertThreat(def: AlertDef, id: string): AlertThreat | undefined {
+  return def.threats.find((t) => t.id === id);
+}
+
+export function alertTaskCheck(state: GameState, def: AlertDef, id: string): Check {
+  const t = alertThreat(def, id);
+  if (!t || !state.alert) return { ok: false, reason: "limit" };
+  if (state.alert.handled.includes(id) || state.alert.prepared.includes(id)) return { ok: false, reason: "fixed" };
+  if (state.room !== t.room) return { ok: false, reason: "notHere" };
+  for (const [stat, need] of Object.entries(t.cost) as [StatId, number][]) {
+    const have = statValue(state, stat);
+    if (have < need) return { ok: false, reason: "notEnough", stat, need, have };
+  }
+  return { ok: true };
+}
+
+export function alertDoTask(cfg: BalanceConfig, state: GameState, def: AlertDef, id: string): GameState {
+  if (!alertTaskCheck(state, def, id).ok || !state.alert) return state;
+  const t = alertThreat(def, id)!;
+  const { next } = applyChange(cfg, state, t.cost, t.gain ?? {});
+  next.alert = { ...state.alert, handled: [...state.alert.handled, id] };
+  return next;
+}
+
+/** Every real problem fixed or prepared? (The alert can end early.) */
+export function alertAllFixed(state: GameState, def: AlertDef): boolean {
+  const a = state.alert;
+  if (!a) return false;
+  return def.threats.every((t) => t.decoy || a.handled.includes(t.id) || a.prepared.includes(t.id));
+}
+
+/** Time's up (or all fixed): problems that were not fixed take effect now. */
+export function resolveAlert(
+  cfg: BalanceConfig,
+  state: GameState,
+  def: AlertDef,
+): { state: GameState; lines: ReportLine[] } {
+  const a = state.alert ?? { handled: [], prepared: [] };
+  let s = state;
+  const lines: ReportLine[] = [];
+  for (const t of def.threats) {
+    if (t.decoy) {
+      const text = a.handled.includes(t.id) ? t.savedText : t.missText;
+      lines.push({ kind: "alert", id: t.id, outcome: "decoy", text, change: {} });
+    } else if (a.prepared.includes(t.id)) {
+      lines.push({ kind: "alert", id: t.id, outcome: "prepared", text: t.preparedText ?? t.savedText, change: {} });
+    } else if (a.handled.includes(t.id)) {
+      lines.push({ kind: "alert", id: t.id, outcome: "saved", text: t.savedText, change: {} });
+    } else {
+      const { next, change } = applyChange(cfg, s, {}, t.effect);
+      s = next;
+      lines.push({ kind: "alert", id: t.id, outcome: "missed", text: t.missText, change });
+    }
+  }
+  return { state: s, lines };
 }
 
 // ---------------------------------------------------------------------------
@@ -276,7 +363,8 @@ export function goalMet(day: DayDef, state: GameState): boolean {
 function todayLines(state: GameState): ReportLine[] {
   const lines: ReportLine[] = [];
   const walks = state.log.filter((l) => l.kind === "walk");
-  if (walks.length) lines.push({ kind: "walked", count: walks.length, change: { time: -walks.length } });
+  const walkTime = walks.reduce((n, l) => n + (l.change.time ?? 0), 0);
+  if (walks.length && walkTime) lines.push({ kind: "walked", count: walks.length, change: { time: walkTime } });
   const byAction = new Map<string, { count: number; change: Amounts }>();
   for (const l of state.log) {
     if (l.kind !== "action") continue;
@@ -299,6 +387,7 @@ export function endSol(
   today: DayDef,
   nextDay: DayDef | null,
   run: RunInfo,
+  alertLines: ReportLine[] = [],
 ): EndResult {
   const night: ReportLine[] = [];
   const n: GameState = { ...state };
@@ -346,6 +435,7 @@ export function endSol(
     },
     after: { power: n.power, air: n.air, food: n.food },
     today: todayLines(state),
+    alert: alertLines,
     night,
     tomorrow: [],
     paused,

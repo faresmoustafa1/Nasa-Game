@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "balance": "vite build --ssr scripts/balance.ts --outDir node_modules/.cache/balance --emptyOutDir --logLevel warn && node node_modules/.cache/balance/balance.js"
+    "balance": "vite build --ssr scripts/balance.ts --outDir node_modules/.cache/balance --emptyOutDir --logLevel warn && node node_modules/.cache/balance/balance.js",
+    "fetch-nasa": "node scripts/fetch-nasa.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",

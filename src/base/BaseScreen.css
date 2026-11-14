@@ -34,7 +34,7 @@
   cursor: pointer;
 }
 .base button:focus-visible,
-.bscene__hit:focus-visible {
+.map__hit:focus-visible {
   outline: 4px solid var(--power);
   outline-offset: 2px;
 }
@@ -314,166 +314,7 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
-  background: #c98a5f;
-}
-.bscene {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.bscene__sign rect {
-  fill: rgba(10, 12, 20, 0.75);
-  stroke: rgba(255, 255, 255, 0.4);
-  stroke-width: 3;
-}
-.bscene__sign > text {
-  fill: #fff;
-  font: 800 30px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-.bscene__screen-text {
-  fill: var(--power);
-  font: 900 28px ui-monospace, Consolas, monospace;
-}
-.bscene__tank-text {
-  fill: #24496d;
-  font: 900 24px system-ui, sans-serif;
-}
-
-.bscene__hit {
-  cursor: pointer;
-  outline: none;
-}
-.bscene__hit > rect {
-  fill: transparent;
-  stroke: transparent;
-  stroke-width: 6;
-  transition: stroke 0.2s;
-}
-.bscene__hit:hover > rect {
-  stroke: rgba(255, 255, 255, 0.6);
-}
-.bscene__hit:focus-visible > rect {
-  stroke: var(--power);
-  stroke-width: 10;
-}
-.bscene__hit.is-here > rect {
-  stroke: rgba(255, 210, 63, 0.85);
-  stroke-dasharray: 22 12;
-}
-.bscene__hit.is-here {
-  cursor: default;
-}
-.bscene__pill rect {
-  fill: rgba(10, 12, 20, 0.8);
-  stroke: rgba(255, 255, 255, 0.55);
-  stroke-width: 3;
-}
-.bscene__pill > text {
-  fill: #fff;
-  font: 900 26px system-ui, sans-serif;
-}
-.bscene__pill--here rect {
-  fill: var(--power);
-  stroke: #2a2210;
-}
-.bscene__pill--here > text {
-  fill: #2a2210;
-}
-.bscene__hit.is-blocked .bscene__pill {
-  opacity: 0.4;
-}
-
-.bscene__dim,
-.bscene__shield-glow,
-.bscene__haze,
-.bscene__panel-dust {
-  transition: opacity 0.8s ease;
-}
-
-/* Kid walking */
-.bscene__kid {
-  transition-property: transform;
-  transition-timing-function: linear;
-}
-.bkid__shadow {
-  fill: rgba(0, 0, 0, 0.35);
-}
-.bkid__leg,
-.bkid__arm {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-}
-.bkid__body {
-  animation: bkid-breathe 3s ease-in-out infinite;
-}
-.is-walking .bkid__body {
-  animation: bkid-bob 0.22s ease-in-out infinite alternate;
-}
-.is-walking .bkid__leg {
-  animation: bkid-step 0.44s ease-in-out infinite alternate;
-}
-.is-walking .bkid__leg--back,
-.is-walking .bkid__arm {
-  animation: bkid-step 0.44s ease-in-out infinite alternate-reverse;
-}
-.is-walking .bkid__arm--back {
-  animation-direction: alternate;
-}
-@keyframes bkid-step {
-  from { transform: rotate(-24deg); }
-  to { transform: rotate(24deg); }
-}
-@keyframes bkid-bob {
-  to { transform: translateY(-5px); }
-}
-@keyframes bkid-breathe {
-  50% { transform: translateY(-1.5px); }
-}
-
-/* Machines */
-.bscene__bubble {
-  fill: #c9efff;
-  opacity: 0;
-  animation: bscene-bubble 2.7s linear infinite;
-}
-@keyframes bscene-bubble {
-  0% { transform: translateY(0); opacity: 0; }
-  15% { opacity: 0.9; }
-  85% { opacity: 0.9; }
-  100% { transform: translateY(-104px); opacity: 0; }
-}
-.bscene__plant {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: bscene-sway 4s ease-in-out infinite alternate;
-  animation-delay: var(--sway);
-}
-.bscene__plant.is-droopy {
-  filter: saturate(0.45) brightness(0.85);
-}
-@keyframes bscene-sway {
-  from { transform: rotate(-2.5deg); }
-  to { transform: rotate(2.5deg); }
-}
-.bscene__growlight {
-  opacity: 0;
-  transition: opacity 0.8s ease;
-}
-.bscene__growlight.is-on {
-  opacity: 1;
-  animation: bscene-glow 2.4s ease-in-out infinite;
-}
-@keyframes bscene-glow {
-  50% { opacity: 0.7; }
-}
-.bscene__dome {
-  animation: bscene-dome 3s linear infinite;
-  transition: opacity 0.8s, stroke-width 0.8s;
-}
-@keyframes bscene-dome {
-  to { stroke-dashoffset: -64; }
+  background: #6e2f1c;
 }
 
 /* ---------- Room tabs (phones only) ---------- */
@@ -831,55 +672,6 @@
   white-space: nowrap;
   animation: toast-in 0.4s ease-out;
 }
-.bscene__night {
-  opacity: 0;
-  transition: opacity 1.4s ease;
-  pointer-events: none;
-}
-.bscene__night.is-on {
-  opacity: 0.88;
-}
-.bscene__night circle {
-  animation: prologue-twinkle 3s ease-in-out infinite;
-}
-.bscene.is-night .bscene__hit {
-  pointer-events: none;
-}
-.bscene.is-night .bscene__pill {
-  opacity: 0;
-}
-.bscene__flare path {
-  fill: none;
-  stroke: #ffb347;
-  stroke-width: 10;
-  stroke-linecap: round;
-  stroke-dasharray: 60 600;
-  stroke-dashoffset: 660;
-  animation: flare-streak 1.1s ease-in 1.2s 2 forwards;
-  filter: drop-shadow(0 0 8px #ff8a1f);
-}
-@keyframes flare-streak {
-  to { stroke-dashoffset: 0; }
-}
-.bscene__dome.is-flash {
-  animation: bscene-dome 3s linear infinite, dome-flash 0.5s ease-in-out 2.1s 3;
-}
-@keyframes dome-flash {
-  50% { stroke: #fff; opacity: 1; }
-}
-.bscene__hitflash {
-  opacity: 0;
-  pointer-events: none;
-}
-.bscene__hitflash.is-on {
-  animation: hit-flash 0.45s ease-in-out 2.2s 3;
-}
-@keyframes hit-flash {
-  50% { opacity: 0.45; }
-}
-@keyframes prologue-twinkle {
-  50% { opacity: 0.4; }
-}
 
 /* ---------- Smaller screens ---------- */
 
@@ -1107,8 +899,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .base *,
-  .bscene * {
+  .base * {
     animation: none !important;
     transition-duration: 0.01ms !important;
   }

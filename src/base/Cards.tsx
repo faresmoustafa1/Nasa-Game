@@ -6,7 +6,8 @@ import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { balance, factsForDay, fmt, glossary, text } from "../game/config";
 import type { RunFlare } from "../game/config";
-import type { DayDef, DayReport, PauseStat, ReportLine } from "../game/types";
+import type { AlertDef, DayDef, DayReport, PauseStat, ReportLine } from "../game/types";
+import type { TimerMode } from "../game/save";
 import { DeltaChips } from "./Hud";
 import { Icon } from "./Icons";
 import type { IconName } from "./Icons";
@@ -189,6 +190,10 @@ function lineView(line: ReportLine): { icon: IconName; words: string } {
       return { icon: "food", words: r.pending };
     case "dustAdd":
       return { icon: "dust", words: r.dustAdd };
+    case "alert": {
+      const icon: IconName = line.outcome === "missed" ? "flare" : line.outcome === "decoy" ? "message" : "check";
+      return { icon, words: line.text };
+    }
   }
 }
 
@@ -244,6 +249,12 @@ export function ReportCard({ report, onNext }: { report: DayReport; onNext: () =
       </p>
       <h3 className="rhead">{r.today}</h3>
       {report.today.length ? <Lines lines={report.today} /> : <p className="rline">{r.nothing}</p>}
+      {report.alert?.length > 0 && (
+        <>
+          <h3 className="rhead">{r.alert}</h3>
+          <Lines lines={report.alert} />
+        </>
+      )}
       <h3 className="rhead">{r.night}</h3>
       <Lines lines={report.night} />
       {report.tomorrow.length > 0 && (
@@ -267,6 +278,7 @@ export function DebriefCard({
   flare,
   nextSol,
   onNext,
+  onRetryAlert,
 }: {
   day: DayDef;
   report: DayReport;
@@ -275,6 +287,8 @@ export function DebriefCard({
   flare: RunFlare;
   nextSol: number | null;
   onNext: () => void;
+  /** Shown when the alert missed something: play the alert again. */
+  onRetryAlert?: () => void;
 }) {
   const d = text.debrief;
   const right = predicted === day.predict.answer;
@@ -287,9 +301,16 @@ export function DebriefCard({
       icon={<Icon name="science" size={32} />}
       tone="win"
       actions={
-        <button type="button" className="btn btn--go" onClick={onNext}>
-          {nextSol ? fmt(d.next, { n: nextSol }) : d.finish}
-        </button>
+        <>
+          {onRetryAlert && (
+            <button type="button" className="btn btn--quiet" onClick={onRetryAlert}>
+              {text.alert.retry}
+            </button>
+          )}
+          <button type="button" className="btn btn--go" onClick={onNext}>
+            {nextSol ? fmt(d.next, { n: nextSol }) : d.finish}
+          </button>
+        </>
       }
     >
       <p className={`guess ${right ? "is-right" : "is-wrong"}`}>
@@ -308,23 +329,23 @@ export function DebriefCard({
             blocked: flareLine.blocked,
             through: flareLine.through,
           })}
-          <span className={`tag ${flare.source === "example" ? "tag--example" : "tag--real"}`}>
-            {flare.source === "example" ? text.labels.example : text.labels.real}
-          </span>
+          <FlareTag flare={flare} />
         </p>
       )}
       {cards.map((f) => (
             <figure key={f.id} className="fact">
               <p className="fact__tag">
                 <span className="tag tag--real">{f.label}</span>
+                {f.dataLabel && <span className="tag tag--data">{f.dataLabel}</span>}
                 {!f.checked && import.meta.env.DEV && <span className="tag tag--warn">{d.unchecked}</span>}
               </p>
               <h3 className="fact__title">{f.title}</h3>
-              <p className="fact__text">
-                {fmt(f.text, { date: flare.date ?? "", class: flare.classType })}
-              </p>
+              <p className="fact__text">{f.text}</p>
               <figcaption className="fact__src">
-                Source: {f.source_url ? <a href={f.source_url} target="_blank" rel="noreferrer">{f.source_name}</a> : f.source_name}
+                <a href={f.source_url} target="_blank" rel="noreferrer">
+                  {f.source_name}
+                </a>{" "}
+                · {f.source_date}
               </figcaption>
             </figure>
       ))}
@@ -352,6 +373,7 @@ export function PauseCard({
   stuck,
   onRetry,
   onBack,
+  onRetryAlert,
 }: {
   stat: PauseStat;
   sol: number;
@@ -359,8 +381,14 @@ export function PauseCard({
   stuck: boolean;
   onRetry: () => void;
   onBack: () => void;
+  onRetryAlert?: () => void;
 }) {
   const p = text.pause;
+  const alertBtn = onRetryAlert && (
+    <button type="button" className="btn btn--quiet" onClick={onRetryAlert}>
+      {text.alert.retry}
+    </button>
+  );
   return (
     <Card
       title={p.title}
@@ -369,6 +397,7 @@ export function PauseCard({
       actions={
         stuck ? (
           <>
+            {alertBtn}
             <button type="button" className="btn btn--quiet" onClick={onRetry}>
               {fmt(p.retryAnyway, { n: sol })}
             </button>
@@ -377,9 +406,12 @@ export function PauseCard({
             </button>
           </>
         ) : (
-          <button type="button" className="btn btn--go" onClick={onRetry}>
-            {fmt(p.retry, { n: sol })}
-          </button>
+          <>
+            {alertBtn}
+            <button type="button" className="btn btn--go" onClick={onRetry}>
+              {fmt(p.retry, { n: sol })}
+            </button>
+          </>
         )
       }
     >
@@ -449,5 +481,99 @@ export function EarthAnswer({ hint, seconds, onClose }: { hint: string; seconds:
         {a.close}
       </button>
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Alert banner (the countdown starts only after Ready)
+
+export function AlertIntroCard({
+  def,
+  seconds,
+  prepared,
+  onReady,
+}: {
+  def: AlertDef;
+  /** null = Calm mode, no timer. */
+  seconds: number | null;
+  prepared: string[];
+  onReady: () => void;
+}) {
+  const a = text.alert;
+  const helped = def.threats.filter((t) => prepared.includes(t.id)).map((t) => t.task);
+  return (
+    <Card
+      title={fmt(a.title, { title: def.title })}
+      icon={<Icon name="flare" size={34} />}
+      tone="pause"
+      actions={
+        <button type="button" className="btn btn--go btn--big" onClick={onReady}>
+          {a.ready}
+        </button>
+      }
+    >
+      <p className="alertintro__problem">{def.problem}</p>
+      <p className="alertintro__goal">{def.goal}</p>
+      <p className="alertintro__time">
+        <Icon name="time" size={26} /> {seconds === null ? a.noTimer : fmt(a.seconds, { n: seconds })}
+      </p>
+      {helped.length > 0 && (
+        <p className="alertintro__helped">
+          <Icon name="check" size={22} /> {fmt(a.planHelped, { list: helped.join(", ") })}
+        </p>
+      )}
+      <p className="alertintro__note">{a.noTimePoints}</p>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Settings: Calm mode
+
+export function SettingsCard({
+  timer,
+  onTimer,
+  onClose,
+}: {
+  timer: TimerMode;
+  onTimer: (t: TimerMode) => void;
+  onClose: () => void;
+}) {
+  const t = text.settings;
+  const options: TimerMode[] = ["normal", "double", "off"];
+  return (
+    <Card
+      title={t.title}
+      icon={<Icon name="time" size={30} />}
+      actions={
+        <button type="button" className="btn btn--go" onClick={onClose}>
+          {t.close}
+        </button>
+      }
+    >
+      <fieldset className="settings">
+        <legend>{t.timer}</legend>
+        {options.map((o) => (
+          <label key={o} className={`settings__opt${timer === o ? " is-on" : ""}`}>
+            <input type="radio" name="timer" checked={timer === o} onChange={() => onTimer(o)} />
+            <span className="settings__mark" aria-hidden="true">
+              {timer === o ? "●" : "○"}
+            </span>
+            {t[o]}
+          </label>
+        ))}
+      </fieldset>
+      <p className="settings__note">{t.note}</p>
+    </Card>
+  );
+}
+
+/** The flare's data label: LIVE / SAVED REAL NASA DATA (date) / GAME EXAMPLE. */
+export function FlareTag({ flare }: { flare: RunFlare }) {
+  if (flare.source === "example") return <span className="tag tag--example">{text.labels.example}</span>;
+  return (
+    <span className="tag tag--real">
+      {flare.source === "live" ? text.labels.live : fmt(text.labels.saved, { date: (flare.fetchedAt ?? "").slice(0, 10) })}
+    </span>
   );
 }

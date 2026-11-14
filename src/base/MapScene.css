@@ -1,0 +1,805 @@
+/* Mission ARES — top-down map, weather, alert countdown, alert jobs. */
+
+.map {
+  position: absolute;
+  inset: 0;
+}
+.map__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.map__room {
+  stroke: #c9d1dc;
+  stroke-width: 16;
+}
+.map__door {
+  stroke: none;
+}
+.map__doorwall rect {
+  fill: #c9d1dc;
+}
+.map__logo circle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 6;
+}
+.map__logo text {
+  fill: rgba(255, 255, 255, 0.3);
+  font: 900 34px system-ui, sans-serif;
+  text-anchor: middle;
+  letter-spacing: 0.15em;
+}
+.map__label > text {
+  fill: #fff;
+  font: 900 46px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.7);
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+.map__mini {
+  fill: #fff;
+  font: 900 40px system-ui, sans-serif;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.6);
+  stroke-width: 6;
+}
+.map__mini--small {
+  font-size: 34px;
+}
+.map__hit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 8;
+  cursor: pointer;
+  outline: none;
+}
+.map__hit:hover {
+  stroke: rgba(255, 255, 255, 0.55);
+}
+.map__hit:focus-visible {
+  stroke: #ffd23f;
+  stroke-width: 12;
+}
+
+/* Kid */
+.tkid {
+  pointer-events: none;
+}
+.tkid.is-moving .tkid__body {
+  animation: tkid-bob 0.28s ease-in-out infinite alternate;
+}
+.tkid.is-moving .tkid__hand--l {
+  animation: tkid-hand 0.28s ease-in-out infinite alternate;
+}
+.tkid.is-moving .tkid__hand--r {
+  animation: tkid-hand 0.28s ease-in-out infinite alternate-reverse;
+}
+@keyframes tkid-bob {
+  to { transform: scale(1.05); }
+}
+@keyframes tkid-hand {
+  from { transform: translateX(-6px); }
+  to { transform: translateX(6px); }
+}
+
+/* Room details */
+.map__bubble {
+  fill: #c9efff;
+  opacity: 0.8;
+  animation: map-bubble 2.4s ease-in-out infinite;
+}
+@keyframes map-bubble {
+  50% { transform: translateY(-14px); opacity: 0.35; }
+}
+.map__glow {
+  fill: #ff6ad5;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.map__green.is-lit .map__glow {
+  opacity: 0.22;
+}
+.map__plant.is-droopy {
+  filter: saturate(0.4) brightness(0.8);
+}
+.map__shieldglow {
+  fill: #c39bff;
+  transition: opacity 0.6s;
+}
+.map__shieldglow.is-flash {
+  animation: map-flash 0.5s ease-in-out 2.2s 3;
+}
+@keyframes map-flash {
+  50% { fill: #fff; opacity: 0.9; }
+}
+.map__seg {
+  fill: #151a28;
+  stroke: #c39bff;
+  stroke-width: 5;
+}
+.map__seg.is-on {
+  fill: #c39bff;
+}
+
+/* Alert badges: "!" needs fixing, "✓" fixed (shape + symbol, not just color) */
+.map__badge circle {
+  fill: #fff3bf;
+  stroke: #2a2210;
+  stroke-width: 6;
+}
+.map__badge text {
+  fill: #2a2210;
+  font: 900 40px system-ui, sans-serif;
+  text-anchor: middle;
+}
+.map__badge--open {
+  animation: badge-pulse 1s ease-in-out infinite;
+}
+.map__badge--open circle {
+  fill: #ff9b3d;
+}
+.map__badge--done circle,
+.map__badge--prepared circle {
+  fill: #7be38a;
+}
+@keyframes badge-pulse {
+  50% { transform: scale(1.15); }
+}
+.map__badge--open {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* "Space / Tap" prompt */
+.map__prompt {
+  cursor: pointer;
+  animation: prompt-in 0.25s ease-out;
+}
+.map__prompt rect {
+  fill: #ffd23f;
+  stroke: #2a2210;
+  stroke-width: 5;
+}
+.map__prompt text {
+  fill: #2a2210;
+  font: 900 30px system-ui, sans-serif;
+  text-anchor: middle;
+}
+@keyframes prompt-in {
+  from { opacity: 0; }
+}
+
+/* Work in progress (alert) */
+.map__work-bg {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.45);
+  stroke-width: 12;
+}
+.map__work-fg {
+  fill: none;
+  stroke: #ffd23f;
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+/* Night */
+.map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #070b22;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.4s ease;
+}
+.map.is-night::after {
+  opacity: 0.62;
+}
+
+/* ---------- Weather: dust tint + flare border, with data labels ---------- */
+
+.weather {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(214, 120, 40, calc(var(--dust, 0) * 0.42));
+  transition: background 1s;
+}
+.base__stage.is-flare .weather {
+  box-shadow: inset 0 0 0 8px rgba(255, 60, 40, 0.9), inset 0 0 40px 10px rgba(255, 60, 40, 0.45);
+  animation: flare-pulse 1.3s ease-in-out infinite;
+}
+@keyframes flare-pulse {
+  50% { box-shadow: inset 0 0 0 4px rgba(255, 60, 40, 0.5), inset 0 0 20px 4px rgba(255, 60, 40, 0.2); }
+}
+.weather__labels {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  pointer-events: none;
+}
+.wchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(10, 12, 20, 0.85);
+  border: 2px solid #d49a6a;
+  font-size: 14px;
+  font-weight: 800;
+}
+.wchip--flare {
+  border: 3px dashed #ff6a4d;
+}
+.wchip .tag {
+  display: inline-block;
+  min-height: 0;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.tag--game-s {
+  border: 2px dashed #cfc6ff;
+  color: #e6dcff;
+}
+
+/* ---------- Countdown: big number + bar with ticks ---------- */
+
+/* During the alert the map moves down so the countdown never covers a room. */
+.base__stage.is-alert .map {
+  top: 84px;
+}
+.countdown {
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  width: min(620px, calc(100% - 20px));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  border-radius: 18px;
+  background: rgba(10, 12, 20, 0.92);
+  border: 4px solid #fff;
+  z-index: 3;
+}
+.countdown__num {
+  min-width: 86px;
+  font: 900 48px/1 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.countdown__num small {
+  font-size: 22px;
+  margin-left: 2px;
+}
+.countdown__body {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.countdown__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+  font-weight: 900;
+}
+.countdown__track {
+  position: relative;
+  display: block;
+  height: 26px;
+  border-radius: 8px;
+  border: 3px solid #fff;
+  background: #1b2133;
+  overflow: hidden;
+}
+.countdown__fill {
+  display: block;
+  height: 100%;
+  background: #ffd23f;
+  transition: width 0.1s linear;
+}
+.countdown__tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1px;
+  background: rgba(10, 12, 20, 0.6);
+}
+.countdown.is-low {
+  border-style: dashed;
+  animation: count-low 0.8s ease-in-out infinite;
+}
+.countdown.is-low .countdown__fill {
+  background: repeating-linear-gradient(45deg, #ff9b3d 0 10px, #ffd23f 10px 20px);
+}
+@keyframes count-low {
+  50% { box-shadow: 0 0 0 6px rgba(255, 155, 61, 0.5); }
+}
+.countdown.is-paused {
+  border-style: dotted;
+  cursor: pointer;
+  animation: none;
+}
+.countdown__paused {
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: #fff;
+  color: #141a2b;
+  font-size: 14px;
+}
+.countdown--calm {
+  justify-content: center;
+}
+.countdown__calm {
+  font-weight: 800;
+}
+
+/* ---------- Alert jobs list, fix cards, work bar ---------- */
+
+.jobs {
+  margin-bottom: 8px;
+}
+.jobs__title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+.jobs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.job {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 2px solid #56638a;
+  background: #1e2539;
+  font-size: 14px;
+}
+.job.is-here {
+  border-width: 3px;
+  border-color: #fff;
+}
+.job__mark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #2a2210;
+  font-weight: 900;
+  color: #2a2210;
+}
+.job--open .job__mark {
+  background: #ff9b3d;
+}
+.job--done .job__mark,
+.job--prepared .job__mark {
+  background: #7be38a;
+}
+.job--decoy .job__mark {
+  background: #b9c6ff;
+}
+.job__task {
+  font-weight: 800;
+}
+.job__status {
+  opacity: 0.8;
+}
+.job--done .job__task,
+.job--prepared .job__task {
+  text-decoration: line-through;
+}
+
+.action--fix {
+  border-color: #ff9b3d;
+  border-width: 4px;
+}
+.action__fixmark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #ff9b3d;
+  color: #2a2210;
+  font-weight: 900;
+}
+.action.is-busy {
+  border-color: #ffd23f;
+}
+.chip--secs {
+  border-color: #e6dcff;
+}
+.workbar {
+  position: relative;
+  display: block;
+  height: 30px;
+  border-radius: 10px;
+  border: 3px solid #ffd23f;
+  background: #0d1220;
+  overflow: hidden;
+}
+.workbar__fill {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(-45deg, #ffd23f 0 12px, #e0b52f 12px 24px);
+}
+.workbar__text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  color: #141a2b;
+  text-shadow: 0 0 4px #fff;
+}
+
+.alerttag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 4px 14px;
+  border-radius: 14px;
+  border: 3px dashed #ff9b3d;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.endsol--alert {
+  background: #7be38a;
+}
+.toast {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+.toast__go {
+  display: block;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ---------- Joystick (touch screens) ---------- */
+
+.joy {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: rgba(10, 12, 20, 0.55);
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  touch-action: none;
+  z-index: 3;
+}
+.joy__knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  border-radius: 50%;
+  background: #ffd23f;
+  border: 3px solid #2a2210;
+}
+
+/* ---------- Alert banner + settings cards ---------- */
+
+.alertintro__problem {
+  font-size: 22px;
+  font-weight: 900;
+}
+.alertintro__goal {
+  font-size: 19px;
+  font-weight: 700;
+}
+.alertintro__time,
+.alertintro__helped {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+.alertintro__helped {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #164d22;
+}
+.alertintro__note {
+  font-size: 15px;
+  opacity: 0.85;
+}
+.btn--big {
+  min-width: 180px;
+  font-size: 24px !important;
+}
+.settings {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 8px;
+}
+.settings legend {
+  margin-bottom: 6px;
+  font-weight: 900;
+}
+.settings__opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 14px;
+  border-radius: 14px;
+  border: 3px solid #56638a;
+  font-weight: 800;
+  cursor: pointer;
+}
+.settings__opt.is-on {
+  border-color: #ffd23f;
+  background: #2c2a18;
+}
+.settings__opt input {
+  position: absolute;
+  opacity: 0;
+}
+.settings__mark {
+  font-size: 22px;
+}
+.settings__opt:focus-within {
+  outline: 4px solid #ffd23f;
+}
+.settings__note {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+@media (max-width: 760px) {
+  .base__stage.is-alert .map {
+    top: 58px;
+  }
+  .countdown {
+    top: 6px;
+    padding: 4px 10px;
+    gap: 10px;
+    border-width: 3px;
+  }
+  .countdown__num {
+    min-width: 62px;
+    font-size: 36px;
+  }
+  .countdown__title {
+    font-size: 14px;
+  }
+  .countdown__track {
+    height: 18px;
+  }
+  .joy {
+    width: 96px;
+    height: 96px;
+  }
+  .wchip {
+    font-size: 12px;
+  }
+}
+
+/* Wide screens: room cards stay in the bottom panel, laid out side by side
+   and kept short so the map stays big. */
+@media (min-width: 900px) {
+  .base__panel {
+    max-height: 32vh;
+  }
+  .base__panel .panel__actions {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  .base__panel .action {
+    padding: 8px 12px;
+    gap: 4px;
+  }
+  .base__panel .panel__title {
+    font-size: 19px;
+    margin-bottom: 6px;
+  }
+}
+
+.base__menu .short {
+  display: none;
+}
+
+/* Phones: keep the map as big as possible. */
+@media (max-width: 760px) {
+  .base {
+    grid-template-rows: auto minmax(210px, 1fr) auto minmax(0, auto) auto;
+  }
+  .base__menu {
+    min-width: 48px;
+  }
+  .base__menu .long {
+    display: none;
+  }
+  .base__menu .short {
+    display: inline;
+    font-size: 22px;
+  }
+  .rbar {
+    min-height: 50px;
+  }
+  .roomtab {
+    min-height: 48px;
+    padding: 2px;
+  }
+  .roomtab .icon {
+    width: 20px;
+    height: 20px;
+  }
+  .askearth {
+    flex: 0 0 auto;
+  }
+  .askearth__left {
+    display: none;
+  }
+  .endsol {
+    font-size: 16px !important;
+  }
+  .weather__labels {
+    top: 6px;
+    bottom: auto;
+    left: 6px;
+    gap: 4px;
+  }
+  .base__stage.is-alert .weather__labels {
+    display: none;
+  }
+  .wchip {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  .base__stage.is-flare .weather {
+    box-shadow: inset 0 0 0 5px rgba(255, 60, 40, 0.9);
+    animation: flare-pulse-s 1.3s ease-in-out infinite;
+  }
+  .joy {
+    width: 84px;
+    height: 84px;
+    right: 8px;
+    bottom: 8px;
+    opacity: 0.85;
+  }
+  .joy__knob {
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+  }
+}
+@keyframes flare-pulse-s {
+  50% { box-shadow: inset 0 0 0 2px rgba(255, 60, 40, 0.5); }
+}
+
+.base {
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .base__side {
+    flex-wrap: wrap;
+  }
+  .base__tools {
+    margin-left: auto;
+  }
+}
+@media (max-width: 760px) {
+  .base__side {
+    flex-wrap: nowrap;
+  }
+  /* The GAME-SIZED label moves onto the bars, to save a row. */
+  .base__tools .tag--game {
+    display: none;
+  }
+  .base__bars {
+    position: relative;
+  }
+  .base__bars::after {
+    content: "GAME-SIZED";
+    position: absolute;
+    right: 6px;
+    bottom: -9px;
+    padding: 0 6px;
+    border: 2px dashed #cfc6ff;
+    border-radius: 6px;
+    background: #10141f;
+    color: #e6dcff;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 14px;
+  }
+  .tonight__label {
+    font-size: 0 !important;
+  }
+  .tonight {
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+}
+@media (max-width: 760px) {
+  .endsol {
+    white-space: normal;
+    line-height: 1.1;
+    min-width: 0;
+  }
+  .base__endbar {
+    flex-wrap: wrap;
+  }
+  .tonight {
+    order: -1;
+    flex: 1 1 100%;
+    align-items: center;
+  }
+  .tonight .deal__side {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Fixed rows, so a hidden row (room tabs on wide screens) never shifts the rest. */
+.base__hud { grid-row: 1; }
+.base__stage { grid-row: 2; }
+.base__roombar { grid-row: 3; }
+.base__panel { grid-row: 4; }
+.base__endbar { grid-row: 5; }
+
+/* Tall enough screens: the map keeps at least 260px; the card panel scrolls. */
+@media (min-height: 640px) and (min-width: 761px) {
+  .base {
+    grid-template-rows: auto minmax(260px, 1fr) auto minmax(0, auto) auto;
+  }
+  .base__side {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: stretch;
+  }
+  .base__side .base__tools {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 1200px) {
+  .todo__flare-long {
+    display: none;
+  }
+  .todo__flare-short {
+    display: inline;
+  }
+}
+.weather__labels {
+  top: 8px;
+  bottom: auto;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.base__stage.is-alert .weather__labels {
+  top: 92px;
+}

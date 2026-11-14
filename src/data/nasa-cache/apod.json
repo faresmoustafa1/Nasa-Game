@@ -1,0 +1,79 @@
+{
+  "source": "NASA Astronomy Picture of the Day (APOD), via api.nasa.gov",
+  "docs": "https://api.nasa.gov/ (APOD)",
+  "fetchedAt": "2026-11-14T01:06:45.538Z",
+  "days": [
+    {
+      "date": "2017-09-06",
+      "title": "The Climber and the Eclipse",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2017/september/EclipseClimber_Struder_3664.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2017-september-6-the-climber-and-the-eclipse/",
+      "credit": "Andrew Struder",
+      "request": "https://apod.nasa.gov/apod/ap170906.html"
+    },
+    {
+      "date": "2017-09-07",
+      "title": "The Flash Spectrum of the Sun",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2017/september/DSC00198SpecSunCropQin.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2017-september-7-the-flash-spectrum-of-the-sun/",
+      "credit": null,
+      "request": "https://apod.nasa.gov/apod/ap170907.html"
+    },
+    {
+      "date": "2017-09-10",
+      "title": "Swirling Around the Eye of Hurricane Irma",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/astro/programs/cosmic-origins/images/misc/news-thumbnail.png/jcr:content/renditions/cq5dam.web.1280.1280.png",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2017-september-10-swirling-around-the-eye-of-hurricane-irma/",
+      "credit": "NASA , GOES-16 Satellite , SPoRT",
+      "request": "https://apod.nasa.gov/apod/ap170910.html"
+    },
+    {
+      "date": "2022-04-17",
+      "title": "Shuttle Over Earth",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/april/shuttleAtm_nasa_960.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2022-april-17-shuttle-over-earth/",
+      "credit": "NASA , Expedition 22 Crew",
+      "request": "https://apod.nasa.gov/apod/ap220417.html"
+    },
+    {
+      "date": "2022-04-20",
+      "title": "Planet Line over New York Bridge",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/april/PlanetBridge_Honda_960.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2022-april-20-planet-line-over-new-york-bridge/",
+      "credit": null,
+      "request": "https://apod.nasa.gov/apod/ap220420.html"
+    },
+    {
+      "date": "2022-04-30",
+      "title": "M44: The Beehive Cluster",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2022/april/M44-resized.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2022-april-30-m44-the-beehive-cluster/",
+      "credit": null,
+      "request": "https://apod.nasa.gov/apod/ap220430.html"
+    },
+    {
+      "date": "2024-05-03",
+      "title": "Temperatures on Exoplanet WASP 43b",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/may/STScI-WASP43b_temperature.png/jcr:content/renditions/cq5dam.web.1280.1280.png",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2024-may-3-temperatures-on-exoplanet-wasp-43b/",
+      "credit": "NASA , ESA , CSA , Ralf Crawford ( STScI )",
+      "request": "https://apod.nasa.gov/apod/ap240503.html"
+    },
+    {
+      "date": "2024-05-05",
+      "title": "A Black Hole Disrupts a Passing Star",
+      "mediaType": "image",
+      "url": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2024/may/BhShredder_NASA_3482.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "pageUrl": "https://science.nasa.gov/image-article/apod-2024-may-5-a-black-hole-disrupts-a-passing-star/",
+      "credit": "NASA , JPL-Caltech",
+      "request": "https://apod.nasa.gov/apod/ap240505.html"
+    }
+  ]
+}

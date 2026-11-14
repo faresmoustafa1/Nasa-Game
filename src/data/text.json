@@ -123,7 +123,8 @@
     "tonight": "Tonight the crew needs",
     "notEnough": "Not enough {stat} for tonight!",
     "endSol": "End Sol {n}",
-    "flareWarn": "Flare {n} vs shield {s}"
+    "flareWarn": "Flare {n} vs shield {s}",
+    "toAlert": "Ready for the alert"
   },
   "askEarth": {
     "button": "Ask Earth",
@@ -162,7 +163,7 @@
     "did": "{name} ×{n}",
     "breathe": "The crew breathed air.",
     "eat": "The crew ate food.",
-    "heat": "Heaters kept the base warm. Mars nights are very cold.",
+    "heat": "Heaters kept the base warm. Mars nights are freezing.",
     "plantsDroop": "Weak plants drooped without light.",
     "flareAll": "A class {cls} flare hit. Your shield blocked it all!",
     "flareSome": "A class {cls} flare hit. The shield blocked {blocked}. {through} got in.",
@@ -172,7 +173,8 @@
     "sunDusty": "The Sun makes power. Dust blocks some light.",
     "pending": "The grow lights made food.",
     "dustAdd": "Dust blew onto the panels.",
-    "next": "Next"
+    "next": "Next",
+    "alert": "The alert"
   },
   "debrief": {
     "title": "Here is why",
@@ -209,9 +211,9 @@
   },
   "coach": {
     "bars": "These 3 bars keep the crew alive. Tap one to learn more.",
-    "rooms": "Tap a room to walk there. Walking costs 1 time.",
+    "rooms": "Tap a room, or walk with the arrow keys or WASD. Walking is free!",
     "panel": "Each button shows its cost first. Try one!",
-    "endsol": "Done for today? End the sol. Tonight the crew uses air, food and power.",
+    "endsol": "Done planning? Tap here. Then the alert starts.",
     "next": "Next",
     "skip": "Skip tips"
   },
@@ -219,6 +221,56 @@
     "game": "GAME-SIZED",
     "real": "REAL NASA VALUE",
     "example": "GAME EXAMPLE",
-    "exampleFlare": "Example flare. Real NASA flare data comes next."
+    "exampleFlare": "No real flare data yet. Run npm run fetch-nasa.",
+    "live": "LIVE NASA DATA",
+    "saved": "SAVED REAL NASA DATA ({date})"
+  },
+  "map": {
+    "prompt": "Space / Tap to enter",
+    "hub": "You are in the hub.",
+    "hint": "Tap a room, or walk with the arrow keys or WASD.",
+    "hintTouch": "Tap a room, or drag the joystick."
+  },
+  "alert": {
+    "title": "ALERT: {title}",
+    "ready": "Ready!",
+    "seconds": "You have {n} seconds.",
+    "noTimer": "Calm mode: no timer today.",
+    "noTimePoints": "No Time Points in the alert. Fixes cost seconds and supplies.",
+    "planHelped": "Your plan already fixed: {list}",
+    "paused": "Paused",
+    "tapToGo": "Tap to keep going",
+    "jobs": "Alert jobs",
+    "takes": "{n} s",
+    "fix": "Fix",
+    "working": "Working… {n} s",
+    "stopped": "You left the room, so the work stopped.",
+    "busy": "Wait, you are already working.",
+    "allFixed": "All fixed! Great planning!",
+    "timeUp": "Time's up!",
+    "finish": "Finish the alert",
+    "status": {
+      "open": "Needs fixing",
+      "done": "Fixed",
+      "prepared": "Ready from your plan",
+      "decoy": "Old advice"
+    },
+    "retry": "Try the alert again",
+    "inRoom": "Go to the {room}",
+    "hud": "ALERT"
+  },
+  "settings": {
+    "button": "Settings",
+    "title": "Settings",
+    "timer": "Alert timer",
+    "normal": "Normal timer",
+    "double": "Calm: double time",
+    "off": "Calm: no timer",
+    "note": "Saved on this device only.",
+    "close": "Done"
+  },
+  "weather": {
+    "dust": "Dust {n} of {max}",
+    "flare": "Flare class {cls} tonight"
   }
 }

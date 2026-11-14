@@ -90,6 +90,49 @@ export type DayDef = {
   discussion: string;
 };
 
+// ---------------------------------------------------------------------------
+// Alerts (src/data/alerts.json)
+
+export type AlertThreat = {
+  id: string;
+  room: RoomId;
+  task: string;
+  /** Real seconds of work to fix it. */
+  work: number;
+  cost: Amounts;
+  /** Extra gain when fixed (e.g. +1 shield). */
+  gain?: Amounts;
+  /** What happens if it is not fixed by the end of the alert. */
+  effect: Amounts;
+  /** Already fixed if one of these actions was done in the plan. */
+  preparedBy?: string[];
+  /** Already fixed if this is true when the alert starts. */
+  preparedIf?: "shieldVsFlare";
+  preparedText?: string;
+  /** Old advice: fixing it does nothing useful (Sol 6). */
+  decoy?: boolean;
+  missText: string;
+  savedText: string;
+};
+
+export type AlertDef = {
+  title: string;
+  duration: number;
+  problem: string;
+  goal: string;
+  afterNote?: string;
+  threats: AlertThreat[];
+};
+
+export type AlertsConfig = {
+  actionWorkSeconds: number;
+  reactionSlackSeconds: number;
+  days: Record<string, AlertDef>;
+};
+
+/** Alert progress, while the alert runs. */
+export type AlertState = { handled: string[]; prepared: string[] };
+
 /** A gain that is waiting for a later sol. */
 export type PendingGain = { sol: number; gain: Amounts; from: string };
 
@@ -102,7 +145,7 @@ export type Prediction = { sol: number; dayId: string; choice: string; right: bo
 
 export type GameState = {
   /** Save format version. Bump it when this shape changes. */
-  v: 2;
+  v: 3;
   /** Which mission day it is, 1-based. */
   sol: number;
   /** Day ids in play order (Step 8 shuffles the middle ones). */
@@ -131,6 +174,8 @@ export type GameState = {
   predictions: Prediction[];
   /** The state at the start of this sol, for "Retry this sol". */
   morning: Snapshot | null;
+  /** Set while the alert runs (and until the sol ends). */
+  alert: AlertState | null;
 };
 
 export type Snapshot = Omit<GameState, "morning">;
@@ -153,7 +198,8 @@ export type ReportLine =
   | { kind: "shieldFade"; change: Amounts }
   | { kind: "sun"; dust: number; change: Amounts }
   | { kind: "pending"; from: string; change: Amounts }
-  | { kind: "dustAdd"; change: Amounts };
+  | { kind: "dustAdd"; change: Amounts }
+  | { kind: "alert"; id: string; outcome: "saved" | "prepared" | "missed" | "decoy"; text: string; change: Amounts };
 
 export type PauseStat = "air" | "food" | "power" | "dose";
 
@@ -164,6 +210,8 @@ export type DayReport = {
   before: { power: number; air: number; food: number };
   after: { power: number; air: number; food: number };
   today: ReportLine[];
+  /** What the alert fixed or missed. */
+  alert: ReportLine[];
   night: ReportLine[];
   /** What tomorrow morning brings (sun, food from grow lights, dust). */
   tomorrow: ReportLine[];

@@ -132,3 +132,74 @@ became a real trade-off.
 Sol 1 has first-run tips with arrows (bars → rooms → buttons → End Sol).
 The flare is a labelled GAME EXAMPLE (class M) until Step 5 connects real
 DONKI data; the "real flare on <date>" card stays hidden until then.
+
+## The base map (top-down)
+
+The base is seen from above: **Power** (top), **Air** (left), **Greenhouse**
+(right), **Shield Shelter** (bottom), joined by a hub.
+
+- Walk with the **arrow keys or WASD**, **tap/click a room** to auto-walk,
+  or drag the **joystick** on touch screens. Walls and doors block you.
+- **Walking is free** and the same speed for everyone (it follows real time,
+  not frame rate). Actions still cost Time Points in the plan.
+- Near a door: a **"Space / Tap to enter"** prompt. Inside a room, its
+  action cards show in the bottom panel.
+- Each room has a live mini-indicator: battery level and today's sun power,
+  an O₂ gauge, plant size and colour for food, shield segments.
+- Dust shows as an orange tint, a coming flare as a pulsing red border with
+  "⚠"; both have a label (dust is GAME-SIZED; the flare is a GAME EXAMPLE
+  until real DONKI data is connected in Step 5).
+- Map shape, walls and walking speed: `src/game/map.ts`.
+
+## The ALERT (end of every plan)
+
+1. **Plan** (untimed): spend 6 Time Points as before.
+2. **Predict**, then the **alert banner** says the problem and the goal.
+   Nothing is timed until **Ready**.
+3. **Countdown** (big number + bar with ticks; dashed and "⚠" when ≤ 10 s).
+   Time Points do not apply: fixes cost **real seconds of work** plus the
+   Power/Air/Food shown on the card. Normal room actions take 6 s.
+4. Each alert has 3 problems in different rooms. You can fix **2, never all 3**,
+   so you choose which to save. One problem per day can be prevented in the
+   plan (shield already up, panels cleaned, grow lights on, air maker fixed);
+   good planning makes everything fixable.
+5. Time's up (or all fixed): the missed problems take effect, then the night,
+   the Day Report (with an "The alert" section) and the debrief. Missed
+   something? **Try the alert again** (from the alert's start).
+
+- The countdown **pauses** while any hint, popup, Settings or Earth's reply is
+  open, and when the tab is hidden. Leaving the room stops a fix in progress.
+- **Settings → Calm mode**: double time or no timer, saved in this browser.
+- Every number is in `src/data/alerts.json`: duration per day
+  (Sol 1–7: 60, 60, 45, 45, 45, 40, 35 s), work seconds, costs, effects.
+
+`npm run balance` now also plays every order of alert fixes after every plan,
+and an **alert timing** check proves for every start room: not everything can
+be fixed (even with instant reactions), at least one thing always can, and the
+plan-preparable problem makes the rest fit. To pay for alert losses, the Sun
+now makes 12 power per sol (was 10).
+
+## Real NASA data (Phase 1)
+
+Everything the game presents as *information* comes from a real NASA record,
+with its source and date. Game numbers (Power 8/20, Time Points…) are
+labelled GAME-SIZED because they are game rules, not measurements.
+
+    npm run fetch-nasa                      # save real data (DEMO_KEY)
+    NASA_API_KEY=yourkey npm run fetch-nasa # with your free api.nasa.gov key
+
+| Data | From | In the game | Live / saved |
+|---|---|---|---|
+| Solar flares (class, date) | DONKI notifications, api.nasa.gov | Flare day, debrief | live + saved |
+| Mars temperatures | InSight weather (mars.nasa.gov feed) | "Freezing nights" card | live + saved |
+| Mars radiation | OSDR RadLab, Curiosity RAD | "Radiation on Mars" card | saved (no browser access) |
+| Plant studies OSD-268/678/766 | OSDR | Weak-plants debrief | saved (no browser access) |
+| Picture of the day | APOD | title / end (Phase 4) | live + saved |
+| Facts (sol, trip, delay, MOXIE…) | NASA pages, checked 2026-11-14 | Notebook cards | in facts.json |
+
+Labels on screen: **LIVE NASA DATA**, **SAVED REAL NASA DATA (date)**, or —
+only if no real flare data exists yet — **GAME EXAMPLE** (never shown as real).
+Live calls give up after 1.5 s. Full list: `src/data/sources.json`.
+
+Optional: put `VITE_NASA_API_KEY=yourkey` in `.env.local` for more live calls
+(the key is visible in the built game).

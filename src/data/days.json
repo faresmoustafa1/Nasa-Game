@@ -44,7 +44,8 @@
         "why": "Every machine uses power. Power is like the base's money."
       },
       "factIds": [
-        "sol-length"
+        "sol-length",
+        "insight-cold"
       ],
       "glossary": [
         "sol",
@@ -143,12 +144,14 @@
       },
       "factIds": [
         "flare-classes",
-        "donki-flare"
+        "donki-flare",
+        "rad-surface"
       ],
       "glossary": [
         "solarFlare",
         "radiation",
-        "atmosphere"
+        "atmosphere",
+        "microGray"
       ],
       "discussion": "Why does Earth's air keep us safe? What would you pack for Mars?"
     },
@@ -196,7 +199,8 @@
         "why": "Plants need light to make food. On Mars, light costs power."
       },
       "factIds": [
-        "veggie-lettuce"
+        "osdr-light",
+        "osdr-tomato"
       ],
       "glossary": [],
       "discussion": "What do plants need to grow? Which of those is hard on Mars?"
@@ -242,7 +246,8 @@
         "why": "The crew breathes all day. A slow machine means less air."
       },
       "factIds": [
-        "moxie-oxygen"
+        "moxie-oxygen",
+        "thin-air"
       ],
       "glossary": [
         "oxygen"

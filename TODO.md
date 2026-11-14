@@ -2,29 +2,17 @@
 
 Nothing here is shown to players as fact until it is checked.
 
-## Fact cards (src/data/facts.json, all `checked: false`)
-Each needs its official NASA page opened, the wording checked, and
-`source_url` + `source_date` filled in:
-- [ ] sol-length: 24 h 39 min (science.nasa.gov/mars/facts/)
-- [ ] trip-length: "about 6 to 9 months" (needs a NASA page)
-- [ ] insight-dust: InSight stopped because of dust on its panels (2022)
-- [ ] flare-classes: C, M, X, each 10 times stronger
-- [ ] donki-flare: filled from a real DONKI record in Step 5
-- [ ] veggie-lettuce: astronauts ate space-grown lettuce (2015)
-- [ ] moxie-oxygen: MOXIE made oxygen from Mars air
-- [ ] signal-delay: 3 to 22 minutes one way
-- [ ] opportunity-storm: 2018 storm, Opportunity went silent
-
-## NASA endpoints (src/data/sources.json, all "not checked")
-Read the official docs before writing any fetch code (Step 5):
-- [ ] DONKI FLR / CME on api.nasa.gov: exact path, params, CORS
-- [ ] APOD on api.nasa.gov: exact path, params, CORS
-- [ ] OSDR: which public API, if any, works from a browser
-- [ ] Earth–Mars distance: JPL Horizons API (likely no CORS → compute from orbits instead?)
-- [ ] NASA Image and Video Library search API
-- [ ] Mars Rover Photos API: still running?
-- [ ] Mars weather: confirm there is no live public API (InSight ended 2022)
-- [ ] DEMO_KEY rate limits
+## Real NASA data
+- [x] All 15 fact cards checked against NASA pages (facts.json: source_url,
+      source_date, evidence, checked_on 2026-11-14).
+- [x] Saved: InSight weather, RadLab MSL-RAD, OSDR studies.
+- [ ] **Saved DONKI flares + APOD: blocked.** DEMO_KEY hit its limit
+      (HTTP 429, 10 calls/day). Run `NASA_API_KEY=… npm run fetch-nasa` with a
+      free key from https://api.nasa.gov/. Until then the flare is labelled
+      GAME EXAMPLE and the "real flare" card is hidden.
+- [ ] The direct CCMC DONKI service (kauai.ccmc.gsfc.nasa.gov) timed out from
+      this network; the game uses api.nasa.gov instead.
+- [ ] RadLab has Curiosity data from the Mars surface only (no cruise data).
 
 ## Game rules
 - [ ] Ask Earth wait is GAME-SIZED (10 s). Step 5: show today's real
@@ -33,6 +21,14 @@ Read the official docs before writing any fetch code (Step 5):
       choice (trust old advice or decide) and the storm finale polish.
 - [ ] "Mars nights are very cold" in the Day Report: add a real temperature
       value with a source in Step 5.
+
+## Map + alert
+- [ ] Movement was tested with keys, tap-to-walk, Space at a door and the
+      joystick, but only with the browser pane mostly hidden: check that
+      walking looks smooth on a real phone and tablet.
+- [ ] The balance checker plays alert fixes but not normal room actions
+      during the alert (they only help, so the check is on the safe side).
+- [ ] Alert texts (alerts.json) need the same reading-level pass as days.json.
 
 ## Game text
 - [ ] Reading-level pass on days.json (grade 2–4, ≤ 12 words a sentence)

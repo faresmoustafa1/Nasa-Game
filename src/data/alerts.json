@@ -1,10 +1,7 @@
 {
-  "_about": "The ALERT at the end of each sol's plan. A countdown (duration, in real seconds) starts when the player taps Ready. Time Points do not apply: walking costs walkSecondsPerRoom real seconds per room, each fix takes `work` seconds, and normal room actions take actionWorkSeconds. Each alert has 3 problems; the numbers are set so 2 can be fixed but never all 3 (a choice, not a speed test). A problem with preparedBy / preparedIf is already fixed if the player did that in the plan. effect = what happens if the problem is not fixed (GAME-SIZED). Check with: npm run balance.",
-
-  "walkSecondsPerRoom": 2,
+  "_about": "The ALERT at the end of each sol's plan. A countdown (duration, in real seconds) starts when the player taps Ready. Time Points do not apply: walking takes real seconds (same speed for everyone, about 2 s between rooms), each fix takes `work` seconds, and normal room actions take actionWorkSeconds. Each alert has 3 problems; the numbers are set so 2 can be fixed but never all 3 (a choice, not a speed test). A problem with preparedBy / preparedIf is already fixed if the player did that in the plan. effect = what happens if the problem is not fixed (GAME-SIZED). Check with: npm run balance.",
   "actionWorkSeconds": 6,
   "reactionSlackSeconds": 2,
-
   "days": {
     "settle": {
       "title": "Power dip",
@@ -12,79 +9,265 @@
       "problem": "Power dip! Three machines just switched off.",
       "goal": "You can restart two. Which matter most?",
       "threats": [
-        { "id": "airMaker", "room": "air", "task": "Restart the air maker", "work": 19, "cost": { "power": 1 }, "effect": { "air": -3 },
-          "missText": "The air maker stayed off.", "savedText": "The air maker is running again." },
-        { "id": "lamps", "room": "greenhouse", "task": "Restart the grow lamps", "work": 19, "cost": { "power": 1 }, "effect": { "food": -2 },
-          "missText": "The plants sat in the dark.", "savedText": "The grow lamps are back on." },
-        { "id": "heater", "room": "power", "task": "Restart the heater", "work": 19, "cost": { "power": 1 }, "effect": { "power": -3 },
-          "missText": "A cold restart drained the battery.", "savedText": "The heater is warm again." }
+        {
+          "id": "airMaker",
+          "room": "air",
+          "task": "Restart the air maker",
+          "work": 19,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "The air maker stayed off.",
+          "savedText": "The air maker is running again."
+        },
+        {
+          "id": "lamps",
+          "room": "greenhouse",
+          "task": "Restart the grow lamps",
+          "work": 19,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "food": -2
+          },
+          "missText": "The plants sat in the dark.",
+          "savedText": "The grow lamps are back on."
+        },
+        {
+          "id": "heater",
+          "room": "power",
+          "task": "Restart the heater",
+          "work": 19,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "power": -2
+          },
+          "missText": "A cold restart drained the battery.",
+          "savedText": "The heater is warm again."
+        }
       ]
     },
-
     "dust": {
       "title": "Dust on the panels",
       "duration": 60,
       "problem": "A dust gust! Dust is piling up fast.",
       "goal": "Brush the panels, or protect the machines.",
       "threats": [
-        { "id": "panels", "room": "power", "task": "Brush the panels", "work": 19, "cost": { "air": 1 }, "effect": { "dust": 1 },
-          "preparedBy": ["cleanPanels"], "preparedText": "You cleaned the panels this morning, so the gust slid off.",
-          "missText": "More dust stuck to the panels.", "savedText": "The panels are brushed clean." },
-        { "id": "filter", "room": "air", "task": "Change the air filter", "work": 19, "cost": { "power": 1 }, "effect": { "air": -2 },
-          "missText": "Dust clogged the air filter.", "savedText": "Fresh filter, fresh air." },
-        { "id": "door", "room": "greenhouse", "task": "Seal the greenhouse door", "work": 19, "cost": { "power": 1 }, "effect": { "food": -2 },
-          "missText": "Dust got on the plants.", "savedText": "The greenhouse door is sealed." }
+        {
+          "id": "panels",
+          "room": "power",
+          "task": "Brush the panels",
+          "work": 19,
+          "cost": {
+            "air": 1
+          },
+          "effect": {
+            "dust": 1
+          },
+          "preparedBy": [
+            "cleanPanels"
+          ],
+          "preparedText": "You cleaned the panels this morning, so the gust slid off.",
+          "missText": "More dust stuck to the panels.",
+          "savedText": "The panels are brushed clean."
+        },
+        {
+          "id": "filter",
+          "room": "air",
+          "task": "Change the air filter",
+          "work": 19,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "Dust clogged the air filter.",
+          "savedText": "Fresh filter, fresh air."
+        },
+        {
+          "id": "door",
+          "room": "greenhouse",
+          "task": "Seal the greenhouse door",
+          "work": 19,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "food": -2
+          },
+          "missText": "Dust got on the plants.",
+          "savedText": "The greenhouse door is sealed."
+        }
       ]
     },
-
     "flare": {
       "title": "Solar flare",
       "duration": 45,
       "problem": "Flare alert! Radiation reaches Mars when the timer ends.",
       "goal": "Boost the shield, or protect the plants and the air maker.",
       "threats": [
-        { "id": "shield", "room": "shelter", "task": "Boost the shield", "work": 14, "cost": { "power": 2 }, "gain": { "shield": 1 }, "effect": {},
-          "preparedIf": "shieldVsFlare", "preparedText": "Your shield is already as strong as the flare!",
-          "missText": "The shield stayed low.", "savedText": "The shield is stronger." },
-        { "id": "plants", "room": "greenhouse", "task": "Cover the plants", "work": 14, "cost": { "power": 1 }, "effect": { "food": -2 },
-          "missText": "Radiation hurt some plants.", "savedText": "The plants are covered." },
-        { "id": "airMaker", "room": "air", "task": "Shield the air maker", "work": 14, "cost": { "power": 1 }, "effect": { "air": -2 },
-          "missText": "Radiation upset the air maker.", "savedText": "The air maker is safe." }
+        {
+          "id": "shield",
+          "room": "shelter",
+          "task": "Boost the shield",
+          "work": 14,
+          "cost": {
+            "power": 2
+          },
+          "gain": {
+            "shield": 1
+          },
+          "effect": {},
+          "preparedIf": "shieldVsFlare",
+          "preparedText": "Your shield is already as strong as the flare!",
+          "missText": "The shield stayed low.",
+          "savedText": "The shield is stronger."
+        },
+        {
+          "id": "plants",
+          "room": "greenhouse",
+          "task": "Cover the plants",
+          "work": 14,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "food": -2
+          },
+          "missText": "Radiation hurt some plants.",
+          "savedText": "The plants are covered."
+        },
+        {
+          "id": "airMaker",
+          "room": "air",
+          "task": "Shield the air maker",
+          "work": 14,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "Radiation upset the air maker.",
+          "savedText": "The air maker is safe."
+        }
       ]
     },
-
     "plants": {
       "title": "Cold plants",
       "duration": 45,
       "problem": "A cold snap! The greenhouse is freezing.",
       "goal": "Warm the plants, or keep the rest of the base warm.",
       "threats": [
-        { "id": "warm", "room": "greenhouse", "task": "Heat the greenhouse", "work": 14, "cost": { "power": 2 }, "effect": { "food": -3 },
-          "preparedBy": ["growLights"], "preparedText": "The grow lights kept the plants warm.",
-          "missText": "Some plants froze.", "savedText": "The plants are cozy." },
-        { "id": "pipes", "room": "air", "task": "Warm the air maker", "work": 14, "cost": { "power": 1 }, "effect": { "air": -2 },
-          "missText": "The cold slowed the air maker.", "savedText": "The air maker stays warm." },
-        { "id": "soup", "room": "shelter", "task": "Make hot soup for the crew", "work": 14, "cost": { "food": 1 }, "effect": { "power": -3 },
-          "missText": "Cold crew, so the heaters worked extra hard.", "savedText": "Warm soup, warm crew!" }
+        {
+          "id": "warm",
+          "room": "greenhouse",
+          "task": "Heat the greenhouse",
+          "work": 14,
+          "cost": {
+            "power": 2
+          },
+          "effect": {
+            "food": -2
+          },
+          "preparedBy": [
+            "growLights"
+          ],
+          "preparedText": "The grow lights kept the plants warm.",
+          "missText": "Some plants froze.",
+          "savedText": "The plants are cozy."
+        },
+        {
+          "id": "pipes",
+          "room": "air",
+          "task": "Warm the air maker",
+          "work": 14,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "The cold slowed the air maker.",
+          "savedText": "The air maker stays warm."
+        },
+        {
+          "id": "soup",
+          "room": "shelter",
+          "task": "Make hot soup for the crew",
+          "work": 14,
+          "cost": {
+            "food": 1
+          },
+          "effect": {
+            "power": -2
+          },
+          "missText": "Cold crew, so the heaters worked extra hard.",
+          "savedText": "Warm soup, warm crew!"
+        }
       ]
     },
-
     "airmaker": {
       "title": "Air maker slows down",
       "duration": 45,
       "problem": "Air alarm! The air maker is slowing down.",
       "goal": "Fix it fast, or patch the leak and save power.",
       "threats": [
-        { "id": "fix", "room": "air", "task": "Fix the air maker fast", "work": 14, "cost": { "power": 1 }, "effect": { "air": -3 },
-          "preparedBy": ["fixAirMaker"], "preparedText": "You fixed the air maker this morning!",
-          "missText": "The air maker made less air.", "savedText": "The air maker is humming." },
-        { "id": "leak", "room": "shelter", "task": "Patch the air leak", "work": 14, "cost": { "power": 1 }, "effect": { "air": -2 },
-          "missText": "A little air leaked out.", "savedText": "The leak is patched." },
-        { "id": "battery", "room": "power", "task": "Switch to the spare battery", "work": 14, "cost": { "air": 1 }, "effect": { "power": -2 },
-          "missText": "The main battery lost some power.", "savedText": "The spare battery took over." }
+        {
+          "id": "fix",
+          "room": "air",
+          "task": "Fix the air maker fast",
+          "work": 14,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "preparedBy": [
+            "fixAirMaker"
+          ],
+          "preparedText": "You fixed the air maker this morning!",
+          "missText": "The air maker made less air.",
+          "savedText": "The air maker is humming."
+        },
+        {
+          "id": "leak",
+          "room": "shelter",
+          "task": "Patch the air leak",
+          "work": 14,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "A little air leaked out.",
+          "savedText": "The leak is patched."
+        },
+        {
+          "id": "battery",
+          "room": "power",
+          "task": "Switch to the spare battery",
+          "work": 14,
+          "cost": {
+            "air": 1
+          },
+          "effect": {
+            "power": -2
+          },
+          "missText": "The main battery lost some power.",
+          "savedText": "The spare battery took over."
+        }
       ]
     },
-
     "message": {
       "title": "Late message",
       "duration": 40,
@@ -92,27 +275,100 @@
       "goal": "It left Earth minutes ago. Trust it, or fix what is broken now?",
       "afterNote": "The flare Earth saw already passed. Their message was old by the time it arrived.",
       "threats": [
-        { "id": "shield", "room": "shelter", "task": "Raise the shield (Earth said so)", "work": 13, "cost": { "power": 2 }, "gain": { "shield": 1 }, "effect": {}, "decoy": true,
-          "missText": "You skipped the old advice.", "savedText": "You raised the shield, just in case." },
-        { "id": "pump", "room": "greenhouse", "task": "Fix the water pump", "work": 20, "cost": { "power": 1 }, "effect": { "food": -3 },
-          "missText": "The plants got thirsty.", "savedText": "The water pump works again." },
-        { "id": "vents", "room": "air", "task": "Unclog the air vents", "work": 20, "cost": { "power": 1 }, "effect": { "air": -2 },
-          "missText": "The vents stayed clogged.", "savedText": "The vents are clear." }
+        {
+          "id": "shield",
+          "room": "shelter",
+          "task": "Raise the shield (Earth said so)",
+          "work": 13,
+          "cost": {
+            "power": 2
+          },
+          "gain": {
+            "shield": 1
+          },
+          "effect": {},
+          "decoy": true,
+          "missText": "You skipped the old advice.",
+          "savedText": "You raised the shield, just in case."
+        },
+        {
+          "id": "pump",
+          "room": "greenhouse",
+          "task": "Fix the water pump",
+          "work": 20,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "food": -2
+          },
+          "missText": "The plants got thirsty.",
+          "savedText": "The water pump works again."
+        },
+        {
+          "id": "vents",
+          "room": "air",
+          "task": "Unclog the air vents",
+          "work": 20,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "The vents stayed clogged.",
+          "savedText": "The vents are clear."
+        }
       ]
     },
-
     "storm": {
       "title": "Big dust storm",
       "duration": 35,
       "problem": "The big storm hits! Everything is in danger.",
       "goal": "Save power, air or food. You cannot save all three.",
       "threats": [
-        { "id": "panels", "room": "power", "task": "Lock the solar panels", "work": 12, "cost": { "air": 1 }, "effect": { "power": -3 },
-          "missText": "The storm shook the panels loose.", "savedText": "The panels are locked down." },
-        { "id": "air", "room": "air", "task": "Seal the air maker", "work": 12, "cost": { "power": 1 }, "effect": { "air": -3 },
-          "missText": "Storm dust got into the air maker.", "savedText": "The air maker is sealed." },
-        { "id": "food", "room": "greenhouse", "task": "Cover the greenhouse", "work": 12, "cost": { "power": 1 }, "effect": { "food": -3 },
-          "missText": "The storm battered the greenhouse.", "savedText": "The greenhouse is covered." }
+        {
+          "id": "panels",
+          "room": "power",
+          "task": "Lock the solar panels",
+          "work": 12,
+          "cost": {
+            "air": 1
+          },
+          "effect": {
+            "power": -2
+          },
+          "missText": "The storm shook the panels loose.",
+          "savedText": "The panels are locked down."
+        },
+        {
+          "id": "air",
+          "room": "air",
+          "task": "Seal the air maker",
+          "work": 12,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "air": -2
+          },
+          "missText": "Storm dust got into the air maker.",
+          "savedText": "The air maker is sealed."
+        },
+        {
+          "id": "food",
+          "room": "greenhouse",
+          "task": "Cover the greenhouse",
+          "work": 12,
+          "cost": {
+            "power": 1
+          },
+          "effect": {
+            "food": -2
+          },
+          "missText": "The storm battered the greenhouse.",
+          "savedText": "The greenhouse is covered."
+        }
       ]
     }
   }

@@ -16,25 +16,41 @@
 // every count (power, air, food, science, shield, dust, dose, food on the way).
 // Earlier sols feed later ones: only best outcomes are carried forward.
 //
-// Exit code 1 if any sol is UNWINNABLE or DOMINANT.
+// ALERTS (src/data/alerts.json) are played too: after each plan, every order
+// of fixes that fits in the countdown (walking time from the map + work time
+// + a reaction slack per fix). A separate ALERT TIMING check proves, for every
+// start room, that:
+//   trade-off  not every problem can be fixed in time (even with 0 slack)
+//   fair       at least one problem can always be fixed
+//   plan helps with the plan-preparable problem done, the rest all fit
+//
+// Exit code 1 if any sol is UNWINNABLE or DOMINANT, or an alert fails
+// trade-off / fair.
 
 import balanceJson from "../src/data/balance.json";
 import daysJson from "../src/data/days.json";
 import flareJson from "../src/data/flare-table.json";
+import alertsJson from "../src/data/alerts.json";
 import {
   actionCheck,
   actionsInRoom,
+  alertDoTask,
+  alertTaskCheck,
+  beginAlert,
   doAction,
   endSol,
   newGame,
+  resolveAlert,
   walk,
 } from "../src/game/engine";
-import type { BalanceConfig, DayDef, GameState, RoomId, RunInfo } from "../src/game/types";
+import { walkSeconds } from "../src/game/map";
+import type { AlertDef, AlertsConfig, BalanceConfig, DayDef, GameState, ReportLine, RoomId, RunInfo } from "../src/game/types";
 
 const cfg = balanceJson as unknown as BalanceConfig;
 const allDays = daysJson.days as unknown as DayDef[];
 const ROOMS: RoomId[] = ["power", "air", "greenhouse", "shelter"];
-let MAX_STARTS = 250;
+const alerts = alertsJson as unknown as AlertsConfig;
+let MAX_STARTS = 120;
 
 const args = process.argv.slice(2);
 const allOrders = args.includes("--all-orders");
@@ -99,13 +115,37 @@ function paretoFront<T extends { vec: number[] }>(items: T[]): T[] {
   return list.filter((a) => !list.some((b) => b !== a && dominates(b.vec, a.vec)));
 }
 
+/** Every order of alert fixes that fits in the countdown, from the plan's end state. */
+function alertPlans(s: GameState, def: AlertDef, run: RunInfo): { state: GameState; lines: ReportLine[] }[] {
+  const started = beginAlert(s, def, run);
+  const open = def.threats.filter((t) => !started.alert!.prepared.includes(t.id));
+  const ends: GameState[] = [];
+  const dfs = (st: GameState, room: RoomId, used: number, done: string[]) => {
+    ends.push(st);
+    for (const t of open) {
+      if (done.includes(t.id)) continue;
+      const need = used + walkSeconds(room, t.room) + t.work + alerts.reactionSlackSeconds;
+      if (need > def.duration) continue;
+      const at = { ...st, room: t.room };
+      if (!alertTaskCheck(at, def, t.id).ok) continue;
+      dfs(alertDoTask(cfg, at, def, t.id), t.room, need, [...done, t.id]);
+    }
+  };
+  dfs(started, s.room, 0, []);
+  return ends.map((e) => resolveAlert(cfg, e, def));
+}
+
 function outcomes(start: GameState, today: DayDef, next: DayDef | null, run: RunInfo): Outcome[] {
   const out: Outcome[] = [];
+  const def = alerts.days[today.id] ?? null;
   for (const s of reachable(start)) {
-    const r = endSol(cfg, s, today, next, run);
-    if (r.report.paused) continue;
-    const after = r.next ?? r.night;
-    out.push({ vec: vector(after), strategy: strategyOf(s), next: after });
+    const ends = def ? alertPlans(s, def, run) : [{ state: s, lines: [] as ReportLine[] }];
+    for (const e of ends) {
+      const r = endSol(cfg, e.state, today, next, run, e.lines);
+      if (r.report.paused) continue;
+      const after = r.next ?? r.night;
+      out.push({ vec: vector(after), strategy: strategyOf(s), next: after });
+    }
   }
   return out;
 }
@@ -235,5 +275,46 @@ if (allOrders) {
   }
 }
 
-console.log(problems ? `\n${problems} problem(s) found.` : "\nNo unwinnable or one-answer sols. ✓");
+// ---------------------------------------------------------------------------
+// Alert timing: can't fix everything, can always fix something, planning helps.
+
+console.log("\n=== Alert timing (seconds; walking from the map, same speed for all) ===");
+for (const day of fileOrder) {
+  const def = alerts.days[day.id];
+  if (!def) continue;
+  const real = def.threats.filter((t) => !t.decoy);
+  const maxFix = (start: RoomId, list: typeof def.threats, slack: number) => {
+    let best = 0;
+    const dfs = (room: RoomId, used: number, done: string[]) => {
+      best = Math.max(best, done.filter((id) => real.some((t) => t.id === id)).length);
+      for (const t of list) {
+        if (done.includes(t.id)) continue;
+        const need = used + walkSeconds(room, t.room) + t.work + slack;
+        if (need <= def.duration) dfs(t.room, need, [...done, t.id]);
+      }
+    };
+    dfs(start, 0, []);
+    return best;
+  };
+  const prepable = real.filter((t) => t.preparedBy || t.preparedIf);
+  const rows = ROOMS.map((start) => {
+    const fast = maxFix(start, real, 0);
+    const normal = maxFix(start, real, alerts.reactionSlackSeconds);
+    const rest = real.filter((t) => !prepable.includes(t));
+    const helped = prepable.length ? maxFix(start, rest, alerts.reactionSlackSeconds) === rest.length : false;
+    return { start, fast, normal, helped };
+  });
+  const tradeOff = rows.every((r) => r.fast < real.length);
+  const fair = rows.every((r) => r.normal >= 1);
+  const helps = prepable.length === 0 || rows.some((r) => r.helped);
+  if (!tradeOff || !fair) problems++;
+  console.log(
+    `${day.id.padEnd(9)} ${String(def.duration).padStart(2)}s  ` +
+      `${tradeOff ? "trade-off ok" : "TOO EASY (all fixable)"}  ${fair ? "fair" : "UNFAIR (nothing fixable)"}  ` +
+      `${prepable.length ? (helps ? "plan helps ✓" : "plan does not help") : "no plan prep"}   ` +
+      rows.map((r) => `${r.start}: ${r.normal}/${real.length}${r.fast > r.normal ? ` (${r.fast} if instant)` : ""}`).join(", "),
+  );
+}
+
+console.log(problems ? `\n${problems} problem(s) found.` : "\nNo unwinnable or one-answer sols, and every alert is a real trade-off. ✓");
 process.exit(problems ? 1 : 0);

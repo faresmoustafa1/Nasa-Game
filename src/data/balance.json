@@ -20,14 +20,14 @@
   "day": {
     "_about": "solarPowerPerDay is made each morning, minus dustPowerLossPerLevel for every level of dust on the panels. crew*/nightHeatPower are used up each night.",
     "timePoints": 6,
-    "solarPowerPerDay": 10,
+    "solarPowerPerDay": 12,
     "dustPowerLossPerLevel": 2,
     "crewAirPerDay": 3,
     "crewFoodPerDay": 2,
     "nightHeatPower": 2
   },
 
-  "walk": { "time": 1 },
+  "walk": { "_about": "Walking is free (0 Time Points). Actions still cost Time Points.", "time": 0 },
 
   "shield": { "max": 3, "dropPerDay": 1 },
 

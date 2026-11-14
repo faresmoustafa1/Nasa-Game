@@ -1,6 +1,10 @@
 import { useState } from "react";
 import Prologue from "./prologue/Prologue";
 import BaseScreen from "./base/BaseScreen";
+import { refreshNasa } from "./game/nasa";
+
+// Live NASA calls start right away (1.5 s timeout each, then saved real data).
+void refreshNasa();
 
 type Scene = "title" | "prologue" | "base";
 

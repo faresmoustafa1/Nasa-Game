@@ -1,0 +1,40 @@
+{
+  "source": "NASA Open Science Data Repository (OSDR)",
+  "docs": "https://osdr.nasa.gov/bio/repo/",
+  "fetchedAt": "2026-11-14T01:06:45.538Z",
+  "studies": [
+    {
+      "id": "OSD-268",
+      "title": "Microbiological and nutritional analysis of lettuce crops grown on the International Space Station-VEG01B",
+      "description": "Lettuce crops grown in the Veggie payload aboard ISS, harvested and returned for chemical, microbiological and molecular analysis",
+      "mission": "SpaceX-3",
+      "missionStart": "04/18/2014",
+      "missionEnd": "05/18/2014",
+      "releaseDate": "2020-02-21",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-268",
+      "request": "https://osdr.nasa.gov/osdr/data/search?term=OSD-268&type=cgene&size=5"
+    },
+    {
+      "id": "OSD-678",
+      "title": "Light has a principal role in the Arabidopsis transcriptomic response to the spaceflight environment",
+      "description": "The Characterizing Arabidopsis Root Attractions (CARA) spaceflight experiment provides comparative transcriptome analyses of plants grown in both light and dark conditions within the same spaceflight. CARA compared three genotypes of Arabidopsis grown in ambient light and in the dark on board the International Space Station (ISS); Col-0, Ws, and phyD, a phytochrome D mutant in the Col-0 background. In all genotypes, leaves responded to spaceflight with a higher number of differentially expressed genes (DEGs) than root tips, and each genotype displayed distinct light / dark transcriptomic patterns that were unique to the spaceflight environment. The Col-0 leaves exhibited a substantial dichotomy, with ten-times as many spaceflight DEGs exhibited in light-grown plants versus dark-grown plants. Although the total number of DEGs in phyD leaves is not very different from Col-0, phyD altered the manner in which light-grown leaves respond to spaceflight, and many genes associated with the physiological adaptation of Col-0 to spaceflight were not represented. This result is in contrast to root tips, where a previous CARA study showed that phyD substantially reduced the number of DEGs. There were few DEGs, but a series of space-altered gene categories, common to genotypes and lighting conditions. This commonality indicates that key spaceflight genes are associated with signal transduction for light, defense, and oxidative stress responses. However, these key signaling pathways enriched from DEGs showed opposite regulatory direction in response to spaceflight under light and dark conditions, suggesting a complex interaction between light as a signal, and light-signaling genes in acclimation to spaceflight.",
+      "mission": "SpaceX-3",
+      "missionStart": "04/18/2014",
+      "missionEnd": "05/18/2014",
+      "releaseDate": "2023-12-20",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-678",
+      "request": "https://osdr.nasa.gov/osdr/data/search?term=OSD-678&type=cgene&size=5"
+    },
+    {
+      "id": "OSD-766",
+      "title": "The microbial communities of a tomato crop grown in Veggie under different lighting regimes on the International Space Station",
+      "description": "The VEG-05 experiment was conducted on ISS between 12/14/2022-3/24/2023 (101 days) to investigate tomato-growth responses and plant-microbiome differences due to two lighting recipes:  90%R:10%B as the “red-rich” treatment and 50%R:50%B as the “blue-rich” treatment.  A ground control was performed in controlled environment chambers at Kennedy Space Center providing. After a 48-hour delay, CO2 concentrations, relative humidity and temperature from data downlinked on the ISS were configured to run in the ground control growth chamber.  To capture humidity and temperature inside of the Veggie units, HOBO data loggers (Onset Computer Corporation, Bourne, MA) were installed. Before initiation of the VEG-05 experiment, verification ground testing was performed at Kennedy Space Center in the previously mentioned controlled-environment chambers providing ISS-comparable temperatures, relative humidity, and CO2 to help determine watering requirements for the duration of the 101-day experiments. When the tomato plants matured and fruited, three harvests were planned at day 83, 90, and 100 if tomato fruit were present. Other fruit that detached in between these periods were also saved. Water stress in plants led to flower and fruit loss. In total, from the five-surviving red-rich lighted plants in flight, only five ripe fruits were produced, and from the four-surviving blue-rich lighted flight plants, 10 fruit were produced with only six of those ripe by day 100. Additional samples were collected including surface swabs, leaves, and roots and pillow materials from two plant pillows per treatment that were frozen and returned.",
+      "mission": "SpaceX-26",
+      "missionStart": "11/26/2022",
+      "missionEnd": "01/09/2023",
+      "releaseDate": "2026-05-21",
+      "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-766",
+      "request": "https://osdr.nasa.gov/osdr/data/search?term=OSD-766&type=cgene&size=5"
+    }
+  ]
+}

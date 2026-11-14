@@ -1,0 +1,86 @@
+{
+  "source": "NASA InSight Mars lander weather (TWINS + PS sensors)",
+  "docs": "https://api.nasa.gov/ (InSight: Mars Weather Service API) · https://mars.nasa.gov/insight/weather/",
+  "place": "Elysium Planitia, Mars",
+  "fetchedAt": "2026-11-14T01:06:45.538Z",
+  "request": "https://mars.nasa.gov/rss/api/?feed=weather&category=insight_temperature&feedtype=json&ver=1.0",
+  "sols": [
+    {
+      "sol": 675,
+      "firstUTC": "2020-10-19T18:32:20Z",
+      "lastUTC": "2020-10-20T19:11:55Z",
+      "season": "fall",
+      "tempMinC": -96.872,
+      "tempMaxC": -15.908,
+      "tempAvgC": -62.314,
+      "pressureAvgPa": 750.563,
+      "windAvgMs": 7.233
+    },
+    {
+      "sol": 676,
+      "firstUTC": "2020-10-20T19:11:55Z",
+      "lastUTC": "2020-10-21T19:51:31Z",
+      "season": "fall",
+      "tempMinC": -96.912,
+      "tempMaxC": -16.499,
+      "tempAvgC": -62.812,
+      "pressureAvgPa": 749.09,
+      "windAvgMs": 8.526
+    },
+    {
+      "sol": 677,
+      "firstUTC": "2020-10-21T19:51:31Z",
+      "lastUTC": "2020-10-22T20:31:06Z",
+      "season": "fall",
+      "tempMinC": -97.249,
+      "tempMaxC": -16.853,
+      "tempAvgC": -63.056,
+      "pressureAvgPa": 748.698,
+      "windAvgMs": 7.887
+    },
+    {
+      "sol": 678,
+      "firstUTC": "2020-10-22T20:31:06Z",
+      "lastUTC": "2020-10-23T21:10:41Z",
+      "season": "fall",
+      "tempMinC": -97.728,
+      "tempMaxC": -9.055,
+      "tempAvgC": -62.562,
+      "pressureAvgPa": 743.741,
+      "windAvgMs": 5.246
+    },
+    {
+      "sol": 679,
+      "firstUTC": "2020-10-23T21:10:41Z",
+      "lastUTC": "2020-10-24T21:50:16Z",
+      "season": "fall",
+      "tempMinC": -96.644,
+      "tempMaxC": -11.561,
+      "tempAvgC": -62.551,
+      "pressureAvgPa": 744.529,
+      "windAvgMs": 5.565
+    },
+    {
+      "sol": 680,
+      "firstUTC": "2020-10-24T21:50:16Z",
+      "lastUTC": "2020-10-25T22:29:51Z",
+      "season": "fall",
+      "tempMinC": -96.811,
+      "tempMaxC": -15.298,
+      "tempAvgC": -61.789,
+      "pressureAvgPa": 743.99,
+      "windAvgMs": 6.517
+    },
+    {
+      "sol": 681,
+      "firstUTC": "2020-10-25T22:29:51Z",
+      "lastUTC": "2020-10-26T23:09:26Z",
+      "season": "fall",
+      "tempMinC": -95.447,
+      "tempMaxC": -4.444,
+      "tempAvgC": -62.434,
+      "pressureAvgPa": 743.55,
+      "windAvgMs": 5.632
+    }
+  ]
+}
