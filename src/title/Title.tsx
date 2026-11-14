@@ -256,7 +256,7 @@ export default function Title({
                 For judges ▸
               </button>
               {dev && (
-                <button type="button" className="title__dev" onClick={() => setView("jump")}>
+                <button type="button" className="title__dev title__jump-btn" onClick={() => setView("jump")}>
                   Jump to a scene
                 </button>
               )}
