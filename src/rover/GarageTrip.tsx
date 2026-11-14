@@ -17,7 +17,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Astronaut, Boy } from "../game/art";
 import { NoteLayer } from "../game/notes";
 import type { SceneNote } from "../game/notes";
-import { applySteps } from "../game/state";
+import { addDecision, applySteps } from "../game/state";
 import type { GameState, Level } from "../game/state";
 import Tablet from "../game/Tablet";
 import { useTimeline } from "../game/useTimeline";
@@ -83,7 +83,12 @@ export default function GarageTrip({ game, onDone }: Props) {
     const paid = applySteps(game, [{ key: "power", delta: -g.power, at: 0 }]);
     const short = coldExtra(cold, level);
     const line = `Garage: ${reading.temp} °C (${COLD_NAME[cold]}), picked ${g.name.toLowerCase()}${short ? `, cold battery +${short} Power per sample` : ""}`;
-    setGeared({ ...paid, log: [...paid.log, line] });
+    setGeared(
+      addDecision(
+        { ...paid, log: [...paid.log, line] },
+        { what: `Garage heater: ${g.name.toLowerCase()}`, effect: `Power −${g.power}${short ? `, still cold: each sample +${short} Power` : ", the battery stays warm"}`, mark: short ? "cost" : "ok" },
+      ),
+    );
     setGear({ level, at: t });
     setPhase("geared");
   };
@@ -143,6 +148,7 @@ export default function GarageTrip({ game, onDone }: Props) {
         from: 0,
         to: 9999,
         kind: "radio",
+        noNav: true,
         title: "Weather report",
         text: `Perseverance's weather station measured ${reading.temp} °C at Jezero (${reading.when}). That is ${COLD_NAME[cold]}! Cold batteries run down fast. Pick a heater for his suit and the rover.`,
         source: WEATHER_SOURCE,
@@ -190,8 +196,8 @@ export default function GarageTrip({ game, onDone }: Props) {
             </g>
           </BaseArt>
         </div>
-        <NoteLayer notes={notes} t={phase === "back" ? 1 : t} />
-        <Tablet meters={shown.meters} locked={shown.locked} crew={shown.crew} nudge={phase === "geared" && t < (gear?.at ?? 0) + 1.6 ? ["power"] : []} />
+        <NoteLayer notes={notes} t={phase === "back" ? 1 : t} selfNav />
+        <Tablet meters={shown.meters} locked={shown.locked} crew={shown.crew} decisions={shown.decisions} nudge={phase === "geared" && t < (gear?.at ?? 0) + 1.6 ? ["power"] : []} />
 
         <GarageCloseup
           on={phase === "gear" || phase === "geared"}

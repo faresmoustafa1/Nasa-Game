@@ -210,3 +210,24 @@ Shared by every Mars scene (src/game):
 - The final grass shot was removed.
 - **◂ ▸ icons only appear in story scenes** (prologue, cruise, landing, the night's story notes). Scenes where the player
   moves on by making a choice (greenhouse, garage, rover, storm, pipes puzzle, tablet, crowning) have no icons. Exception: the hub's first-visit story notes ("Two jobs today…", "The plants need water…") keep ◂ ▸, because they are read-along; the notes after you pick a room have none.
+
+## Phase 9c: arrows in the rover, "Your choices" on the tablet, badge cut-offs
+
+- **Rover ◂ ▸:** the rover's read-along boxes (intro, Earth's reply, Jezero and Opportunity facts, the hint, the "rock collected" box) have ◂ ▸.
+  The three boxes that ask for a decision have none: the dust storm warning, "Message sent", and the science team's rock request (`noNav` on those notes).
+  In this scene ▸ hides the box and ◂ brings the one before it back; the scene clock is never touched (`selfNav` in `NoteLayer`).
+- **Your choices (the tablet):** `GameState.decisions` records every choice with its consequence (hub order, greenhouse water and light, garage heater, wait or go, each rover stop, storm shield).
+  It is shown under the meters on the Crew Tablet in every Mars scene, newest on top of the view, and can be collapsed.
+  A rover trip to the wrong rock gets an orange ✗ and a "WRONG ROCK" tag, and says which rock the team needed. The result screen's "What you chose" uses the same list.
+- Delta top and Delta foot moved right a little on the rover map so the longer tablet never covers them.
+- **Badges:** Gold 30+, Silver 25–29, Bronze under 25 (from the balance check). The result screen now shows the three cut-offs, which one you got,
+  and how many points are missing for the next one.
+
+### Phase 9d: more rover arrows, countdown sound
+
+- ◂ ▸ now also on the "Message sent" box (the wait for Earth) and on the garage's "Just right!", "Cold Mars" and "Home safe" boxes.
+  Still none on the three boxes that ask for a decision: the weather report (heater), the dust storm warning (wait or go),
+  and the science team's rock request (where to drive).
+- Countdown sound: while the rover waits for Earth's reply, a tick plays every second, higher and doubled for the last three, then the chime (`tick` in `gameAudio.ts`; silent when Sound is off).
+- The science team's rock request ("Where is the LAVA rock?") now stays on screen until the player has chosen a destination and the rover reaches it.
+  The Jezero and Opportunity facts and the hint come after the first rock, not before the choice.

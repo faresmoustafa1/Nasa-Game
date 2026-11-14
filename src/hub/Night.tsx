@@ -212,7 +212,7 @@ export default function Night({ game, onDone, sound = true }: NightProps) {
 
         <NoteLayer notes={NIGHT_NOTES} t={t} nav={puzzleOpen ? undefined : { onBack, onNext }} />
 
-        <Tablet meters={shown.meters} locked={game.locked} crew={game.crew} nudge={nudge} />
+        <Tablet meters={shown.meters} locked={game.locked} crew={game.crew} decisions={game.decisions} nudge={nudge} />
 
         {usedBackup && (
           <p className="hubn__alert" role="alert">

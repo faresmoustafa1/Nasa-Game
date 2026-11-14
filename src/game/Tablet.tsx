@@ -5,9 +5,10 @@
 // Every row is a button: tap one and a short note slides out beside it.
 // (Colour never carries the meaning alone: each meter has its own icon and number.)
 
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { METER_LABEL, METER_MAX, crewFaces } from "./state";
-import type { Face, MeterKey, Meters, TabletFocus } from "./state";
+import type { Decision, Face, MeterKey, Meters, TabletFocus } from "./state";
 import { TABLET_NOTES } from "./tabletNotes";
 import type { TabletNote } from "./tabletNotes";
 import "./tablet.css";
@@ -45,6 +46,8 @@ type TabletProps = {
   locked?: number;
   /** Crew score, 0–6. */
   crew: number;
+  /** Every choice made so far, with its consequence. Shown under the meters in every Mars scene. */
+  decisions?: Decision[];
   /** The row whose note is open, if any. */
   focus?: TabletFocus | null;
   /** Rows to pulse ("tap me"). */
@@ -52,6 +55,47 @@ type TabletProps = {
   /** If given, rows are tappable. */
   onPick?: (row: TabletFocus) => void;
 };
+
+const MARK: Record<Decision["mark"], { icon: string; word: string }> = {
+  ok: { icon: "✓", word: "Good" },
+  cost: { icon: "!", word: "Cost" },
+  wrong: { icon: "✗", word: "Wrong rock" },
+  info: { icon: "•", word: "Plan" },
+};
+
+/** "Your choices": what you picked and what it caused. It stays on the tablet so choices always show their consequences. */
+function Choices({ decisions }: { decisions: Decision[] }) {
+  const [open, setOpen] = useState(true);
+  const list = useRef<HTMLOListElement>(null);
+  // Keep the newest choice in view.
+  useEffect(() => {
+    const el = list.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [decisions.length, open]);
+  return (
+    <div className="tablet__choices">
+      <button type="button" className="tablet__choices-head" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <span>YOUR CHOICES ({decisions.length})</span>
+        <span aria-hidden="true">{open ? "▾" : "▸"}</span>
+      </button>
+      {open && (
+        <ol className="tablet__choices-list" ref={list}>
+          {decisions.map((d, i) => (
+            <li key={i} className={`tablet__choice tablet__choice--${d.mark}${i === decisions.length - 1 ? " is-new" : ""}`}>
+              <span className="tablet__choice-mark" aria-label={MARK[d.mark].word}>
+                {MARK[d.mark].icon}
+              </span>
+              <span className="tablet__choice-body">
+                <b>{d.what}{d.mark === "wrong" && <em>WRONG ROCK</em>}</b>
+                <span>{d.effect}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
 
 function Note({ note }: { note: TabletNote }) {
   return (
@@ -62,7 +106,7 @@ function Note({ note }: { note: TabletNote }) {
   );
 }
 
-export default function Tablet({ meters, locked = 0, crew, focus = null, nudge = [], onPick }: TabletProps) {
+export default function Tablet({ meters, locked = 0, crew, decisions = [], focus = null, nudge = [], onPick }: TabletProps) {
   const keys: MeterKey[] = ["power", "water", "air"];
   const faces = crewFaces(crew);
   const usable = (k: MeterKey) => (k === "water" ? Math.max(0, meters.water - locked) : meters[k]);
@@ -112,6 +156,7 @@ export default function Tablet({ meters, locked = 0, crew, focus = null, nudge =
         </button>
         {focus === "crew" && <Note note={TABLET_NOTES.crew} />}
       </div>
+      {decisions.length > 0 && <Choices decisions={decisions} />}
     </aside>
   );
 }

@@ -394,7 +394,7 @@ export default function Greenhouse({ game, onDone, sound = true }: GreenhousePro
 
         <NoteLayer notes={notes} t={t} />
 
-        <Tablet meters={cur.meters} locked={cur.locked} crew={cur.crew} nudge={phase === "grow" || phase === "done" ? ["water", "power", "crew"] : []} />
+        <Tablet decisions={cur.decisions} meters={cur.meters} locked={cur.locked} crew={cur.crew} nudge={phase === "grow" || phase === "done" ? ["water", "power", "crew"] : []} />
 
         {planning && (
           <button type="button" className="ares__cta" onClick={grow}>

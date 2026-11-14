@@ -229,3 +229,29 @@
   color: #d9ffe9;
   font-weight: 800;
 }
+
+.res__tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.res__tiers li {
+  padding: 4px 12px;
+  border: 2px solid;
+  border-radius: 999px;
+  font-size: 14px;
+  opacity: 0.75;
+}
+.res__tiers li.is-you {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 800;
+}
+.res__next {
+  margin: 0 0 10px;
+  font-size: 14px;
+  opacity: 0.85;
+}

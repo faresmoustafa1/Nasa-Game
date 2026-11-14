@@ -25,6 +25,7 @@ import { useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import { JUDGE_DELAY_MIN, isJudge } from "../game/judge";
 import { earthMarsDelayMinutes } from "./delay";
+import { addDecision } from "../game/state";
 import { ADVICE_NOTE, DUST_NOTE, HINT_NOTE, INTRO_NOTE, JEZERO_FACT, OPPORTUNITY_FACT, choiceNote, missionNote, sampleNote, waitingNote } from "./notes";
 import { BASE_POS, MISSIONS, MISSION_POINTS, SITES, rockValue, sampleCap, sampleCost } from "./sites";
 import type { Site } from "./sites";
@@ -40,9 +41,9 @@ type RoverProps = {
 };
 
 const CHOICE_AT = 5.8;
+const NEVER_AT = 9999;
 const WAIT_SECONDS = 6; // the game's shortcut for the real delay
 const ADVICE_SECONDS = 4.5;
-const ROCK_SECONDS = 10;
 const DRIVE_MS = 2200;
 const SAMPLE_MS = 900;
 
@@ -85,6 +86,8 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const [done, setDone] = useState<string[]>([]);
   const [pose, setPose] = useState<Pose>({ x: BASE_POS.x, y: BASE_POS.y, rot: 180 });
   const [last, setLast] = useState<{ at: number; text: string } | null>(null);
+  /** The second the first rock was collected. Until then Mission Control's rock request stays on screen. */
+  const [firstRockAt, setFirstRockAt] = useState<number | null>(null);
   const clock = useRef(0);
   useEffect(() => {
     clock.current = t;
@@ -95,7 +98,6 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const picking = decision?.kind === "go" || waitDone;
   const pickAt = decision ? (decision.kind === "go" ? decision.at : decision.at + WAIT_SECONDS) : 0;
   const rockAt = waited ? pickAt + ADVICE_SECONDS : pickAt;
-  const factsAt = rockAt + ROCK_SECONDS;
   const mission = MISSIONS[game.bonusSite];
   const tired = cur.crew <= 2;
   const cap = sampleCap(first, waited);
@@ -123,7 +125,12 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const sec = Math.floor(t);
   useEffect(() => {
     if (sec === Math.floor(CHOICE_AT)) audioRef.current?.blip(660);
-    if (decision?.kind === "wait" && sec === Math.floor(decision.at + WAIT_SECONDS)) audioRef.current?.chime();
+    if (decision?.kind === "wait") {
+      // Countdown: a tick every second, sharper for the last three, then the chime when Earth answers.
+      const left = Math.ceil(decision.at + WAIT_SECONDS - sec);
+      if (sec === Math.floor(decision.at + WAIT_SECONDS)) audioRef.current?.chime();
+      else if (left >= 1 && left <= WAIT_SECONDS) audioRef.current?.tick(left <= 3);
+    }
   }, [sec, decision]);
 
   const decide = useCallback(
@@ -131,8 +138,16 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
       if (decision) return;
       audioRef.current?.blip(kind === "wait" ? 560 : 760);
       setDecision({ kind, at: t });
+      setCur((c) =>
+        addDecision(
+          c,
+          kind === "wait"
+            ? { what: "Rover: waited for Earth", effect: `Trips cost 1 less Power, but 1 rock fewer (a ${Math.max(2, Math.round(delay * 2))}-minute wait in real life)`, mark: "info" }
+            : { what: "Rover: went right away", effect: "Full price, more rocks, no advice from Earth", mark: "info" },
+        ),
+      );
     },
-    [decision, t],
+    [decision, t, delay],
   );
 
   /** Drive out, take the sample, drive back. */
@@ -155,8 +170,15 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
           setPose(along(site, 1, false));
           if (!sampled) {
             sampled = true;
-            setCur((c) => applySample(c, cost, value));
+            setCur((c) =>
+              addDecision(applySample(c, cost, value), {
+                what: `Rover → ${site.name}`,
+                effect: special ? `${site.rock}: the one the team needed! +${MISSION_POINTS} ★ extra` : `${site.rock}: not the one the team asked for (they needed ${mission.need})`,
+                mark: special ? "ok" : "wrong",
+              }),
+            );
             setDone((d) => [...d, site.id]);
+            setFirstRockAt((f) => f ?? clock.current);
             setLast({
               at: clock.current,
               text: special
@@ -192,9 +214,15 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
     if (capped) return [DUST_NOTE];
     const list: SceneNote[] = [];
     if (waited) list.push({ ...ADVICE_NOTE, from: pickAt, to: pickAt + ADVICE_SECONDS });
-    list.push(missionNote(mission, rockAt, factsAt), JEZERO_FACT(factsAt), OPPORTUNITY_FACT(factsAt), HINT_NOTE(factsAt));
+    if (firstRockAt === null) {
+      // The rock request stays until the player has chosen a destination and the rover gets there.
+      list.push({ ...missionNote(mission, rockAt, rockAt), to: NEVER_AT });
+    } else {
+      const at = firstRockAt + 3.2; // after the "rock collected" box
+      list.push(JEZERO_FACT(at), OPPORTUNITY_FACT(at), HINT_NOTE(at));
+    }
     return list;
-  }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, factsAt, mission]);
+  }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, firstRockAt, mission]);
 
   const dust = Math.min(1, 0.12 + (picking ? gained / cap : 0) * 0.8 + (decision ? 0.08 : 0));
   const canPick = picking && busy === null && !capped;
@@ -327,9 +355,9 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
           </g>
         </svg>
 
-        <NoteLayer notes={notes} t={t} />
+        <NoteLayer notes={notes} t={t} selfNav />
 
-        <Tablet meters={cur.meters} locked={cur.locked} crew={cur.crew} nudge={busy !== null ? ["power", "air"] : []} />
+        <Tablet decisions={cur.decisions} meters={cur.meters} locked={cur.locked} crew={cur.crew} nudge={busy !== null ? ["power", "air"] : []} />
 
         {picking && (
           <div className="rover__jars" aria-label={`Rocks collected: ${gained} of ${cap}`}>

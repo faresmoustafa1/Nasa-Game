@@ -17,6 +17,8 @@ export type GameAudio = {
   alarm: () => void;
   /** A burst of radio static (a message that did not get through). */
   crackle: () => void;
+  /** One tick of a countdown; `last` makes the final seconds higher and sharper. */
+  tick: (last?: boolean) => void;
   /** A happy two-note chime. */
   chime: () => void;
   /** A short trumpet-like fanfare (the crowning). */
@@ -38,6 +40,7 @@ const SILENT: GameAudio = {
   thump: () => {},
   creak: () => {},
   blip: () => {},
+  tick: () => {},
   chime: () => {},
   fanfare: () => {},
   alarm: () => {},
@@ -177,6 +180,14 @@ export function createGameAudio(): GameAudio {
     blip: (freq = 760) =>
       safely(() => {
         tone(freq, ctx.currentTime, 0.14, 0.06);
+      }),
+
+    tick: (last = false) =>
+      safely(() => {
+        const now = ctx.currentTime;
+        // A short wooden "tock"; the last seconds are higher and double up.
+        tone(last ? 1320 : 880, now, 0.09, last ? 0.09 : 0.06, "square");
+        if (last) tone(1320, now + 0.14, 0.09, 0.07, "square");
       }),
 
     chime: () =>

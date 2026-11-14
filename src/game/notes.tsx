@@ -11,6 +11,8 @@
 
 // List every fact's `source` on the Data Sources screen.
 
+import { useState } from "react";
+
 export type SceneNote = {
   from: number;
   to: number;
@@ -21,6 +23,8 @@ export type SceneNote = {
   source?: string;
   box: { x: number; y: number; w: number };
   point?: { x: number; y: number };
+  /** In a scene that uses `selfNav`, this note shows no ◂ ▸ icons (it asks the player to decide). */
+  noNav?: boolean;
 };
 
 // Rough text metrics at the note font sizes (viewBox units), used to size each box.
@@ -98,15 +102,44 @@ const noteId = (n: SceneNote) => `${n.from}|${n.title ?? ""}|${n.text}`;
  * Draws whichever note is active at second `t`. Drop it on top of a scene.
  *
  * Story scenes pass `nav`: the box gets ◂ ▸ icons that jump the scene clock to the next / last note.
- * Decision scenes (hub, greenhouse, garage, rover, storm, the pipes puzzle, the tablet) pass no `nav`:
- * no icons, because the player moves on by making the choice.
+ * Play scenes where the clock also drives animations (the rover) pass `selfNav` instead: ▸ hides the note
+ * ("I've read it"), ◂ brings back the note before it, and the clock is never touched. A note with `noNav`
+ * (a question the player must answer) shows no icons. Decision scenes pass neither: no icons.
  */
-export function NoteLayer({ notes, t, nav }: { notes: SceneNote[]; t: number; nav?: NoteNav }) {
-  const note = notes.find((n) => t >= n.from && t < n.to);
+export function NoteLayer({ notes, t, nav, selfNav = false }: { notes: SceneNote[]; t: number; nav?: NoteNav; selfNav?: boolean }) {
+  const index = notes.findIndex((n) => t >= n.from && t < n.to);
+  const live = index >= 0 ? notes[index] : undefined;
+  const liveId = live ? noteId(live) : "";
+  const [dismissed, setDismissed] = useState<string | null>(null);
+  const [pin, setPin] = useState<{ id: string; forLive: string } | null>(null);
+
+  const pinnedNote = pin && pin.forLive === liveId ? notes.find((n) => noteId(n) === pin.id) : undefined;
+  const note = pinnedNote ?? (live && noteId(live) !== dismissed ? live : undefined);
+
+  let own: NoteNav | undefined;
+  if (selfNav && note && !note.noNav) {
+    const pos = notes.indexOf(note);
+    const earlier = (from: number, to: number) => notes.slice(from, to).filter((n) => !n.noNav);
+    own = {
+      onNext: () => {
+        const after = pinnedNote ? earlier(pos + 1, Math.max(index, 0))[0] : undefined;
+        if (after) setPin({ id: noteId(after), forLive: liveId });
+        else {
+          setPin(null);
+          if (!pinnedNote) setDismissed(liveId);
+        }
+      },
+      onBack: () => {
+        const before = earlier(0, pos).at(-1);
+        if (before) setPin({ id: noteId(before), forLive: liveId });
+      },
+    };
+  }
+
   return (
     <>
       <svg className="ares__scene ares__notes" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        {note && <SceneNoteView key={noteId(note)} note={note} leaving={t >= note.to - 0.4} nav={nav} />}
+        {note && <SceneNoteView key={noteId(note)} note={note} leaving={!pinnedNote && t >= note.to - 0.4} nav={nav ?? own} />}
       </svg>
       <p className="ares__sr-only" aria-live="polite">
         {noteSpeech(note)}

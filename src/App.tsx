@@ -16,7 +16,7 @@ import Title from "./title/Title";
 import type { JumpKey } from "./title/Title";
 import "./title/title.css";
 import { isJudge } from "./game/judge";
-import { NIGHT_STEPS, applySteps, applyStorm, newGame } from "./game/state";
+import { LATER_COST, NIGHT_STEPS, applySteps, applyStorm, newGame } from "./game/state";
 import type { GameState, Task } from "./game/state";
 import Touchdown from "./touchdown/Touchdown";
 import "./game/game.css";
@@ -55,7 +55,7 @@ function sampleEnd(): GameState {
 
 /** A game that is part-way through: one job done, the night and the storm over (a medium storm, a medium shield). */
 function midGame(first: Task): GameState {
-  const g = { ...newGame(), order: first === "greenhouse" ? ("GR" as const) : ("RG" as const), tasks: [first], log: [`Chose the ${first} first`] };
+  const g = { ...newGame(), order: first === "greenhouse" ? ("GR" as const) : ("RG" as const), tasks: [first], log: [`Chose the ${first} first`], decisions: [{ what: `${first === "greenhouse" ? "Greenhouse" : "Rover"} first`, effect: LATER_COST[first === "greenhouse" ? "rover" : "greenhouse"].chip, mark: "cost" as const }] };
   return applyStorm({ ...applySteps(g, NIGHT_STEPS), sol: 2 }, { level: 2, shield: 2, speed: 758, date: "2025-06-06", live: false, flare: null, lost: false });
 }
 
@@ -63,7 +63,7 @@ function firstGame(): GameState {
   if (devParam("scene") === "end" || devParam("scene") === "crown") return sampleEnd();
   const done = devParam("done");
   if (done !== "greenhouse" && done !== "rover") return newGame();
-  return { ...newGame(), order: done === "greenhouse" ? "GR" : "RG", tasks: [done], log: [`Chose the ${done} first`] };
+  return { ...newGame(), order: done === "greenhouse" ? "GR" : "RG", tasks: [done], log: [`Chose the ${done} first`], decisions: [{ what: `${done === "greenhouse" ? "Greenhouse" : "Rover"} first`, effect: LATER_COST[done === "greenhouse" ? "rover" : "greenhouse"].chip, mark: "cost" as const }] };
 }
 
 function Game() {

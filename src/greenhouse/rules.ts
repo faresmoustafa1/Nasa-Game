@@ -8,7 +8,7 @@
 //   enough            grow   the crop's harvest (3–6)
 //   one extra of both lush   a bigger harvest, crew +1 (not for every crop, and out of reach when the tank or lamp cannot go higher)
 
-import { CREW_MAX, applySteps } from "../game/state";
+import { CREW_MAX, addDecision, applySteps } from "../game/state";
 import type { GameState } from "../game/state";
 import { CROPS } from "./crops";
 import type { Crop } from "./crops";
@@ -50,5 +50,12 @@ export function applyGreenhouse(game: GameState, water: number, light: number): 
   ]);
   const crew = Math.max(0, Math.min(CREW_MAX, paid.crew + r.crew));
   const line = `Greenhouse (${crop.name.toLowerCase()}): water ${water}, light ${light} → ${r.label.toLowerCase()} plants${r.harvest ? `, harvest ${r.harvest}` : ""}`;
-  return { ...paid, crew, harvest: paid.harvest + r.harvest, log: [...paid.log, line] };
+  return addDecision(
+    { ...paid, crew, harvest: paid.harvest + r.harvest, log: [...paid.log, line] },
+    {
+      what: `Greenhouse: water ${water}, light ${light}`,
+      effect: out === "wilt" ? `${crop.name} wilted, no harvest, crew −1` : `${crop.name} ${out === "lush" ? "grew lush" : "grew healthy"}: +${r.harvest} harvest${r.crew ? ", crew +1" : ""}`,
+      mark: out === "wilt" ? "cost" : "ok",
+    },
+  );
 }

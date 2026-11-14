@@ -154,7 +154,7 @@ export default function Storm({ game, onDone, sound = true }: StormProps) {
 
         <NoteLayer notes={notes} t={t} />
 
-        <Tablet meters={view.meters} locked={view.locked} crew={view.crew} nudge={[...nudge]} />
+        <Tablet decisions={view.decisions} meters={view.meters} locked={view.locked} crew={view.crew} nudge={[...nudge]} />
 
         {event && t >= RADIO_AT && (
           <p className="storm__tag">

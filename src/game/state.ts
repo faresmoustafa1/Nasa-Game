@@ -71,6 +71,12 @@ export type StormRecord = {
   hits: number;
 };
 
+/**
+ * One choice the player made, shown on the tablet for the rest of the game ("what you choose always has consequences").
+ *   ok     it helped         cost   it cost something         wrong   not what Mission Control asked for         info   a plain fact of the plan
+ */
+export type Decision = { what: string; effect: string; mark: "ok" | "cost" | "wrong" | "info" };
+
 export type GameState = {
   meters: Meters;
   /** Crew score, 0–6. Shown as 5 faces. */
@@ -99,7 +105,11 @@ export type GameState = {
   penalty: number;
   /** One line per choice, for the recap on the result screen. */
   log: string[];
+  /** The same choices with their consequences, shown on the tablet in every Mars scene. */
+  decisions: Decision[];
 };
+
+export const addDecision = (g: GameState, d: Decision): GameState => ({ ...g, decisions: [...g.decisions, d] });
 
 export const newGame = (): GameState => ({
   meters: { power: 12, water: 10, air: 6 },
@@ -116,6 +126,7 @@ export const newGame = (): GameState => ({
   storm: null,
   penalty: 0,
   log: [],
+  decisions: [],
 });
 
 /** One change to a meter. `at` is the second it happens in a timed scene (the night). */
@@ -174,13 +185,21 @@ export function applyStorm(game: GameState, rec: Omit<StormRecord, "hits">): Gam
   const paid = applySteps(game, [{ key: "power", delta: -shield.power, at: 0 }]);
   const crew = Math.max(0, paid.crew - 2 * hits);
   const line = `Storm (${LEVEL_NAME[rec.level]}): picked a ${shield.name} shield${hits ? `, crew −${paid.crew - crew}` : ""}`;
-  return {
-    ...paid,
-    crew,
-    locked: Math.min(shield.lock, paid.meters.water),
-    storm: { ...rec, hits },
-    log: [...paid.log, line],
-  };
+  const locked = Math.min(shield.lock, paid.meters.water);
+  return addDecision(
+    {
+      ...paid,
+      crew,
+      locked,
+      storm: { ...rec, hits },
+      log: [...paid.log, line],
+    },
+    {
+      what: `Storm (${LEVEL_NAME[rec.level]}): ${shield.name} shield`,
+      effect: `Power −${shield.power}, ${locked} water locked${hits ? `, storm was bigger: crew −${paid.crew - crew}` : ", the crew was safe"}`,
+      mark: hits ? "cost" : "ok",
+    },
+  );
 }
 
 /** One rover sample: Power (the site's cost) and 1 Air, and the rock's points. A meter that runs out is refilled by the emergency backup. */

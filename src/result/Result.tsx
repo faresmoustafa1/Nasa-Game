@@ -7,7 +7,7 @@ import type { GameAudio } from "../game/gameAudio";
 import { crewFaces } from "../game/state";
 import type { GameState } from "../game/state";
 import { EARTH_CARDS } from "./earth";
-import { badgeOf, scoreOf } from "./score";
+import { BADGES, badgeOf, scoreOf } from "./score";
 import type { Badge } from "./score";
 import Sources from "./Sources";
 import "./result.css";
@@ -41,6 +41,7 @@ export default function Result({ game, junior = null, onAgain, onTitle, sound = 
   const audioRef = useRef<GameAudio | null>(null);
   const s = scoreOf(game);
   const badge = badgeOf(s.total);
+  const nextTier = [...BADGES].reverse().find((b) => b.min > s.total);
 
   useEffect(() => {
     if (!sound) return;
@@ -88,6 +89,19 @@ export default function Result({ game, junior = null, onAgain, onTitle, sound = 
           <h2>
             Your score <b>{s.total}</b>
           </h2>
+          <ol className="res__tiers" aria-label="Badge scores">
+            {BADGES.map((b, i, all) => {
+              const top = i === 0 ? null : all[i - 1].min;
+              const range = b.id === "gold" ? `${b.min}+` : b.id === "silver" ? `${b.min}–${(top ?? 0) - 1}` : `under ${top}`;
+              return (
+                <li key={b.id} className={b.id === badge.id ? "is-you" : ""} style={{ borderColor: b.color }}>
+                  <b style={{ color: b.color }}>{b.id[0].toUpperCase() + b.id.slice(1)}</b> {range}
+                  {b.id === badge.id && <em> ← you</em>}
+                </li>
+              );
+            })}
+          </ol>
+          {nextTier && <p className="res__next">{nextTier.min - s.total} more point{nextTier.min - s.total > 1 ? "s" : ""} for {nextTier.id}. Try different choices!</p>}
           <ul>
             {rows.map((r) => (
               <li key={r.label}>
@@ -109,9 +123,14 @@ export default function Result({ game, junior = null, onAgain, onTitle, sound = 
         <section className="res__recap" aria-label="What you chose">
           <h2>What you chose</h2>
           <ol>
-            {game.log.map((line, i) => (
-              <li key={i}>{line}</li>
-            ))}
+            {game.decisions.length > 0
+              ? game.decisions.map((d, i) => (
+                  <li key={i}>
+                    <b>{d.what}</b> → {d.effect}
+                    {d.mark === "wrong" ? " ✗" : ""}
+                  </li>
+                ))
+              : game.log.map((line, i) => <li key={i}>{line}</li>)}
           </ol>
         </section>
 

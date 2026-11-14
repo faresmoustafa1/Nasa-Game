@@ -17,6 +17,7 @@ import { Boy, CrewMember } from "../game/art";
 import { createGameAudio } from "../game/gameAudio";
 import type { GameAudio } from "../game/gameAudio";
 import { NoteLayer } from "../game/notes";
+import { LATER_COST } from "../game/state";
 import type { GameState, Task, TabletFocus } from "../game/state";
 import Tablet from "../game/Tablet";
 import { backTarget, nextTarget } from "../game/sceneStops";
@@ -76,6 +77,9 @@ export default function Hub({ game, onDone, sound = true }: HubProps) {
           ...game,
           order: game.order ?? (picked === "greenhouse" ? "GR" : "RG"),
           log: [...game.log, first ? `Chose the ${picked} first` : `Then the ${picked}`],
+          decisions: first
+            ? [...game.decisions, { what: `${picked === "greenhouse" ? "Greenhouse" : "Rover"} first`, effect: LATER_COST[OTHER[picked]].chip, mark: "cost" as const }]
+            : game.decisions,
         },
         picked,
       );
@@ -143,7 +147,7 @@ export default function Hub({ game, onDone, sound = true }: HubProps) {
           nav={introNav ? { onBack: () => seek(backTarget(INTRO_STOPS, t)), onNext: () => seek(nextTarget(INTRO_STOPS, t) ?? t) } : undefined}
         />
 
-        <Tablet meters={game.meters} locked={game.locked} crew={game.crew} focus={focus} onPick={pickTablet} />
+        <Tablet meters={game.meters} locked={game.locked} crew={game.crew} decisions={game.decisions} focus={focus} onPick={pickTablet} />
 
         {!picked && t >= 1.2 && <p className="hub__hint">Tap a glowing room</p>}
         <div className="ares__flash" aria-hidden="true" />
