@@ -16,7 +16,7 @@
 // really turns out is a game rule (stormLevel below): real forecasts can be off, so it can be one size bigger or
 // smaller. That is listed under "Made up for the game" on the Data Sources screen.
 
-import { JUDGE_STORM_INDEX, isJudge } from "../game/judge";
+import { JUDGE_STORM_INDEX, isJudge, judgeLive } from "../game/judge";
 import { seededRandom } from "../game/random";
 import type { Level } from "../game/state";
 
@@ -234,7 +234,7 @@ export function nextSaved(): StormEvent {
 
 /** Dev only: a forced event from the URL, or null to go on as normal. */
 export function devEvent(): { forced: StormEvent | null; skipLive: boolean } {
-  if (isJudge()) return { forced: SAVED_EVENTS[JUDGE_STORM_INDEX], skipLive: true };
+  if (isJudge() && !judgeLive()) return { forced: SAVED_EVENTS[JUDGE_STORM_INDEX], skipLive: true };
   if (!import.meta.env.DEV) return { forced: null, skipLive: false };
   const params = new URLSearchParams(window.location.search);
   const which = ["small", "medium", "big"].indexOf(params.get("storm") ?? "");

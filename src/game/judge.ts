@@ -43,3 +43,23 @@ export const JUDGE_PICKS: Record<string, string> = { cold: "average", crop: "pep
 /** The fixed message delay (minutes) and the fixed saved storm (index into SAVED_EVENTS: 1 = medium). */
 export const JUDGE_DELAY_MIN = 12;
 export const JUDGE_STORM_INDEX = 1;
+
+const LIVE_KEY = "ares-judge-live";
+
+/** Judge Mode normally uses the saved medium storm. With this on, the storm asks NASA DONKI live (the saved one is still the fallback). */
+export function judgeLive(): boolean {
+  try {
+    return window.sessionStorage.getItem(LIVE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setJudgeLive(on: boolean) {
+  try {
+    if (on) window.sessionStorage.setItem(LIVE_KEY, "1");
+    else window.sessionStorage.removeItem(LIVE_KEY);
+  } catch {
+    /* private mode: stays on the saved storm */
+  }
+}

@@ -288,3 +288,87 @@
   padding: 0;
   list-style: none;
 }
+
+/* For judges: a quick tour and jump-ins to the best moments. */
+.title__judges {
+  max-height: min(86vh, 820px);
+  overflow-y: auto;
+}
+.title__judges p {
+  margin: 0;
+}
+.title__tour {
+  min-height: 52px;
+  border: 3px solid #ffcf99;
+  border-radius: 999px;
+  background: #2a1608;
+  color: #ffcf99;
+  font: 800 18px/1.1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+}
+.title__tour:hover {
+  background: #3b200c;
+}
+.title__judges-head {
+  color: #ffcf99;
+  font: 800 12px/1 system-ui, sans-serif !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.title__tourlist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.title__tourlist button {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 2px solid #4a8be0;
+  border-radius: 14px;
+  background: #101a38;
+  color: #cfe0ff;
+  font: 500 12px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.title__tourlist button b {
+  color: #ffffff;
+  font-size: 15px;
+}
+.title__tourlist button:hover {
+  background: #1b2a58;
+}
+.title__tour:focus-visible,
+.title__tourlist button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+.title__judges-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.title__judges-row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+@media (max-height: 560px) {
+  .title__judges {
+    max-height: 92vh;
+  }
+  .title__judges .title__hint {
+    display: block;
+  }
+  .title__tourlist {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .title__tourlist button span {
+    display: none;
+  }
+}

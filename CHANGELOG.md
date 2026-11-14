@@ -270,3 +270,12 @@ Shared by every Mars scene (src/game):
 - Countdown sound: while the rover waits for Earth's reply, a tick plays every second, higher and doubled for the last three, then the chime (`tick` in `gameAudio.ts`; silent when Sound is off).
 - The science team's rock request ("Where is the LAVA rock?") now stays on screen until the player has chosen a destination and the rover reaches it.
   The Jezero and Opportunity facts and the hint come after the first rock, not before the choice.
+
+## Phase 11: see the data
+
+- **Radiation chart:** the storm's RadLab card now draws a line chart of the real hourly peak readings from Curiosity's RAD, 19–22 May 2024
+  (`RADLAB_SERIES` in `src/storm/radlab.ts`, `RadChart.tsx`). It sits near 4 µGy/h, jumps to 304 when the storm arrives, then falls back.
+- **Real eruption photo:** a NASA photo of a flare and CME (PIA21836) appears beside the forecast until the shield is picked. Its caption says it is a different storm.
+  Hidden on short screens (phone held sideways); also listed on the Data Sources screen.
+- **Egypt card:** a new "Back on Earth" card on desert farming in Egypt, sourced to NASA Earth Observatory.
+- Two long notes were shortened (the "no forecast in time" radio call and the lettuce fact). The storm notes were narrowed so they do not touch the new photo card.

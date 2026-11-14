@@ -45,7 +45,8 @@ There is no game over: if a meter would hit zero, an emergency backup saves the 
 | Data | Where it comes from | What it changes in the game | Live or saved |
 |---|---|---|---|
 | Solar eruptions (CMEs) and their arrival at Mars | **NASA DONKI** (`api.nasa.gov`), with NASA's **WSA-Enlil** model runs stored in DONKI | The cloud's speed sets the storm forecast; the game picks a cloud the model sends to Mars and says when it arrives. The DONKI event ID is shown on screen, and the result screen links to it | **Live** (last 30 days); if NASA is slow or the key is over its limit, one of 3 saved real events (also Mars-bound) |
-| Radiation on Mars | **NASA RadLab** (OSDR radiation database): Curiosity's RAD, Gale Crater | The storm's radiation card compares a quiet week (about 4 µGy/h) with the 20 May 2024 storm (304 µGy/h) | Saved (the API query is in `src/storm/radlab.ts`) |
+| Sun eruption photo | NASA/JPL Photojournal PIA21836 (flare and CME, 14 July 2017) | Shown beside the forecast so players see what a solar storm looks like (it is labeled as a different storm) | Saved image |
+| Radiation on Mars | **NASA RadLab** (OSDR radiation database): Curiosity's RAD, Gale Crater | The storm's radiation card shows a chart of the real hourly readings, 19–22 May 2024: flat at about 4 µGy/h, then 304 µGy/h when the storm arrives | Saved (the API query is in `src/storm/radlab.ts`) |
 | Space biology | **NASA OSDR** study OSD-268 (lettuce from the ISS Veggie garden tested for germs and nutrients) | Explains why fresh food matters to the crew score | Saved |
 | Jezero temperatures | **Perseverance MEDA** weather station (NASA/JPL) | Sets how cold it is; the heater must match it | Saved (5 real readings; there is no public live feed) |
 | Earth–Mars distance | **NASA/JPL** approximate planet positions | The real one-way message delay today (about 4–24 min), used for "ask Earth" and for why a storm forecast can come too late | Calculated live from the date |

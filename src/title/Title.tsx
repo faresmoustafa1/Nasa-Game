@@ -2,13 +2,13 @@
 //
 // A night field next to a launch site: Mars glowing in the sky, a rocket under floodlights, and the boy
 // lying in the grass with his telescope (that is where the story starts). The menu sits in the middle:
-//   Start mission · How to play · Settings · NASA data · Credits
+//   Start mission · How to play · Settings · NASA data · Credits · For judges
 // Settings (sound, reading speed, Judge Mode) live in ../game/settings.ts and judge.ts.
 // The scene-jump panel is for demos and testing: it only shows with Judge Mode on or ?dev=1 in the address.
 
 import { useMemo, useState } from "react";
 import { StarField } from "../game/art";
-import { JUDGE_DELAY_MIN, isJudge, setJudge } from "../game/judge";
+import { JUDGE_DELAY_MIN, isJudge, judgeLive, setJudge, setJudgeLive } from "../game/judge";
 import { seededRandom } from "../game/random";
 import { getSettings, saveSettings } from "../game/settings";
 import type { Settings, Speed } from "../game/settings";
@@ -45,7 +45,23 @@ const JUMPS: { key: JumpKey; label: string }[] = [
   { key: "sources", label: "Data sources" },
 ];
 
-type View = "main" | "how" | "settings" | "credits" | "jump";
+type View = "main" | "how" | "settings" | "credits" | "jump" | "judges";
+
+/** The best moments for a judge, in play order. Each one starts with a sensible game behind it. */
+const TOUR: { key: JumpKey; label: string; what: string }[] = [
+  { key: "storm", label: "Solar storm", what: "NASA DONKI forecast, real eruption photo, Mars radiation chart (RadLab)" },
+  { key: "rover", label: "Garage + rover", what: "Today's Earth–Mars message delay, real Jezero photo and weather" },
+  { key: "greenhouse", label: "Greenhouse", what: "Water and light trade-offs, NASA OSDR space-plant study" },
+  { key: "result", label: "Result", what: "Score, \"Your storm was real\", Back on Earth cards (incl. Egypt)" },
+];
+
+/** What the game uses from NASA, one line each. */
+const DATA_LINES = [
+  "NASA DONKI + WSA-Enlil: a real Sun eruption sets the storm forecast, and the forecast can be wrong",
+  "NASA RadLab (OSDR): Curiosity's real radiation readings on Mars, before and during a storm",
+  "NASA OSDR (OSD-268): a real study of plants grown in space",
+  "NASA/JPL planet positions: how long a message takes from Earth to Mars today",
+];
 
 /** The team, for the Credits screen. */
 const TEAM = ["Fares Mostafa", "Merna Hossam", "Eman Ahmed", "Amr Obaia", "Ahmed Zahran"];
@@ -197,6 +213,7 @@ export default function Title({
   const [view, setView] = useState<View>("main");
   const [settings, setSettings] = useState<Settings>(getSettings);
   const [judge, setJ] = useState(isJudge);
+  const [live, setLive] = useState(judgeLive);
   const dev = judge || new URLSearchParams(window.location.search).get("dev") === "1";
 
   const change = (patch: Partial<Settings>) => {
@@ -234,6 +251,9 @@ export default function Title({
               </button>
               <button type="button" onClick={() => setView("credits")}>
                 Credits
+              </button>
+              <button type="button" className="title__dev title__judges-btn" onClick={() => setView("judges")}>
+                For judges ▸
               </button>
               {dev && (
                 <button type="button" className="title__dev" onClick={() => setView("jump")}>
@@ -319,7 +339,7 @@ export default function Title({
               ))}
             </ul>
             <p>
-              All drawings and sounds are made in code. One real NASA photo is used (Jezero Crater from orbit, NASA/JPL-Caltech/MSSS/JHU-APL).
+              All drawings and sounds are made in code. Two real NASA photos are used (Jezero Crater from orbit, NASA/JPL-Caltech/MSSS/JHU-APL; a solar eruption, NASA/JPL PIA21836).
               Real data: NASA DONKI (solar storms) with the WSA-Enlil model, NASA RadLab (Mars radiation), NASA OSDR (space lettuce study),
               Perseverance MEDA (weather), NASA/JPL planet positions (message delay), and the Canadian Space Agency food toolkit. Game numbers are made up
               to make a fair puzzle. See “NASA data” for every source.
@@ -331,6 +351,74 @@ export default function Title({
             <button type="button" className="title__back" onClick={() => setView("main")}>
               ◂ Back
             </button>
+          </section>
+        )}
+
+        {view === "judges" && (
+          <section className="title__card title__judges" aria-label="For judges">
+            <h2>For judges</h2>
+            <p>
+              Kids (9–12) run a Mars outpost. Every choice trades Power, Water and Air, and a real NASA storm forecast decides how big the risk is.
+            </p>
+            <button
+              type="button"
+              className="title__tour"
+              onClick={() => {
+                setJudge(true);
+                setJ(true);
+                onJump("hub");
+              }}
+            >
+              ▶ Quick tour (about 3 min): start at the base
+            </button>
+            <p className="title__judges-head">Or jump to a moment</p>
+            <div className="title__tourlist">
+              {TOUR.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => {
+                    setJudge(true);
+                    setJ(true);
+                    onJump(t.key);
+                  }}
+                >
+                  <b>{t.label}</b>
+                  <span>{t.what}</span>
+                </button>
+              ))}
+            </div>
+            <Seg
+              label="Storm data"
+              value={live}
+              options={[
+                { value: false, text: "Saved (same every time)" },
+                { value: true, text: "Live from NASA" },
+              ]}
+              onChange={(on) => {
+                setJudgeLive(on);
+                setLive(on);
+              }}
+            />
+            <p className="title__judges-head">Real NASA data in the game</p>
+            <ul className="title__judges-list">
+              {DATA_LINES.map((d) => (
+                <li key={d}>{d}</li>
+              ))}
+            </ul>
+            <p className="title__hint">
+              Judge Mode fixes everything random (−55 °C, chile peppers, lake-mud rock, a {JUDGE_DELAY_MIN}-minute message), so every demo plays the
+              same. Some game numbers are made up to keep the puzzle fair; they are all listed under “NASA data”. 12 automated tests, and a balance
+              check that played every choice (1.86 million games) so no choice is free.
+            </p>
+            <div className="title__judges-row">
+              <button type="button" className="title__back" onClick={onSources}>
+                NASA data and sources ▸
+              </button>
+              <button type="button" className="title__back" onClick={() => setView("main")}>
+                ◂ Back
+              </button>
+            </div>
           </section>
         )}
 
