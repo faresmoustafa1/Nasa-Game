@@ -1,0 +1,275 @@
+/* Mission ARES — the greenhouse close-up. */
+
+.gh__closeup {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #102a2e;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+.gh__closeup.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The largest 16:9 box that fits the screen, so the HTML pieces line up with the drawing. */
+.gh__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100%, 177.78vh);
+  aspect-ratio: 16 / 9;
+  translate: -50% -50%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.gh__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.gh__tanktext {
+  fill: #cfe9ff;
+  font: 800 22px/1 system-ui, sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.gh__plant {
+  transform-origin: 0 0;
+  animation: gh-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.gh__plant.is-timelapse {
+  animation: gh-timelapse 2.6s ease-out both;
+}
+@keyframes gh-pop {
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes gh-timelapse {
+  from {
+    transform: scale(0.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.gh__bob {
+  animation: gh-bob 1.4s ease-in-out infinite alternate;
+}
+@keyframes gh-bob {
+  to {
+    transform: translateY(14px);
+  }
+}
+
+/* ---------- Water drops ---------- */
+
+.gh__tank {
+  position: absolute;
+  left: 15%;
+  top: 37%;
+  width: 9.4%;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 1.1% 0.6% 1.2%;
+  border: 3px solid #7fb6e6;
+  border-radius: 18px;
+  background: rgba(8, 24, 40, 0.82);
+  color: #cfe9ff;
+  text-align: center;
+}
+.gh__tank b {
+  font-size: clamp(10px, 1.1vw, 15px);
+  letter-spacing: 0.1em;
+}
+.gh__tank span {
+  min-height: 2.4em;
+  font-size: clamp(9px, 0.95vw, 13px);
+  line-height: 1.2;
+}
+.gh__drops {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
+.gh__drop {
+  width: clamp(34px, 3.9vw, 58px);
+  aspect-ratio: 0.82;
+  padding: 0;
+  border: 3px solid #d4ecff;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: #4aa8f0;
+  cursor: grab;
+  touch-action: none;
+  box-shadow: 0 0 14px rgba(74, 168, 240, 0.6);
+}
+.gh__drop:hover:not(:disabled) {
+  background: #66b9ff;
+}
+.gh__drop:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+.gh__drop:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.gh__drop.is-locked {
+  background: repeating-linear-gradient(45deg, #3a4a60 0 6px, #55698a 6px 12px);
+  border-color: #8a98b3;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.gh__ghost {
+  position: fixed;
+  z-index: 9;
+  width: 46px;
+  height: 56px;
+  translate: -50% -60%;
+  border: 3px solid #d4ecff;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: #4aa8f0;
+  pointer-events: none;
+  box-shadow: 0 0 18px rgba(74, 168, 240, 0.8);
+}
+
+/* The drop zone covers the trough and the plants. */
+.gh__bed {
+  position: absolute;
+  left: 23.75%;
+  top: 36%;
+  width: 52.5%;
+  height: 49%;
+  border: 3px dashed transparent;
+  border-radius: 22px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.gh__bed.is-over {
+  border-color: #7fd9ff;
+  background: rgba(74, 168, 240, 0.18);
+}
+.gh__placed {
+  position: absolute;
+  top: 3%;
+  translate: -50% 0;
+  width: clamp(26px, 2.6vw, 38px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: rgba(8, 24, 40, 0.85);
+  color: #ffffff;
+  font: 800 18px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.gh__placed:focus-visible {
+  outline: 3px solid #ffcf99;
+  outline-offset: 2px;
+}
+
+/* ---------- The lamp switch ---------- */
+
+.gh__lamp {
+  position: absolute;
+  left: 85%;
+  top: 36%;
+  width: 12.6%;
+  display: grid;
+  gap: 8px;
+  padding: 1% 1% 1.2%;
+  border: 3px solid #cbb3ee;
+  border-radius: 18px;
+  background: rgba(24, 12, 44, 0.86);
+  color: #f0e4ff;
+}
+.gh__lamp b {
+  text-align: center;
+  font-size: clamp(10px, 1.1vw, 15px);
+  letter-spacing: 0.1em;
+}
+.gh__lamp button {
+  display: grid;
+  gap: 2px;
+  padding: 7px 4px;
+  border: 3px solid #8d72b8;
+  border-radius: 12px;
+  background: #2a1c46;
+  color: #f0e4ff;
+  font: 800 clamp(11px, 1.25vw, 17px)/1.1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.gh__lamp em {
+  font: 600 clamp(9px, 0.95vw, 13px)/1.1 system-ui, sans-serif;
+  font-style: normal;
+  opacity: 0.85;
+}
+.gh__lamp button.is-on {
+  border-color: #fff6c8;
+  background: #5b3a96;
+  box-shadow: 0 0 16px rgba(255, 246, 200, 0.55);
+}
+.gh__lamp button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.gh__lamp button:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* ---------- Live preview ---------- */
+
+.gh__preview {
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  translate: -50% 0;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  max-width: 62%;
+  padding: 10px 20px;
+  border: 3px solid #ffcf99;
+  border-radius: 16px;
+  background: rgba(30, 18, 6, 0.9);
+  color: #ffffff;
+  text-align: center;
+}
+.gh__preview b {
+  font-size: clamp(13px, 1.5vw, 21px);
+}
+.gh__preview span {
+  font-size: clamp(11px, 1.2vw, 17px);
+  color: #ffe9c8;
+}
+.gh__preview.is-wilt {
+  border-color: #e3b25a;
+}
+.gh__preview.is-grow {
+  border-color: #7ee0b0;
+}
+.gh__preview.is-lush {
+  border-color: #ffd84a;
+  box-shadow: 0 0 24px rgba(255, 216, 74, 0.5);
+}
+
+/* Words sit above the close-up. */
+.gh .ares__notes {
+  z-index: 3;
+}
+
+/* Short screens: the preview sits above the Grow button */
+@media (max-height: 560px) {
+  .gh__preview {
+    bottom: 26%;
+    padding: 6px 12px;
+  }
+}

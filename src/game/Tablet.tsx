@@ -41,6 +41,8 @@ function FaceIcon({ face }: { face: Face }) {
 
 type TabletProps = {
   meters: Meters;
+  /** Water locked in the shelter walls: shown hatched, and not counted in the number. */
+  locked?: number;
   /** Crew score, 0–6. */
   crew: number;
   /** The row whose note is open, if any. */
@@ -60,9 +62,10 @@ function Note({ note }: { note: TabletNote }) {
   );
 }
 
-export default function Tablet({ meters, crew, focus = null, nudge = [], onPick }: TabletProps) {
+export default function Tablet({ meters, locked = 0, crew, focus = null, nudge = [], onPick }: TabletProps) {
   const keys: MeterKey[] = ["power", "water", "air"];
   const faces = crewFaces(crew);
+  const usable = (k: MeterKey) => (k === "water" ? Math.max(0, meters.water - locked) : meters[k]);
   return (
     <aside className="tablet" aria-label="Commander's tablet">
       <p className="tablet__title">CREW TABLET</p>
@@ -71,10 +74,10 @@ export default function Tablet({ meters, crew, focus = null, nudge = [], onPick 
           <button
             type="button"
             className={`tablet__row tablet__row--${k}${focus === k ? " is-open" : ""}${nudge.includes(k) ? " is-nudged" : ""}${
-              meters[k] <= 3 ? " is-low" : ""
+              usable(k) <= 3 ? " is-low" : ""
             }`}
             onClick={() => onPick?.(k)}
-            aria-label={`${METER_LABEL[k]}: ${meters[k]} of ${METER_MAX}`}
+            aria-label={`${METER_LABEL[k]}: ${usable(k)} of ${METER_MAX}${k === "water" && locked > 0 ? `, ${locked} locked in the shelter walls` : ""}`}
             aria-expanded={focus === k}
           >
             <svg className="tablet__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -82,9 +85,12 @@ export default function Tablet({ meters, crew, focus = null, nudge = [], onPick 
             </svg>
             <span className="tablet__label">{METER_LABEL[k]}</span>
             <span className="tablet__bar" aria-hidden="true">
-              <span style={{ width: `${(meters[k] / METER_MAX) * 100}%` }} />
+              <span style={{ width: `${(usable(k) / METER_MAX) * 100}%` }} />
+              {k === "water" && locked > 0 && (
+                <span className="tablet__lockseg" style={{ left: `${(usable(k) / METER_MAX) * 100}%`, width: `${(Math.min(locked, meters.water) / METER_MAX) * 100}%` }} />
+              )}
             </span>
-            <span className="tablet__num">{meters[k]}</span>
+            <span className="tablet__num">{usable(k)}</span>
           </button>
           {focus === k && <Note note={TABLET_NOTES[k]} />}
         </div>

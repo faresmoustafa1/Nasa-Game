@@ -12,8 +12,14 @@ export type GameAudio = {
   creak: () => void;
   /** A soft UI blip (tablet taps, calendar ticks). */
   blip: (freq?: number) => void;
+  /** The storm siren: three rising whoops. */
+  alarm: () => void;
+  /** A burst of radio static (a message that did not get through). */
+  crackle: () => void;
   /** A happy two-note chime. */
   chime: () => void;
+  /** A short trumpet-like fanfare (the crowning). */
+  fanfare: () => void;
   /** Atmosphere roar that grows, then fades, over `seconds`. */
   roar: (seconds: number) => void;
   /** The parachute opening: a short "whump". */
@@ -32,6 +38,9 @@ const SILENT: GameAudio = {
   creak: () => {},
   blip: () => {},
   chime: () => {},
+  fanfare: () => {},
+  alarm: () => {},
+  crackle: () => {},
   roar: () => {},
   chute: () => {},
   thud: () => {},
@@ -151,6 +160,19 @@ export function createGameAudio(): GameAudio {
         tone(210, now + 0.1, 0.6, 0.04, "square", 330);
       }),
 
+    alarm: () =>
+      safely(() => {
+        const now = ctx.currentTime;
+        for (let i = 0; i < 3; i++) tone(520, now + i * 0.9, 0.8, 0.12, "square", 880);
+      }),
+
+    crackle: () =>
+      safely(() => {
+        const { gain, now } = noise(0.9, 4000, 1500);
+        gain.gain.linearRampToValueAtTime(0.16, now + 0.05);
+        gain.gain.linearRampToValueAtTime(0.0001, now + 0.9);
+      }),
+
     blip: (freq = 760) =>
       safely(() => {
         tone(freq, ctx.currentTime, 0.14, 0.06);
@@ -161,6 +183,14 @@ export function createGameAudio(): GameAudio {
         const now = ctx.currentTime;
         tone(523.25, now, 0.7, 0.07);
         tone(783.99, now + 0.16, 0.9, 0.07);
+      }),
+
+    fanfare: () =>
+      safely(() => {
+        const now = ctx.currentTime;
+        [523.25, 659.25, 783.99].forEach((f, i) => tone(f, now + i * 0.16, 0.24, 0.05, "square"));
+        [523.25, 659.25, 783.99, 1046.5].forEach((f) => tone(f, now + 0.55, 1.1, 0.04, "square"));
+        tone(130.81, now + 0.55, 1.1, 0.08, "triangle");
       }),
 
     roar: (seconds) =>

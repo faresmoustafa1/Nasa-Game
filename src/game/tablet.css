@@ -83,6 +83,15 @@
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.14);
   overflow: hidden;
+  position: relative;
+}
+/* Water locked in the shelter walls: striped, so it looks "held" (and is not counted). */
+.tablet__bar span.tablet__lockseg {
+  position: absolute;
+  top: 0;
+  border-radius: 0;
+  background: repeating-linear-gradient(45deg, rgba(91, 184, 255, 0.55) 0 4px, rgba(91, 184, 255, 0.12) 4px 8px);
+  animation: none;
 }
 .tablet__bar span {
   display: block;
@@ -226,5 +235,12 @@
   .tablet__bar span,
   .tablet__row.is-nudged {
     animation: none;
+  }
+}
+
+/* Short screens (a phone held sideways): a smaller tablet, so it does not cover the scene */
+@media (max-height: 560px) {
+  .tablet {
+    zoom: 0.62;
   }
 }

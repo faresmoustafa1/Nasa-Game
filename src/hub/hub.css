@@ -1,0 +1,420 @@
+/* Mission ARES — the base hub and the night. Cut-away base, 1600 × 900 stage. */
+
+.hub__label {
+  fill: #ffffff;
+  fill-opacity: 0.8;
+  font: 800 22px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.18em;
+}
+.hub__o2 {
+  fill: #7ee0ff;
+  font: 800 44px/1 system-ui, sans-serif;
+  opacity: 0.6;
+}
+
+/* ---------- Day and night ---------- */
+
+.hub__night,
+.hub__rim-dark,
+.hub__ground-dark {
+  opacity: 0;
+  transition: opacity 2.5s ease-in-out;
+  pointer-events: none;
+}
+.hub__rim-dark {
+  mix-blend-mode: multiply;
+}
+.hub__svg.is-night .hub__night {
+  opacity: 1;
+}
+.hub__svg.is-night .hub__rim-dark {
+  opacity: 0.55;
+}
+.hub__svg.is-night .hub__ground-dark {
+  opacity: 0.6;
+}
+.hub__sun {
+  transition: opacity 2s ease-in-out;
+}
+.hub__svg.is-night .hub__sun {
+  opacity: 0;
+}
+.hub__growlight {
+  opacity: 0.75;
+  transition: opacity 1.5s;
+}
+.hub__svg.is-night .hub__growlight {
+  opacity: 1;
+}
+
+/* ---------- Solar storm ---------- */
+
+.hub__storm-sky {
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition: opacity 1.6s ease-in-out;
+  pointer-events: none;
+}
+.hub__svg.is-storm .hub__storm-sky {
+  opacity: 0.55;
+  animation: hub-alarm 0.9s ease-in-out infinite alternate;
+}
+.hub__storm {
+  opacity: 0;
+  transition: opacity 1s;
+  pointer-events: none;
+}
+.hub__storm path {
+  fill: none;
+  stroke: #ffe3b0;
+  stroke-width: 3;
+  stroke-linecap: round;
+  animation: hub-streak 1.1s linear infinite;
+}
+.hub__svg.is-storm .hub__storm {
+  opacity: 0.85;
+}
+.hub__tanks {
+  opacity: 0;
+  transition:
+    opacity 0.9s ease-out,
+    transform 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+.hub__tanks.from-top {
+  transform: translateY(-48px);
+}
+.hub__tanks.from-right {
+  transform: translateX(70px);
+}
+.hub__tanks.from-bottom {
+  transform: translateY(44px);
+}
+.hub__tanks.is-on {
+  opacity: 1;
+  transform: none;
+}
+.hub__hit-ring {
+  fill: rgba(255, 70, 40, 0.12);
+  stroke: #ff6a4d;
+  stroke-width: 6;
+  opacity: 0;
+  pointer-events: none;
+}
+.hub__hit-ring.is-on {
+  animation: hub-hit 0.5s ease-in-out 4 alternate;
+}
+
+/* ---------- The oxygen maker ---------- */
+
+.hub__led {
+  fill: #e0a63a;
+}
+.hub__svg.is-running .hub__led {
+  fill: #7ee0b0;
+}
+.hub__bubble {
+  fill: #7ee0ff;
+  opacity: 0;
+}
+.hub__svg.is-running .hub__bubble {
+  animation: hub-rise 2.2s ease-in infinite;
+}
+.hub__fan {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.hub__svg.is-running .hub__fan {
+  animation: hub-spin 0.7s linear infinite;
+}
+
+/* ---------- Jobs you can tap ---------- */
+
+.hub__hit {
+  fill: #000;
+  fill-opacity: 0;
+  pointer-events: none;
+}
+.hub__ring {
+  fill: none;
+  stroke: #ffcf99;
+  stroke-width: 6;
+  opacity: 0;
+  pointer-events: none;
+}
+.hub__job.is-glow {
+  cursor: pointer;
+  outline: none;
+}
+.hub__job.is-glow .hub__hit {
+  pointer-events: all;
+}
+.hub__job.is-glow .hub__ring {
+  opacity: 1;
+  filter: drop-shadow(0 0 14px #ffcf99);
+  animation: hub-glow 1.4s ease-in-out infinite alternate;
+}
+.hub__job.is-glow:hover .hub__ring,
+.hub__job.is-glow:focus-visible .hub__ring {
+  stroke-width: 10;
+  fill: rgba(255, 207, 153, 0.14);
+}
+.hub__job.is-lit .hub__ring {
+  opacity: 1;
+  stroke: #7ee0b0;
+  filter: drop-shadow(0 0 12px #7ee0b0);
+}
+.hub__job.is-quiet {
+  opacity: 0.6;
+}
+
+.hub__chip rect {
+  fill: #2a1608;
+  stroke: #ffcf99;
+  stroke-width: 3;
+}
+.hub__chip text {
+  fill: #ffcf99;
+  font: 800 22px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  animation: hub-chip-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.hub__chip {
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+.hub__hint {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: clamp(18px, 4.5vh, 44px);
+  translate: -50% 0;
+  padding: 12px 26px;
+  border: 2px solid #ffcf99;
+  border-radius: 999px;
+  background: rgba(42, 22, 8, 0.9);
+  color: #ffcf99;
+  font: 800 20px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  pointer-events: none;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+/* ---------- People ---------- */
+
+.hub__people {
+  pointer-events: none;
+}
+.hub__person {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.hub__boy {
+  transition: transform 2.6s linear;
+}
+.hub__runner {
+  transition: transform 1.9s ease-in-out;
+}
+.hub__runner.is-walk .astro,
+.hub__runner.is-walk .boy {
+  animation: hub-step 0.36s ease-in-out infinite alternate;
+}
+.hub__runner.is-walk .astro__arm,
+.hub__runner.is-walk .boy .astro__arm {
+  animation: ares-swing 0.5s ease-in-out infinite alternate;
+}
+.hub__boy.is-walk .astro,
+.hub__boy.is-walk .boy {
+  animation: hub-step 0.36s ease-in-out infinite alternate;
+}
+.hub__boy.is-walk .astro__arm,
+.hub__boy.is-walk .boy .astro__arm {
+  animation: ares-swing 0.5s ease-in-out infinite alternate;
+}
+
+/* ---------- The night ---------- */
+
+.hubn__day,
+.hubn__sleepers {
+  transition: opacity 1.2s ease-in-out;
+}
+.hubn__sleepers {
+  opacity: 0;
+}
+.hubn.is-asleep .hubn__day {
+  opacity: 0;
+}
+.hubn.is-asleep .hubn__sleepers {
+  opacity: 1;
+}
+.hubn__zzz {
+  fill: #cfd8ea;
+  font: 800 28px/1 system-ui, sans-serif;
+  opacity: 0;
+}
+.hubn.is-asleep .hubn__zzz {
+  animation: hub-zzz 2.4s ease-out infinite;
+}
+.hubn__pop {
+  font: 800 34px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  paint-order: stroke;
+  stroke: #0a0f24;
+  stroke-width: 7px;
+  stroke-linejoin: round;
+  animation: hub-float 2.2s ease-out both;
+}
+.hubn__pop--minus {
+  fill: #ffb086;
+}
+.hubn__pop--plus {
+  fill: #7ee0b0;
+}
+.hubn__alert {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: clamp(18px, 4.5vh, 44px);
+  translate: -50% 0;
+  padding: 14px 26px;
+  border: 3px solid #ffcf99;
+  border-radius: 18px;
+  background: rgba(42, 22, 8, 0.94);
+  color: #ffcf99;
+  font: 800 20px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-align: center;
+  animation: ares-pop-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+/* ---------- A stand-in for scenes that are built in later phases ---------- */
+
+.hub__stand-in {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 24px;
+}
+.hub__stand-in h1 {
+  margin: 0 0 8px;
+  font-size: clamp(26px, 4vw, 40px);
+}
+.hub__stand-in p {
+  margin: 0 auto 16px;
+  max-width: 34em;
+  color: #cfd8ea;
+}
+.hub__stand-in ul {
+  margin: 0 auto 22px;
+  padding: 0;
+  list-style: none;
+  max-width: 34em;
+  color: #9fb0cc;
+  font-size: 14px;
+}
+
+@keyframes hub-alarm {
+  from { opacity: 0.35; }
+  to { opacity: 0.65; }
+}
+@keyframes hub-streak {
+  from { transform: translate(40px, -60px); opacity: 0; }
+  20% { opacity: 1; }
+  to { transform: translate(-50px, 80px); opacity: 0; }
+}
+@keyframes hub-hit {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes hub-glow {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+@keyframes hub-chip-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes hub-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes hub-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 0.9; }
+  100% { transform: translateY(-70px); opacity: 0; }
+}
+@keyframes hub-step {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
+}
+@keyframes hub-zzz {
+  0% { transform: translateY(0); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translateY(-34px); opacity: 0; }
+}
+@keyframes hub-float {
+  0% { transform: translateY(14px); opacity: 0; }
+  15% { transform: translateY(0); opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateY(-46px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub__boy,
+  .hub__runner {
+    transition-duration: 0.01s;
+  }
+  .hub__svg.is-storm .hub__storm-sky,
+  .hub__storm path {
+    animation: none;
+  }
+  .hub__job.is-glow .hub__ring,
+  .hub__svg.is-running .hub__fan,
+  .hub__svg.is-running .hub__bubble,
+  .hubn.is-asleep .hubn__zzz {
+    animation: none;
+  }
+  .hubn__zzz {
+    opacity: 0.8;
+  }
+}
+
+/* ---------- Camera zoom into a room (greenhouse, garage) ---------- */
+
+.hub__zoom {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transition: transform 1.7s cubic-bezier(0.55, 0, 0.25, 1);
+}
+.hub__rover {
+  transition: transform 1.3s cubic-bezier(0.5, 0, 0.6, 1);
+}
+.hub__rover.is-away {
+  transform: translateX(420px);
+}
+.hub__boy-fade {
+  transition: opacity 0.4s;
+}
+.hub__boy-fade.is-hidden {
+  opacity: 0;
+}
+
+/* Garage gear: the heater's warm glow around the rover, and the flame icons on the gear buttons. */
+.garage__heat {
+  fill: #ff9a3c;
+  fill-opacity: 0.32;
+  filter: blur(10px);
+  animation: hub-glow 1.4s ease-in-out infinite alternate;
+}
+.garage__flames {
+  display: flex;
+  gap: 4px;
+}
+.garage__flames i {
+  width: 14px;
+  height: 18px;
+  border: 2px solid #ffb36b;
+  border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%;
+  opacity: 0.35;
+}
+.garage__flames i.is-on {
+  background: #ff8a2c;
+  opacity: 1;
+}
