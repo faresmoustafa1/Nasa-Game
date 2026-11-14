@@ -289,7 +289,7 @@ export default function Title({
             />
             <p className="title__hint">
               Judge mode makes every game the same (for demos): cold weather (−55 °C), Hatch chile
-              peppers, the interesting rock at the Delta foot, the saved medium storm and a {JUDGE_DELAY_MIN}-minute message to Earth.
+              peppers, the science team asking for LAKE MUD rock, the saved medium storm and a {JUDGE_DELAY_MIN}-minute message to Earth.
             </p>
             <button type="button" className="title__back" onClick={() => setView("main")}>
               ◂ Back

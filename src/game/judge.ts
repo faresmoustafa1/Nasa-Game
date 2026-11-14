@@ -4,7 +4,7 @@
 // address), every game is the same:
 //   weather   -55 °C (the real Jezero average): "cold"
 //   crop      Hatch chile peppers
-//   rock      the interesting rock is at the Delta foot
+//   rock      the science team needs LAKE MUD rock (the Delta foot)
 //   storm     the saved real medium storm (758 km/s, DONKI 2025-06-06), no live call
 //   message   Earth to Mars takes 12 minutes
 // The title screen also shows a panel to jump straight to any scene.

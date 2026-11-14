@@ -14,6 +14,8 @@ import "./result.css";
 
 type ResultProps = {
   game: GameState;
+  /** Stars from the Junior Astronaut Test (0–3); null if skipped. */
+  junior?: number | null;
   onAgain: () => void;
   onTitle: () => void;
   sound?: boolean;
@@ -34,7 +36,7 @@ function Medal({ badge }: { badge: Badge }) {
   );
 }
 
-export default function Result({ game, onAgain, onTitle, sound = true }: ResultProps) {
+export default function Result({ game, junior = null, onAgain, onTitle, sound = true }: ResultProps) {
   const [view, setView] = useState<"result" | "sources">("result");
   const audioRef = useRef<GameAudio | null>(null);
   const s = scoreOf(game);
@@ -73,6 +75,12 @@ export default function Result({ game, onAgain, onTitle, sound = true }: ResultP
               {badge.name}
             </p>
             <p className="res__line">{badge.line}</p>
+            {junior !== null && (
+              <p className="res__junior">
+                🚀 Junior Astronaut · {"★".repeat(junior)}
+                {"☆".repeat(3 - junior)}
+              </p>
+            )}
           </div>
         </header>
 
@@ -131,7 +139,7 @@ export default function Result({ game, onAgain, onTitle, sound = true }: ResultP
             Title
           </button>
         </div>
-        <p className="res__note">Next time the weather, the crop and the interesting rock will be different.</p>
+        <p className="res__note">Next time the weather, the crop and the rock the science team needs will be different.</p>
       </div>
     </div>
   );

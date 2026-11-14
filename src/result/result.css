@@ -219,3 +219,13 @@
     animation: none;
   }
 }
+
+.res__junior {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 6px 14px;
+  border: 2px solid #7ee0b0;
+  border-radius: 999px;
+  color: #d9ffe9;
+  font-weight: 800;
+}

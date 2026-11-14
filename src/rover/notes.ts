@@ -1,7 +1,8 @@
 // Mission ARES — the words of the rover trip (1600 × 900 coordinates). Add every fact's source to the Data Sources screen.
 
 import type { SceneNote } from "../game/notes";
-import { BONUS_POINTS } from "./sites";
+import { MISSION_POINTS } from "./sites";
+import type { Mission } from "./sites";
 
 const NEVER = 9999;
 
@@ -40,13 +41,14 @@ export function waitingNote(delayMin: number): SceneNote {
   };
 }
 
-/** Mission Control spots an interesting rock at a different site each game. */
-export const rockNote = (siteName: string, at: number, until: number): SceneNote => ({
+/** Mission Control asks for one kind of rock, with the real NASA reason. The player has to find where it is. */
+export const missionNote = (m: Mission, at: number, until: number): SceneNote => ({
   from: at,
   to: until,
   kind: "radio",
-  title: "Go to the gold star!",
-  text: `We spotted a rock with interesting layers at the ${siteName} (gold star ★). Drive there and bring it home for ${BONUS_POINTS} bonus points!`,
+  title: m.title,
+  text: `${m.text} (+${MISSION_POINTS} ★ if you bring it)`,
+  source: m.source,
   box: { x: 410, y: 100, w: 800 },
 });
 
@@ -58,18 +60,6 @@ export const ADVICE_NOTE: SceneNote = {
   text: "Use the old tracks! Trips cost 1 less Power. But dust is closer: 1 rock fewer.",
   box: { x: 410, y: 100, w: 800 },
 };
-
-/** Why the rover goes out at all: the real reason Perseverance drives to the delta. */
-export const WHY_FACT = (at: number): SceneNote => ({
-  from: at + 0.4,
-  to: at + 6.4,
-  kind: "fact",
-  title: "Why these rocks?",
-  text: "Long ago a river flowed into a lake here and left mud that became rock. Scientists think rocks like these are the best place to look for signs of ancient life.",
-  source: "NASA Science · Two Perseverance Sampling Locations in Jezero's Delta (Sept 15, 2022)",
-  box: { x: 410, y: 100, w: 800 },
-  point: { x: 480, y: 520 },
-});
 
 export const JEZERO_FACT = (at: number): SceneNote => ({
   from: at + 0.4,
@@ -96,7 +86,7 @@ export const HINT_NOTE = (at: number): SceneNote => ({
   from: at + 13.8,
   to: NEVER,
   kind: "story",
-  text: "Tap a glowing rock spot. The rover drives there and collects a rock.",
+  text: "Read the rock names on the map. Which one did the science team ask for? Tap it!",
   box: { x: 520, y: 110, w: 680 },
 });
 

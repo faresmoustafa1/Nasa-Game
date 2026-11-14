@@ -185,8 +185,28 @@ Shared by every Mars scene (src/game):
 
 ### Phase 8b – note icons, in-game menu, rover "why"
 
-- **◂ ▸ icons inside every story note box** (prologue, trip, landing, night): next note / read it again. The arrow keys still work. (`NavIcons` in `src/game/notes.tsx`; `SceneNav` is now keyboard only.) The bottom Back/Next pill is gone.
+- **◂ ▸ icons inside every note box**, in every scene. Story scenes (prologue, trip, landing, night): next note / read it again. Play scenes (hub, greenhouse, garage, rover, storm, crowning — including Mission Control): ▸ hides the note, ◂ shows the last one again; the scene clock is never moved there, so animations stay correct. The arrow keys still work. (`NavIcons` in `src/game/notes.tsx`; `SceneNav` is now keyboard only.) The bottom Back/Next pill is gone.
 - **⚙ menu on every scene** (`src/menu/GameMenu.tsx`): pauses the story (`src/game/pause.ts`), with Resume, Settings (sound, story speed), Restart mission and Exit to main menu (both ask "Are you sure?").
 - **Rover:** the goal now says where to go and why: tap a place on the map to send the rover for a rock; rocks from the old river delta may hold signs of ancient life (new fact card, source: NASA Science, "Two Perseverance Sampling Locations in Jezero's Delta"). Mission Control says "Go to the gold star!".
 - **Longer flights:** the liftoff now flies for about 5 s, and the trip to Mars is about 15 s (3 s leaving Earth, the stowaway, then 5 s of the long curve with the months flipping).
 - `src/game/nav.css` and `src/game/speech.ts` are no longer used and can be deleted.
+
+## Phase 9: Junior Astronaut Test and the last shot
+
+- After the crowning there is an optional **Junior Astronaut Test** (`src/result/JuniorTest.tsx`): the Commander offers 3 quick questions. Each uses a fact the player already met, shown with its source. Wrong answers just show the right one, nobody loses points. Finishing adds a "Junior Astronaut ★★☆" chip on the result screen. It is a game badge, not a real NASA program. It can be skipped.
+- Flow: crown, test, result. The dev URL is `?scene=test`.
+
+## Phase 9b: rover science missions, arrows only in story scenes
+
+- **No more gold-star bonus.** Each game Mission Control asks for one kind of rock, with the real NASA reason
+  (`MISSIONS` in `src/rover/sites.ts`, picked without repeats; dev `&rock=floor|foot|top`):
+  - LAVA rock (crater floor): its crystals work like a clock, so it tells when the lake was there. Source: NASA Science, Perseverance science highlights.
+  - LAKE MUD rock (delta foot): mud from a drying lake traps clues; Wildcat Ridge had the most organic matter of the mission. Source: NASA, Sept 15, 2022.
+  - RIVER SAND rock (delta top): sand and rock bits the river carried from far outside the crater (Skinner Ridge). Source: NASA, Sept 15, 2022.
+- The map no longer marks the right place. Each site shows its rock type in yellow, and the player matches it to the request.
+  The needed rock is worth +2 (MISSION_POINTS, same value as the old bonus, so the balance is unchanged). Any other rock says
+  "Good find, but the team still needs …", so a wrong pick still teaches.
+- The Junior Astronaut Test's first question is now "Which Mars rock is best at keeping clues of ancient life?" (lake mud).
+- The final grass shot was removed.
+- **◂ ▸ icons only appear in story scenes** (prologue, cruise, landing, the night's story notes). Scenes where the player
+  moves on by making a choice (greenhouse, garage, rover, storm, pipes puzzle, tablet, crowning) have no icons. Exception: the hub's first-visit story notes ("Two jobs today…", "The plants need water…") keep ◂ ▸, because they are read-along; the notes after you pick a room have none.

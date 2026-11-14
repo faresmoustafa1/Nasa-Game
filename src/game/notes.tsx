@@ -8,6 +8,7 @@
 //   fact   taped paper    a SPACE FACT (always give a `source`)
 //   radio  green screen   a message from Mission Control (used from the rover scene on)
 //
+
 // List every fact's `source` on the Data Sources screen.
 
 export type SceneNote = {
@@ -91,15 +92,21 @@ export function NavIcons({ nav, className = "gnote__nav" }: { nav: NoteNav; clas
   );
 }
 
-/** Draws whichever note is active at second `t`. Drop it on top of a scene. Pass `nav` for ◂ ▸ icons. */
-export function NoteLayer({ notes, t, nav }: { notes: SceneNote[]; t: number; nav?: NoteNav }) {
-  const index = notes.findIndex((n) => t >= n.from && t < n.to);
-  const note = index >= 0 ? notes[index] : undefined;
+const noteId = (n: SceneNote) => `${n.from}|${n.title ?? ""}|${n.text}`;
 
+/**
+ * Draws whichever note is active at second `t`. Drop it on top of a scene.
+ *
+ * Story scenes pass `nav`: the box gets ◂ ▸ icons that jump the scene clock to the next / last note.
+ * Decision scenes (hub, greenhouse, garage, rover, storm, the pipes puzzle, the tablet) pass no `nav`:
+ * no icons, because the player moves on by making the choice.
+ */
+export function NoteLayer({ notes, t, nav }: { notes: SceneNote[]; t: number; nav?: NoteNav }) {
+  const note = notes.find((n) => t >= n.from && t < n.to);
   return (
     <>
       <svg className="ares__scene ares__notes" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        {note && <SceneNoteView key={index} note={note} leaving={t >= note.to - 0.4} nav={nav} />}
+        {note && <SceneNoteView key={noteId(note)} note={note} leaving={t >= note.to - 0.4} nav={nav} />}
       </svg>
       <p className="ares__sr-only" aria-live="polite">
         {noteSpeech(note)}

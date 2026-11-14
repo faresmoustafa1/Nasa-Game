@@ -25,8 +25,8 @@ import { useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import { JUDGE_DELAY_MIN, isJudge } from "../game/judge";
 import { earthMarsDelayMinutes } from "./delay";
-import { ADVICE_NOTE, DUST_NOTE, HINT_NOTE, INTRO_NOTE, JEZERO_FACT, WHY_FACT, OPPORTUNITY_FACT, choiceNote, rockNote, sampleNote, waitingNote } from "./notes";
-import { BASE_POS, BONUS_POINTS, SITES, rockValue, sampleCap, sampleCost } from "./sites";
+import { ADVICE_NOTE, DUST_NOTE, HINT_NOTE, INTRO_NOTE, JEZERO_FACT, OPPORTUNITY_FACT, choiceNote, missionNote, sampleNote, waitingNote } from "./notes";
+import { BASE_POS, MISSIONS, MISSION_POINTS, SITES, rockValue, sampleCap, sampleCost } from "./sites";
 import type { Site } from "./sites";
 import "./rover.css";
 
@@ -42,7 +42,7 @@ type RoverProps = {
 const CHOICE_AT = 5.8;
 const WAIT_SECONDS = 6; // the game's shortcut for the real delay
 const ADVICE_SECONDS = 4.5;
-const ROCK_SECONDS = 5.5;
+const ROCK_SECONDS = 10;
 const DRIVE_MS = 2200;
 const SAMPLE_MS = 900;
 
@@ -96,7 +96,7 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
   const pickAt = decision ? (decision.kind === "go" ? decision.at : decision.at + WAIT_SECONDS) : 0;
   const rockAt = waited ? pickAt + ADVICE_SECONDS : pickAt;
   const factsAt = rockAt + ROCK_SECONDS;
-  const bonus = SITES.find((s) => s.id === game.bonusSite) ?? SITES[0];
+  const mission = MISSIONS[game.bonusSite];
   const tired = cur.crew <= 2;
   const cap = sampleCap(first, waited);
   const gained = cur.samples - game.samples;
@@ -157,7 +157,12 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
             sampled = true;
             setCur((c) => applySample(c, cost, value));
             setDone((d) => [...d, site.id]);
-            setLast({ at: clock.current, text: special ? `The interesting rock! ★ +${value} points (+${BONUS_POINTS} bonus). Power −${cost}, Air −1.` : `Rock collected! ★ +${value} points. Power −${cost}, Air −1.` });
+            setLast({
+              at: clock.current,
+              text: special
+                ? `Yes! ${site.rock}: the rock the science team needed! ★ +${value} (+${MISSION_POINTS} for the mission). Power −${cost}, Air −1.`
+                : `Rock collected: ${site.rock}. ★ +${value}. Good find, but the team still needs ${mission.need}. Power −${cost}, Air −1.`,
+            });
             audioRef.current?.chime();
           }
         } else if (e < 2 * DRIVE_MS + SAMPLE_MS) {
@@ -171,7 +176,7 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
       };
       frame.current = requestAnimationFrame(step);
     },
-    [busy, picking, capped, done, tired, advice, cold, game.bonusSite],
+    [busy, picking, capped, done, tired, advice, cold, game.bonusSite, mission.need],
   );
 
   const finish = useCallback(() => {
@@ -187,9 +192,9 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
     if (capped) return [DUST_NOTE];
     const list: SceneNote[] = [];
     if (waited) list.push({ ...ADVICE_NOTE, from: pickAt, to: pickAt + ADVICE_SECONDS });
-    list.push(rockNote(bonus.name, rockAt, factsAt), WHY_FACT(factsAt), JEZERO_FACT(factsAt + 6.4), OPPORTUNITY_FACT(factsAt + 6.4), HINT_NOTE(factsAt + 6.4));
+    list.push(missionNote(mission, rockAt, factsAt), JEZERO_FACT(factsAt), OPPORTUNITY_FACT(factsAt), HINT_NOTE(factsAt));
     return list;
-  }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, factsAt, bonus.name]);
+  }, [last, t, capped, decision, picking, delay, waited, pickAt, rockAt, factsAt, mission]);
 
   const dust = Math.min(1, 0.12 + (picking ? gained / cap : 0) * 0.8 + (decision ? 0.08 : 0));
   const canPick = picking && busy === null && !capped;
@@ -252,7 +257,7 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
                 className={`rover__site${active ? " is-glow" : ""}${isDone ? " is-done" : ""}`}
                 role={active ? "button" : undefined}
                 tabIndex={active ? 0 : undefined}
-                aria-label={active ? `Send the rover to the ${s.name}: ${s.climb}, costs ${cost} Power and 1 Air${s.id === game.bonusSite ? `, interesting rock, ${BONUS_POINTS} bonus points` : ""}` : undefined}
+                aria-label={active ? `Send the rover to the ${s.name}: ${s.rock}, ${s.climb}, costs ${cost} Power and 1 Air` : undefined}
                 onClick={active ? () => visit(i) : undefined}
                 onKeyDown={
                   active
@@ -274,24 +279,19 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
                 ) : (
                   <path transform={`translate(${s.x} ${s.y})`} d="M-12 7 L-14 -2 L-5 -11 L7 -10 L14 -1 L10 8 Z" fill="#8a5a38" stroke="#2a1608" strokeWidth="3" strokeLinejoin="round" />
                 )}
-                {s.id === game.bonusSite && !isDone && (
-                  <g aria-hidden="true">
-                    <circle className="rover__ring rover__ring--gold" cx={s.x} cy={s.y} r="46" />
-                    <text className="rover__star" x={s.x + 68} y={s.y + 18} textAnchor="middle">
-                      ★
-                    </text>
-                  </g>
-                )}
-                <text className="rover__label" x={s.x} y={s.y - 52} textAnchor="middle">
+                <text className="rover__label" x={s.x} y={s.y - 80} textAnchor="middle">
                   {s.name}
                 </text>
+                <text className="rover__rock" x={s.x} y={s.y - 50} textAnchor="middle">
+                  {s.rock}
+                </text>
                 <text className="rover__sub" x={s.x} y={s.y + 62} textAnchor="middle">
-                  {isDone ? "collected" : s.id === game.bonusSite ? `Power −${cost} · ★ ${s.points} + ${BONUS_POINTS} bonus` : `Power −${cost} · ★ ${s.points}`}
+                  {isDone ? "collected" : `Power −${cost} · ★ ${s.points}`}
                 </text>
                 <text className="rover__sub rover__sub--small" x={s.x} y={s.y + 88} textAnchor="middle">
                   {s.climb}
                 </text>
-                <rect className="rover__hit" x={s.x - 70} y={s.y - 80} width="140" height="190" />
+                <rect className="rover__hit" x={s.x - 90} y={s.y - 110} width="180" height="220" />
               </g>
             );
           })}
@@ -343,11 +343,17 @@ export default function Rover({ game, onDone, cold = 0, sound = true }: RoverPro
 
         {picking && (
           <aside className="rover__goal" aria-label="Goal">
-            <b>GOAL: tap a place on the map to send the rover there for a rock</b>
-            <span>
-              Why? Rocks from the old river delta may hold signs of ancient life. Far places cost more Power but give more ★. Gold star:
-              +{BONUS_POINTS} bonus!
-            </span>
+            {done.includes(game.bonusSite) ? (
+              <>
+                <b>MISSION DONE ✓ You found the {mission.need}!</b>
+                <span>Collect more rocks if you have Power, or head home.</span>
+              </>
+            ) : (
+              <>
+                <b>MISSION: the science team needs {mission.need} (+{MISSION_POINTS} ★)</b>
+                <span>Find it on the map and tap it. You can collect other rocks too: far places cost more Power but give more ★.</span>
+              </>
+            )}
           </aside>
         )}
 

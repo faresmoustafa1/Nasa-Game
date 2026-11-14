@@ -91,7 +91,7 @@ export type GameState = {
   harvest: number;
   /** This game's greenhouse crop (a different real space-grown crop each game). */
   crop: CropId;
-  /** The site where Mission Control spotted an interesting rock (a different one each game, worth bonus points). */
+  /** The site with the rock the science team needs (see MISSIONS in rover/sites.ts; a different one each game). */
   bonusSite: SiteId;
   /** The storm, once it has happened. */
   storm: StormRecord | null;

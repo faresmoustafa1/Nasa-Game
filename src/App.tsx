@@ -8,6 +8,7 @@ import Night from "./hub/Night";
 import GarageTrip from "./rover/GarageTrip";
 import Storm from "./storm/Storm";
 import Crowning from "./result/Crowning";
+import JuniorTest from "./result/JuniorTest";
 import Result from "./result/Result";
 import Sources from "./result/Sources";
 import { badgeOf, scoreOf } from "./result/score";
@@ -20,9 +21,9 @@ import type { GameState, Task } from "./game/state";
 import Touchdown from "./touchdown/Touchdown";
 import "./game/game.css";
 
-type Scene = "title" | "prologue" | "cruise" | "touchdown" | "hub" | "task" | "night" | "storm" | "crown" | "end" | "sources";
+type Scene = "title" | "prologue" | "cruise" | "touchdown" | "hub" | "task" | "night" | "storm" | "crown" | "test" | "end" | "sources";
 
-const SCENES: Scene[] = ["title", "prologue", "cruise", "touchdown", "hub", "task", "night", "storm", "crown", "end", "sources"];
+const SCENES: Scene[] = ["title", "prologue", "cruise", "touchdown", "hub", "task", "night", "storm", "crown", "test", "end", "sources"];
 
 /** Dev only: ?scene=night starts there (add &at=8 to start the scene at 8 s, &done=greenhouse for "one job finished"). */
 function devParam(name: string) {
@@ -70,6 +71,8 @@ function Game() {
   const [game, setGame] = useState<GameState>(firstGame);
   /** Bumped by Restart, so even the scene you are in starts over from the beginning. */
   const [run, setRun] = useState(0);
+  /** Stars from the Junior Astronaut Test (0–3), or null if the player skipped it. */
+  const [junior, setJunior] = useState<number | null>(null);
   const [task, setTask] = useState<Task>(() => (devParam("room") === "rover" ? "rover" : "greenhouse"));
 
   /** Judge Mode: start any scene with a sensible game behind it. */
@@ -164,8 +167,20 @@ function Game() {
     }
 
     if (scene === "crown") {
-      return <Crowning badge={badgeOf(scoreOf(game).total)} onDone={() => setScene("end")} />;
+      return <Crowning badge={badgeOf(scoreOf(game).total)} onDone={() => setScene("test")} />;
     }
+
+    if (scene === "test") {
+      return (
+        <JuniorTest
+          onDone={(stars) => {
+            setJunior(stars);
+            setScene("end");
+          }}
+        />
+      );
+    }
+
 
     if (scene === "sources") {
       return <Sources onBack={() => setScene("title")} />;
@@ -175,8 +190,10 @@ function Game() {
       return (
         <Result
           game={game}
+          junior={junior}
           onAgain={() => {
             setGame(newGame());
+            setJunior(null);
             setScene("cruise");
           }}
           onTitle={() => setScene("title")}
@@ -205,6 +222,7 @@ function Game() {
           key={scene}
           onRestart={() => {
             setGame(newGame());
+            setJunior(null);
             setScene("prologue");
             setRun((r) => r + 1);
           }}

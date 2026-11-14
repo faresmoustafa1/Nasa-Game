@@ -19,11 +19,14 @@ import type { GameAudio } from "../game/gameAudio";
 import { NoteLayer } from "../game/notes";
 import type { GameState, Task, TabletFocus } from "../game/state";
 import Tablet from "../game/Tablet";
+import { backTarget, nextTarget } from "../game/sceneStops";
 import { useTimeline } from "../game/useTimeline";
 import "../game/game.css";
 import BaseArt from "./BaseArt";
 import { BOY_START_X, CREW_POS, FLOOR_Y, PERSON_SCALE, TASK_STAND_X } from "./layout";
 import { HUB_INTRO_NOTES, pickedNote, secondNote } from "./notes";
+
+const INTRO_STOPS = HUB_INTRO_NOTES.map((n) => n.from);
 import "./hub.css";
 
 type HubProps = {
@@ -44,7 +47,7 @@ export default function Hub({ game, onDone, sound = true }: HubProps) {
   const second = game.tasks.length > 0;
   const todo = (["greenhouse", "rover"] as Task[]).filter((k) => !game.tasks.includes(k));
 
-  const { t } = useTimeline({ holdAt: 13.5 });
+  const { t, seek } = useTimeline({ holdAt: 13.5 });
   const [picked, setPicked] = useState<Task | null>(null);
   const [arrived, setArrived] = useState(false);
   const [focus, setFocus] = useState<TabletFocus | null>(null);
@@ -106,6 +109,9 @@ export default function Hub({ game, onDone, sound = true }: HubProps) {
     return HUB_INTRO_NOTES;
   }, [second, picked, todo]);
 
+  // The first-visit story notes (before the player picks) are read-along, so they get ◂ ▸. Later notes follow a choice: none.
+  const introNav = !second && !picked;
+
   const boyX = picked ? TASK_STAND_X[picked] : BOY_START_X;
 
   return (
@@ -131,7 +137,11 @@ export default function Hub({ game, onDone, sound = true }: HubProps) {
           </g>
         </BaseArt>
 
-        <NoteLayer notes={notes} t={Math.max(t, second || picked ? 1 : 0)} />
+        <NoteLayer
+          notes={notes}
+          t={Math.max(t, second || picked ? 1 : 0)}
+          nav={introNav ? { onBack: () => seek(backTarget(INTRO_STOPS, t)), onNext: () => seek(nextTarget(INTRO_STOPS, t) ?? t) } : undefined}
+        />
 
         <Tablet meters={game.meters} locked={game.locked} crew={game.crew} focus={focus} onPick={pickTablet} />
 
